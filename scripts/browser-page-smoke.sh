@@ -25,7 +25,7 @@ check_redirect() {
   local slug="$1"
   local expect="$2"
   local location code
-  code=$(curl -sL -o /dev/null -w "%{http_code}" "$BASE/$slug")
+  code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/$slug")
   location=$(curl -sI "$BASE/$slug" | awk -F': ' 'tolower($1)=="location"{print $2}' | tr -d '\r')
   if [ "$code" = "302" ] || [ "$code" = "301" ]; then
     if echo "$location" | grep -q "$expect"; then
@@ -45,9 +45,11 @@ for slug in login dashboard caja clients company-verification libro-interno sche
   check_page "$slug"
 done
 
-for slug in events plates suly-ledger; do
+for slug in events plates; do
   check_redirect "$slug" "/inventory"
 done
+
+check_redirect "suly-ledger" "/libro-interno"
 
 echo "Browser smoke: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]
