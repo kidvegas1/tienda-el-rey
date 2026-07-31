@@ -23,21 +23,21 @@ if [ -n "${DATABASE_URL:-}" ] && [ -f /var/www/html/supabase/migrations/001_init
       echo "[entrypoint] Seeding Postgres schema (001_initial.sql)..."
       psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f /var/www/html/supabase/migrations/001_initial.sql
       echo "[entrypoint] Schema seed complete."
-    else
-      echo "[entrypoint] Postgres schema already present (users table found)."
-    fi
 
-    # Application migrations are additive/idempotent and safe on fresh or existing schemas.
-    for migration_path in /var/www/html/supabase/migrations/[0-9]*.sql; do
-      migration="$(basename "$migration_path")"
-      case "$migration" in
-        001_initial.sql|002_storage_buckets.sql)
-          continue
-          ;;
-      esac
-      echo "[entrypoint] Applying ${migration}..."
-      psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration_path"
-    done
+      # Fresh installs only: apply numbered migrations after initial seed.
+      for migration_path in /var/www/html/supabase/migrations/[0-9]*.sql; do
+        migration="$(basename "$migration_path")"
+        case "$migration" in
+          001_initial.sql|002_storage_buckets.sql)
+            continue
+            ;;
+        esac
+        echo "[entrypoint] Applying ${migration}..."
+        psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration_path"
+      done
+    else
+      echo "[entrypoint] Postgres schema already present (users table found); skipping migrations."
+    fi
 
     # Supabase Storage is optional; apply its bucket migration only when available.
     storage_table="$(psql "$DATABASE_URL" -tAc "SELECT to_regclass('storage.buckets') IS NOT NULL" 2>/dev/null | tr -d '[:space:]' || true)"
