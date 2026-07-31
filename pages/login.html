@@ -8,21 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <script>
-        (function () {
-            if (!location.hostname.toLowerCase().endsWith('.onrender.com')) return;
-            fetch('https://tiendarey.com/api/health', { cache: 'no-store' })
-                .then(function (res) {
-                    if (!res.ok) return;
-                    return res.json().then(function (body) {
-                        if (body && body.status === 'ok') {
-                            location.replace('https://tiendarey.com' + location.pathname + location.search + location.hash);
-                        }
-                    });
-                })
-                .catch(function () {});
-        })();
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
         @theme {
