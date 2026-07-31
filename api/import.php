@@ -6,6 +6,7 @@ if (!auth_can_import_excel()) {
 $method = get_method();
 $pdo = db();
 require_once __DIR__ . '/../includes/reconciliation.php';
+require_once __DIR__ . '/../includes/commission.php';
 
 function import_store_id(?array $data = null): int {
     $requested = null;
@@ -25,6 +26,105 @@ function parseMonthSpanish(string $m): int {
             'sep'=>9,'sept'=>9,'septiembre'=>9,'oct'=>10,'octubre'=>10,'nov'=>11,'noviembre'=>11,
             'dic'=>12,'diciembre'=>12,'eneero'=>1];
     return $map[strtolower(trim($m))] ?? (int)$m;
+}
+
+function import_viamericas_check_cashing(
+    PDO $pdo,
+    int $storeId,
+    int $userId,
+    array $rows,
+    array $importRow
+): int {
+    $checks = [];
+    foreach ($rows as $row) {
+        $status = trim((string)($row['status'] ?? ''));
+        if ($status !== '' && strcasecmp($status, 'Enviado') !== 0) continue;
+
+        $amount = abs((float)($row['amount'] ?? 0));
+        $date = trim((string)($row['transaction_date'] ?? ''));
+        $time = trim((string)($row['transaction_time'] ?? '00:00:00'));
+        $agency = strtoupper(sanitize(trim((string)($row['agency_number'] ?? ''))));
+        $reference = sanitize(trim((string)($row['reference'] ?? '')));
+        if ($amount <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || $reference === '') continue;
+        if ($agency === '' || !preg_match('/^A\d{4,}$/', $agency)) continue;
+
+        $rate = commission_rate_for_check($amount);
+        $checks[] = [
+            'agency_number' => $agency,
+            'date' => $date,
+            'time' => preg_match('/^\d{2}:\d{2}:\d{2}$/', $time) ? $time : '00:00:00',
+            'reference' => substr($reference, 0, 30),
+            'customer' => sanitize(trim((string)($row['customer_name'] ?? ''))),
+            'issuer' => sanitize(trim((string)($row['issuer'] ?? ''))),
+            'operator' => sanitize(trim((string)($row['operator'] ?? $agency))),
+            'amount' => round($amount, 2),
+            'commission' => round($amount * $rate, 2),
+            'rate' => $rate,
+        ];
+    }
+    if (!$checks) {
+        throw new RuntimeException('No valid Viamericas check-cashing rows were found');
+    }
+
+    usort($checks, static fn(array $a, array $b): int => strcmp($a['date'], $b['date']));
+    $agencyNumber = $checks[0]['agency_number'];
+    $dateFrom = $checks[0]['date'];
+    $dateTo = $checks[count($checks) - 1]['date'];
+
+    $dup = $pdo->prepare(
+        "SELECT id FROM barri_reports
+         WHERE store_id = ? AND agency_number = ? AND report_date_from = ? AND report_date_to = ?
+           AND report_type = 'viamericas_check_cashing'
+         LIMIT 1"
+    );
+    $dup->execute([$storeId, $agencyNumber, $dateFrom, $dateTo]);
+    if ($dup->fetch()) {
+        throw new RuntimeException('This Viamericas check-cashing report has already been imported for this store and period');
+    }
+
+    $totalAmount = round(array_sum(array_column($checks, 'amount')), 2);
+    $totalCommission = round(array_sum(array_column($checks, 'commission')), 2);
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare(
+            'INSERT INTO barri_reports
+             (store_id, user_id, agency_number, agency_name, company, report_date_from, report_date_to,
+              total_transactions, total_principal, total_amount, total_agcomm, filename, original_name,
+              status, report_type)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        )->execute([
+            $storeId, $userId, $agencyNumber, 'Viamericas Check Cashing', 'Viamericas',
+            $dateFrom, $dateTo, count($checks), $totalAmount, $totalAmount, $totalCommission,
+            '', (string)($importRow['original_name'] ?? 'organization.xlsx'),
+            'processed', 'viamericas_check_cashing',
+        ]);
+        $reportId = sql_last_insert_id($pdo, 'barri_reports');
+
+        $insert = $pdo->prepare(
+            'INSERT INTO barri_transactions
+             (report_id, store_id, transaction_time, transaction_date, transaction_type,
+              reference_number, customer_name, description, operator, quantity, principal,
+              fee, tax, total, running_balance, ag_commission, variable_fee, variable_fx,
+              transaction_status)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        );
+        $seen = [];
+        foreach ($checks as $check) {
+            if (isset($seen[$check['reference']])) continue;
+            $seen[$check['reference']] = true;
+            $insert->execute([
+                $reportId, $storeId, $check['time'], $check['date'], 'cambio_cheque',
+                $check['reference'], $check['customer'] ?: 'Unknown customer',
+                $check['issuer'], $check['operator'], 1, $check['amount'],
+                0, 0, $check['amount'], 0, $check['commission'], 0, 0, 'Enviado',
+            ]);
+        }
+        $pdo->commit();
+        return count($seen);
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        throw $e;
+    }
 }
 
 if ($method === 'GET') {
@@ -61,7 +161,7 @@ if ($method === 'POST') {
         validate_required($data, ['import_id', 'sheet_mapping']);
         $importId = (int)$data['import_id'];
 
-        $impStmt = $pdo->prepare('SELECT store_id FROM excel_imports WHERE id = ?');
+        $impStmt = $pdo->prepare('SELECT store_id, user_id, filename, original_name FROM excel_imports WHERE id = ?');
         $impStmt->execute([$importId]);
         $impRow = $impStmt->fetch();
         if (!$impRow) {
@@ -88,6 +188,20 @@ if ($method === 'POST') {
         }
 
         foreach ($moduleRows as $module => $rows) {
+            if ($module === 'cambio_cheques') {
+                try {
+                    $rowsImported += import_viamericas_check_cashing(
+                        $pdo,
+                        $storeId,
+                        (int)$user['id'],
+                        is_array($rows) ? $rows : [],
+                        $impRow
+                    );
+                } catch (Throwable $e) {
+                    $errors[] = $e->getMessage();
+                }
+                continue;
+            }
             foreach ($rows as $row) {
                 try {
                     if ($module === 'caja') {
@@ -288,7 +402,12 @@ if ($method === 'POST') {
             }
         }
 
-        $pdo->prepare('UPDATE excel_imports SET status = ?, rows_imported = ?, sheet_mapping = ?, errors = ? WHERE id = ? AND store_id = ?')->execute(['completed', $rowsImported, json_encode($data['sheet_mapping']), implode("\n", $errors), $importId, $storeId]);
+        $importStatus = ($rowsImported === 0 && $errors) ? 'failed' : 'completed';
+        $pdo->prepare('UPDATE excel_imports SET status = ?, rows_imported = ?, sheet_mapping = ?, errors = ? WHERE id = ? AND store_id = ?')
+            ->execute([$importStatus, $rowsImported, json_encode($data['sheet_mapping']), implode("\n", $errors), $importId, $storeId]);
+        if ($importStatus === 'failed') {
+            json_error(implode("\n", $errors), 422);
+        }
 
         $reconVariances = [];
         if ($importedCaja) {

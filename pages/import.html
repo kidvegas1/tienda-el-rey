@@ -182,13 +182,16 @@
     <script src="assets/js/i18n.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/personal-transfer-xlsx.js"></script>
+    <script src="assets/js/check-cashing-xlsx.js"></script>
     <script>
         let parsedWorkbook = null;
         let selectedFile = null;
         let sheetMappings = {};
         let personalTransferParse = null;
+        let checkCashingParse = null;
 
         const MODULE_RULES = [
+            { module: 'cambio_cheques', keywords: ['CHEQUE ELIMINADO', 'ROUTING', 'CHECK NUMBER', 'NUMERO DE CHEQUE'] },
             { module: 'caja',       keywords: ['COMPANIA', 'ENTRADA', 'CHEQUES Y DEBITOS', 'CAJERA'] },
             { module: 'transfers',  keywords: ['REFERENCIA', 'BENEFICIARIO', 'PRINCIPAL', 'FECHA', 'TIENDA'] },
             { module: 'inventory',  keywords: ['PRODUCTO', 'QTY', 'CANTIDAD', 'SKU', 'PRECIO', 'STOCK'] },
@@ -350,6 +353,72 @@
             document.getElementById('import-actions').classList.remove('hidden');
         }
 
+        function renderCheckCashingPreview(parsed) {
+            const container = document.getElementById('sheets-section');
+            const preview = parsed.transactions.slice(0, 8);
+            sheetMappings = { [parsed.sheetName]: 'cambio_cheques' };
+            container.innerHTML = `
+                <div class="card space-y-4">
+                    <div class="flex items-start justify-between flex-wrap gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-text-primary">${App.t('import.option.cambio_cheques')}</p>
+                            <p class="text-xs text-text-muted mt-1">${escapeHtml(parsed.sheetName)} · ${App.t('import.checks_meta', { count: parsed.transactions.length, deleted: parsed.deleted_count || 0 })}</p>
+                        </div>
+                        <span class="badge badge-success">${App.t('import.auto_detected')}</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="rounded-xl bg-bg-elevated p-3">
+                            <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.personal.agency')}</p>
+                            <p class="text-sm font-semibold font-mono mt-1">${escapeHtml(parsed.agency_number)}</p>
+                        </div>
+                        <div class="rounded-xl bg-bg-elevated p-3">
+                            <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.personal.date_range')}</p>
+                            <p class="text-sm font-semibold mt-1">${escapeHtml(parsed.date_from)} → ${escapeHtml(parsed.date_to)}</p>
+                        </div>
+                        <div class="rounded-xl bg-bg-elevated p-3">
+                            <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.checks.total')}</p>
+                            <p class="text-sm font-semibold font-mono mt-1">$${fmtMoney(parsed.totals.amount)}</p>
+                        </div>
+                        <div class="rounded-xl bg-bg-elevated p-3">
+                            <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.checks.commission')}</p>
+                            <p class="text-sm font-semibold font-mono text-success mt-1">$${fmtMoney(parsed.totals.commission)}</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto mobile-cards rounded-xl border border-border">
+                        <table class="w-full text-xs">
+                            <thead><tr>
+                                <th>${App.t('col.date')}</th>
+                                <th>${App.t('import.checks.issuer')}</th>
+                                <th>${App.t('import.checks.customer')}</th>
+                                <th>${App.t('import.checks.number')}</th>
+                                <th class="text-right">${App.t('import.checks.amount')}</th>
+                                <th class="text-right">${App.t('import.checks.rate')}</th>
+                                <th class="text-right">${App.t('import.checks.commission')}</th>
+                            </tr></thead>
+                            <tbody>${preview.map(tx => `<tr>
+                                <td>${escapeHtml(tx.transaction_date)}</td>
+                                <td>${escapeHtml(tx.issuer)}</td>
+                                <td>${escapeHtml(tx.customer_name)}</td>
+                                <td class="font-mono">${escapeHtml(tx.check_number)}</td>
+                                <td class="text-right font-mono">$${fmtMoney(tx.amount)}</td>
+                                <td class="text-right font-mono">${fmtMoney(tx.commission_rate * 100)}%</td>
+                                <td class="text-right font-mono text-success">$${fmtMoney(tx.commission)}</td>
+                            </tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+            container.classList.remove('hidden');
+            const btn = document.getElementById('import-btn');
+            btn.querySelector('span').textContent = App.t('import.import_checks', { count: parsed.transactions.length });
+            document.getElementById('import-summary').textContent = App.t('import.checks.summary', {
+                count: parsed.transactions.length,
+                amount: fmtMoney(parsed.totals.amount),
+            });
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('import-actions').classList.remove('hidden');
+        }
+
         function renderSheets() {
             const container = document.getElementById('sheets-section');
             container.innerHTML = '';
@@ -390,8 +459,9 @@
                                 <option value="internal_ledger" ${detected === 'internal_ledger' ? 'selected' : ''}>${App.t('import.option.internal_ledger')}</option>
                                 <option value="accounting" ${detected === 'accounting' ? 'selected' : ''}>${App.t('import.option.accounting')}</option>
                                 <option value="transfers" ${detected === 'transfers' ? 'selected' : ''}>${App.t('import.option.transfers')}</option>
+                                <option value="cambio_cheques" ${detected === 'cambio_cheques' ? 'selected' : ''}>${App.t('import.option.cambio_cheques')}</option>
                             </select>
-                            ${detected !== 'skip' ? `<span class="badge badge-${({caja:'accent',clients:'info',inventory:'success',statistics:'info',internal_ledger:'danger',accounting:'warning',transfers:'info'})[detected] || 'info'}">${App.t('import.auto_detected')}</span>` : ''}
+                            ${detected !== 'skip' ? `<span class="badge badge-${({caja:'accent',clients:'info',inventory:'success',statistics:'info',internal_ledger:'danger',accounting:'warning',transfers:'info',cambio_cheques:'success'})[detected] || 'info'}">${App.t('import.auto_detected')}</span>` : ''}
                         </div>
                     </div>
                     <div class="overflow-x-auto mobile-cards rounded-xl border border-border">
@@ -456,8 +526,13 @@
                 try {
                     parsedWorkbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                     sheetMappings = {};
-                    personalTransferParse = PersonalTransferXlsx.detectWorkbookPersonalTransfer(parsedWorkbook, XLSX);
-                    if (personalTransferParse?.transactions?.length) {
+                    checkCashingParse = CheckCashingXlsx.detectWorkbook(parsedWorkbook, XLSX);
+                    personalTransferParse = checkCashingParse
+                        ? null
+                        : PersonalTransferXlsx.detectWorkbookPersonalTransfer(parsedWorkbook, XLSX);
+                    if (checkCashingParse?.transactions?.length) {
+                        renderCheckCashingPreview(checkCashingParse);
+                    } else if (personalTransferParse?.transactions?.length) {
                         renderPersonalTransferPreview(personalTransferParse);
                     } else {
                         personalTransferParse = null;
@@ -476,6 +551,7 @@
             parsedWorkbook = null;
             sheetMappings = {};
             personalTransferParse = null;
+            checkCashingParse = null;
             document.getElementById('file-input').value = '';
             document.getElementById('file-info').classList.add('hidden');
             document.getElementById('sheets-section').classList.add('hidden');
@@ -507,7 +583,12 @@
                 progressText.textContent = App.t('import.progress.processing');
 
                 const sheetsData = {};
-                if (personalTransferParse?.transactions?.length) {
+                if (checkCashingParse?.transactions?.length) {
+                    sheetsData[checkCashingParse.sheetName] = {
+                        module: 'cambio_cheques',
+                        rows: checkCashingParse.transactions,
+                    };
+                } else if (personalTransferParse?.transactions?.length) {
                     sheetsData[personalTransferParse.sheetName] = {
                         module: 'transfers',
                         rows: personalTransferParse.transactions,

@@ -21,6 +21,12 @@ node scripts/test-intermex-giros-enviados-pdf.mjs
 echo "== personal transfer xlsx =="
 node scripts/test-personal-transfer-xlsx.mjs
 
+echo "== viamericas check-cashing xlsx =="
+node scripts/test-viamericas-check-cashing-xlsx.mjs
+
+echo "== per-check commission =="
+php scripts/test-check-commission.php
+
 echo "== viamericas pdf parse =="
 node scripts/test-viamericas-pdf-parse.mjs
 

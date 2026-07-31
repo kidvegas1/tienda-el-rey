@@ -1,12 +1,14 @@
 <?php
 /**
- * Store commission tracker for Libro interno.
+ * Check-cashing commission tracker for Libro interno.
  *
- * Progressive (marginal) bands — every $100 at 1% earns $1:
- *   $0 – $2,000     → 1%
- *   $2,000 – $4,000 → 2%
- *   $4,000 – $7,000 → 3%
- *   $7,000+         → 4%
+ * Each individual check receives one rate based on that check's amount:
+ *   $0.01 – $2,000       → 1% of the full check
+ *   $2,000.01 – $4,000   → 2% of the full check
+ *   $4,000.01 – $7,000   → 3% of the full check
+ *   Above $7,000         → 4% of the full check
+ *
+ * Money-transfer (envío) volume is intentionally excluded.
  */
 
 function commission_tiers(): array {
@@ -25,226 +27,119 @@ function commission_on_amount(float $amount, float $rate): float {
     return round($amount * $rate, 2);
 }
 
-/**
- * @return array{
- *   volume: float,
- *   commission: float,
- *   current_rate: float,
- *   current_rate_pct: float,
- *   current_tier_label: string,
- *   next_tier: ?array,
- *   progress_pct: float,
- *   overall_progress_pct: float,
- *   per_100: float,
- *   breakdown: list<array>,
- *   tiers: list<array>,
- *   rule_summary: string
- * }
- */
-function commission_calculate(float $volume): array {
-    $volume = max(0.0, round($volume, 2));
-    $tiers = commission_tiers();
-    $breakdown = [];
-    $commission = 0.0;
-    $currentIdx = 0;
-
-    foreach ($tiers as $i => $tier) {
-        $min = (float)$tier['min'];
-        $max = $tier['max'] === null ? null : (float)$tier['max'];
-        $rate = (float)$tier['rate'];
-
-        if ($volume <= $min) {
-            $inBand = 0.0;
-        } elseif ($max === null) {
-            $inBand = round($volume - $min, 2);
-        } else {
-            $inBand = round(min($volume, $max) - $min, 2);
-        }
-        $inBand = max(0.0, $inBand);
-        $earned = commission_on_amount($inBand, $rate);
-        $commission += $earned;
-
-        // Current tier: first band that still contains volume (at boundary stay in that tier)
-        $isCurrent = false;
-        if ($max === null) {
-            $isCurrent = $volume >= $min;
-        } else {
-            $isCurrent = $volume >= $min && $volume <= $max;
-            // If volume exactly on a boundary shared with next tier, prefer the lower tier
-            if ($isCurrent && $volume === $max && isset($tiers[$i + 1])) {
-                $isCurrent = true; // 2000 counts as end of 1% band
-            }
-        }
-        // Override: volume past this max means not current
-        if ($max !== null && $volume > $max) {
-            $isCurrent = false;
-        }
-        if ($isCurrent) {
-            $currentIdx = $i;
-        }
-
-        $breakdown[] = [
-            'min' => $min,
-            'max' => $max,
-            'rate' => $rate,
-            'rate_pct' => round($rate * 100, 2),
-            'label' => (string)$tier['label'],
-            'volume_in_tier' => $inBand,
-            'commission' => $earned,
-            'active' => $inBand > 0,
-            'is_current' => false,
-        ];
-    }
-
-    if ($volume > 7000) {
-        $currentIdx = count($tiers) - 1;
-    } elseif ($volume <= 0) {
-        $currentIdx = 0;
-    } else {
-        foreach ($tiers as $i => $tier) {
-            $min = (float)$tier['min'];
-            $max = $tier['max'] === null ? null : (float)$tier['max'];
-            if ($max === null) {
-                if ($volume > $min) {
-                    $currentIdx = $i;
-                }
-            } elseif ($volume > $min && $volume <= $max) {
-                $currentIdx = $i;
-            } elseif ($volume === $min && $i === 0) {
-                $currentIdx = 0;
-            }
-        }
-        // Exactly 0 → tier 0; exactly 2000 → still tier 0; 2000.01 → tier 1
-        if ($volume > 0 && $volume <= 2000) {
-            $currentIdx = 0;
-        } elseif ($volume > 2000 && $volume <= 4000) {
-            $currentIdx = 1;
-        } elseif ($volume > 4000 && $volume <= 7000) {
-            $currentIdx = 2;
-        } elseif ($volume > 7000) {
-            $currentIdx = 3;
-        }
-    }
-
-    foreach ($breakdown as $i => &$band) {
-        $band['is_current'] = ($i === $currentIdx);
-    }
-    unset($band);
-
-    $current = $tiers[$currentIdx];
-    $currentRate = (float)$current['rate'];
-    $currentLabel = (string)$current['label'];
-
-    $nextTier = null;
-    $progressPct = 100.0;
-    if ($current['max'] !== null) {
-        $min = (float)$current['min'];
-        $max = (float)$current['max'];
-        $span = $max - $min;
-        $into = max(0.0, min($volume, $max) - $min);
-        $progressPct = $span > 0 ? min(100.0, round(($into / $span) * 100, 1)) : 0.0;
-        $next = $tiers[$currentIdx + 1] ?? null;
-        if ($next) {
-            $nextTier = [
-                'threshold' => $max,
-                'remaining' => round(max(0.0, $max - $volume), 2),
-                'rate' => (float)$next['rate'],
-                'rate_pct' => round((float)$next['rate'] * 100, 2),
-                'label' => (string)$next['label'],
-            ];
-        }
-    }
-
-    $topMarker = 7000.0;
-    $overallPct = min(100.0, round(($volume / $topMarker) * 100, 1));
-
-    return [
-        'volume' => $volume,
-        'commission' => round($commission, 2),
-        'current_rate' => $currentRate,
-        'current_rate_pct' => round($currentRate * 100, 2),
-        'current_tier_label' => $currentLabel,
-        'next_tier' => $nextTier,
-        'progress_pct' => $progressPct,
-        'overall_progress_pct' => $overallPct,
-        'per_100' => round($currentRate * 100, 2),
-        'breakdown' => $breakdown,
-        'tiers' => array_map(static function (array $t): array {
-            return [
-                'min' => $t['min'],
-                'max' => $t['max'],
-                'rate' => $t['rate'],
-                'rate_pct' => round($t['rate'] * 100, 2),
-                'label' => $t['label'],
-            ];
-        }, $tiers),
-        'rule_summary' => '1% up to $2,000 · 2% past $2,000 · 3% past $4,000 · 4% past $7,000 ($1 per $100 at 1%)',
-    ];
+function commission_rate_for_check(float $amount): float {
+    $amount = abs($amount);
+    if ($amount <= 0) return 0.0;
+    if ($amount <= 2000) return 0.01;
+    if ($amount <= 4000) return 0.02;
+    if ($amount <= 7000) return 0.03;
+    return 0.04;
 }
 
 /**
- * Volume = max(ledger owed_to_store, imported report principal) for the period.
- * Using max avoids double-counting when the same activity is logged and imported.
+ * Check-cashing volume only. Money transfers and generic ledger volume are excluded.
+ * Every returned amount represents one check and is priced independently.
  */
 function commission_volume_for_period(PDO $pdo, ?int $storeId, string $dateFrom, string $dateTo, ?string $employeeName = null): array {
-    $storeSql = store_filter_sql('store_id', $storeId);
     $params = [$dateFrom, $dateTo];
+    $sql = "SELECT ABS(principal) AS check_amount
+        FROM barri_transactions
+        WHERE transaction_date >= ? AND transaction_date <= ?
+          AND LOWER(REPLACE(transaction_type, ' ', '_')) IN ('cambio_cheque', 'cambio_de_cheques', 'check_cashing')";
     if ($storeId) {
+        $sql .= ' AND store_id = ?';
         $params[] = $storeId;
     }
-
-    $ledgerSql = "SELECT COALESCE(SUM(owed_to_store),0) AS volume, COUNT(*) AS entry_count
-        FROM internal_ledger
-        WHERE entry_date >= ? AND entry_date <= ?" . $storeSql;
-    if ($employeeName) {
-        $ledgerSql .= ' AND employee_name = ?';
-        $params[] = $employeeName;
-    }
-    $stmt = $pdo->prepare($ledgerSql);
+    $sql .= ' AND principal <> 0 ORDER BY principal';
+    $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    $ledger = $stmt->fetch() ?: ['volume' => 0, 'entry_count' => 0];
-    $ledgerVolume = round((float)($ledger['volume'] ?? 0), 2);
+    $amounts = array_values(array_filter(
+        array_map(static fn(array $row): float => round(abs((float)$row['check_amount']), 2), $stmt->fetchAll()),
+        static fn(float $amount): bool => $amount > 0
+    ));
 
-    $barriVolume = 0.0;
-    $barriCount = 0;
-    try {
-        $barriParams = [$dateFrom, $dateTo];
-        $barriSql = "SELECT COALESCE(SUM(principal),0) AS volume, COUNT(*) AS txn_count
-            FROM barri_transactions
-            WHERE transaction_date >= ? AND transaction_date <= ?" . store_filter_sql('store_id', $storeId);
-        if ($storeId) {
-            $barriParams[] = $storeId;
-        }
-        $bstmt = $pdo->prepare($barriSql);
-        $bstmt->execute($barriParams);
-        $barri = $bstmt->fetch() ?: ['volume' => 0, 'txn_count' => 0];
-        $barriVolume = round((float)($barri['volume'] ?? 0), 2);
-        $barriCount = (int)($barri['txn_count'] ?? 0);
-    } catch (Throwable $e) {
-        // ignore missing table
-    }
+    return [
+        'amounts' => $amounts,
+        'volume' => round(array_sum($amounts), 2),
+        'check_count' => count($amounts),
+        'largest_check' => $amounts ? max($amounts) : 0.0,
+        'average_check' => $amounts ? round(array_sum($amounts) / count($amounts), 2) : 0.0,
+        'ledger_volume' => 0.0,
+        'ledger_entries' => 0,
+        'report_volume' => round(array_sum($amounts), 2),
+        'report_transactions' => count($amounts),
+        'source' => $amounts ? 'check_reports' : 'none',
+        'date_from' => $dateFrom,
+        'date_to' => $dateTo,
+    ];
+}
 
-    $volume = max($ledgerVolume, $barriVolume);
-    $source = 'none';
-    if ($ledgerVolume > 0 && $barriVolume > 0) {
-        $source = abs($ledgerVolume - $barriVolume) < 0.01
-            ? 'both'
-            : ($ledgerVolume >= $barriVolume ? 'ledger' : 'reports');
-    } elseif ($ledgerVolume > 0) {
-        $source = 'ledger';
-    } elseif ($barriVolume > 0) {
-        $source = 'reports';
+function commission_calculate_checks(array $amounts): array {
+    $tiers = commission_tiers();
+    $breakdown = array_map(static function (array $tier): array {
+        return [
+            'min' => (float)$tier['min'],
+            'max' => $tier['max'] === null ? null : (float)$tier['max'],
+            'rate' => (float)$tier['rate'],
+            'rate_pct' => round((float)$tier['rate'] * 100, 2),
+            'label' => (string)$tier['label'],
+            'volume_in_tier' => 0.0,
+            'commission' => 0.0,
+            'check_count' => 0,
+            'active' => false,
+            'is_current' => false,
+        ];
+    }, $tiers);
+
+    $volume = 0.0;
+    $commission = 0.0;
+    foreach ($amounts as $rawAmount) {
+        $amount = round(abs((float)$rawAmount), 2);
+        if ($amount <= 0) continue;
+        $rate = commission_rate_for_check($amount);
+        $tierIndex = $rate === 0.01 ? 0 : ($rate === 0.02 ? 1 : ($rate === 0.03 ? 2 : 3));
+        $earned = commission_on_amount($amount, $rate);
+        $volume += $amount;
+        $commission += $earned;
+        $breakdown[$tierIndex]['volume_in_tier'] += $amount;
+        $breakdown[$tierIndex]['commission'] += $earned;
+        $breakdown[$tierIndex]['check_count']++;
+        $breakdown[$tierIndex]['active'] = true;
     }
+    foreach ($breakdown as &$band) {
+        $band['volume_in_tier'] = round($band['volume_in_tier'], 2);
+        $band['commission'] = round($band['commission'], 2);
+    }
+    unset($band);
+
+    $volume = round($volume, 2);
+    $commission = round($commission, 2);
+    $effectiveRate = $volume > 0 ? $commission / $volume : 0.0;
+    $checkCount = count(array_filter($amounts, static fn($a): bool => abs((float)$a) > 0));
 
     return [
         'volume' => $volume,
-        'ledger_volume' => $ledgerVolume,
-        'ledger_entries' => (int)($ledger['entry_count'] ?? 0),
-        'report_volume' => $barriVolume,
-        'report_transactions' => $barriCount,
-        'source' => $source,
-        'date_from' => $dateFrom,
-        'date_to' => $dateTo,
+        'commission' => $commission,
+        'current_rate' => $effectiveRate,
+        'current_rate_pct' => round($effectiveRate * 100, 2),
+        'current_tier_label' => number_format($effectiveRate * 100, 2) . '%',
+        'next_tier' => null,
+        'progress_pct' => 0.0,
+        'overall_progress_pct' => 0.0,
+        'per_100' => round($effectiveRate * 100, 2),
+        'breakdown' => $breakdown,
+        'tiers' => array_map(static function (array $tier): array {
+            return [
+                'min' => $tier['min'],
+                'max' => $tier['max'],
+                'rate' => $tier['rate'],
+                'rate_pct' => round($tier['rate'] * 100, 2),
+                'label' => $tier['label'],
+            ];
+        }, $tiers),
+        'check_count' => $checkCount,
+        'calculation_method' => 'per_check',
+        'rule_summary' => 'Each check is priced independently: up to $2,000 at 1%; $2,000.01–$4,000 at 2%; $4,000.01–$7,000 at 3%; above $7,000 at 4%.',
     ];
 }
 
@@ -253,6 +148,7 @@ function commission_tracker_payload(PDO $pdo, ?int $storeId, ?string $dateFrom =
     $from = $dateFrom ?: $now->format('Y-m-01');
     $to = $dateTo ?: $now->format('Y-m-d');
     $vol = commission_volume_for_period($pdo, $storeId, $from, $to, $employeeName);
-    $calc = commission_calculate((float)$vol['volume']);
+    $calc = commission_calculate_checks($vol['amounts']);
+    unset($vol['amounts']);
     return array_merge($calc, $vol);
 }
