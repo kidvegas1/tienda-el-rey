@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title">
+  <title id="title">Paisaje ilustrado de El Salvador</title>
+  <rect width="640" height="480" fill="#e7f7fb"/>
+  <circle cx="115" cy="100" r="54" fill="#e9b75f"/>
+  <path d="M0 325c91-42 153-53 214-35l126-179 158 217c40-13 88-16 142-5v157H0Z" fill="#85c5d8"/>
+  <path d="m251 237 89-126 53 73-33-18-24 25-27-20Z" fill="#f8fbfa"/>
+  <path d="M0 353c111-51 219-30 310 36 86 62 191 49 330-29v120H0Z" fill="#5d9a70"/>
+  <path d="M0 411c137-27 251-11 342 48 103-46 202-53 298-22v43H0Z" fill="#397b5a"/>
+  <path d="M487 353v79m-27-55c26 0 43-17 43-43-27 0-43 16-43 43Zm27 12c-26 0-42-16-42-42 26 0 42 16 42 42Z" fill="#704633"/>
+</svg>

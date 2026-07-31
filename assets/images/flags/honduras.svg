@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 24" role="img" aria-label="Bandera de Honduras">
+  <rect width="36" height="24" fill="#0073CF"/>
+  <rect y="8" width="36" height="8" fill="#fff"/>
+  <g fill="#0073CF">
+    <circle cx="18" cy="12" r="1.05"/>
+    <circle cx="14.2" cy="10.4" r=".85"/>
+    <circle cx="21.8" cy="10.4" r=".85"/>
+    <circle cx="14.2" cy="13.6" r=".85"/>
+    <circle cx="21.8" cy="13.6" r=".85"/>
+  </g>
+</svg>

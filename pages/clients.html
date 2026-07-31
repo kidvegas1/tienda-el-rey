@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css?v=20260714c">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div><h1 class="text-sm font-bold text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="nav.clients">Clients</p></div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.clients.heading">Clients</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto flex-wrap">
+                <div class="relative w-full sm:w-auto">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="search-input" class="input py-2 pl-9 pr-4 text-sm w-full sm:w-80" data-i18n-placeholder="clients.search_placeholder" placeholder="Search clients...">
+                </div>
+                <button id="fincen-filter-btn" class="btn-secondary border-danger/20 text-danger hover:bg-danger/5" data-i18n-title="clients.fincen_filter_btn_title" title="Show FinCEN senders at or above the global limit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span id="fincen-filter-label" data-i18n="clients.fincen">FinCEN</span>
+                </button>
+                <select id="sort-select" class="input py-2 px-3 text-sm w-44">
+                    <option value="name" data-i18n="clients.sort.name">Sort: Name A-Z</option>
+                    <option value="top_sender" data-i18n="clients.sort.top_sender">Sort: Top Sender</option>
+                    <option value="month_usage" data-i18n="clients.sort.month_usage">Sort: Period Usage</option>
+                    <option value="recent" data-i18n="clients.sort.recent">Sort: Most Recent</option>
+                    <option value="limit" data-i18n="clients.sort.limit">Sort: Highest Limit</option>
+                    <option value="fincen" data-i18n="clients.sort.fincen">Sort: FinCEN Amount</option>
+                </select>
+                <button id="other-services-btn" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+                    <span data-i18n="clients.other_services">Otros servicios</span>
+                </button>
+                <button id="records-by-name-btn" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><circle cx="10" cy="13" r="2"/><path d="M14 17c0-1.1-.9-2-2-2h-4a2 2 0 0 0-2 2"/></svg>
+                    <span data-i18n="clients.records_by_name">Records by Name</span>
+                </button>
+                <button id="add-client-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="clients.add_client">Add Client</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8">
+            <!-- Client List -->
+            <div id="client-list-view">
+                <div class="table-container mobile-cards">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="common.name">Name</th>
+                                <th data-i18n="common.phone">Phone</th>
+                                <th id="usage-column-label" data-i18n="clients.col.period_usage">Period Usage</th>
+                                <th data-i18n="clients.col.total_sent">Total Sent</th>
+                                <th data-i18n="clients.col.transfers">Transfers</th>
+                                <th class="align-top min-w-[130px]">
+                                    <div class="flex flex-col gap-1.5" onclick="event.stopPropagation()">
+                                        <span data-i18n="clients.col.fincen_limit">FinCEN Limit</span>
+                                        <select id="fincen-period-select" class="input text-[11px] py-1 px-2 w-full" data-i18n-title="clients.fincen_period_select_title" title="Period to measure sender volume against the limit">
+                                            <option value="month" data-i18n="clients.fincen_period.month">This Calendar Month</option>
+                                            <option value="previous_month" data-i18n="clients.fincen_period.previous_month">Previous Calendar Month</option>
+                                            <option value="3months" data-i18n="clients.fincen_period.3months">Last 3 Calendar Months</option>
+                                            <option value="6months" data-i18n="clients.fincen_period.6months">Last 6 Calendar Months</option>
+                                            <option value="12months" data-i18n="clients.fincen_period.12months">Last 12 Calendar Months</option>
+                                            <option value="lifetime" data-i18n="clients.fincen_period.lifetime">Lifetime Total</option>
+                                        </select>
+                                        <p id="fincen-period-range" class="text-[10px] text-text-muted leading-tight font-mono"></p>
+                                        <div class="flex items-center gap-0.5">
+                                            <span class="text-text-muted text-xs">$</span>
+                                            <input type="number"
+                                                id="global-fincen-limit"
+                                                class="input font-mono text-xs py-1 px-2 w-[5.5rem] border-danger/30 focus:border-danger"
+                                                min="0"
+                                                step="100"
+                                                value="2500"
+                                                data-i18n-title="clients.global_fincen_limit_title"
+                                                title="Global FinCEN limit for the selected period">
+                                        </div>
+                                    </div>
+                                </th>
+                                <th data-i18n="common.status">Status</th>
+                                <th data-i18n="common.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-tbody">
+                            <tr><td colspan="8" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex items-center justify-between mt-4" id="pagination"></div>
+            </div>
+
+            <!-- Client Detail -->
+            <div id="client-detail" class="hidden space-y-6">
+                <button id="back-to-clients" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    <span data-i18n="clients.back_to_clients">Back to Clients</span>
+                </button>
+
+                <div id="service-bucket-banner" class="finance-side-banner hidden mb-4">
+                    <p class="text-sm font-semibold finance-side-text" data-i18n="clients.other_services.banner_title">This is a Money Order service ledger — not a FinCEN client</p>
+                    <p class="text-xs mt-1 opacity-90" data-i18n="clients.other_services.banner_hint">Viamericas PDFs do not include payer names for Money Orders. Use Otros servicios for the full ledger.</p>
+                    <button type="button" id="service-bucket-open-ledger" class="btn-secondary text-xs mt-2" data-i18n="clients.other_services">Otros servicios</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Client Info -->
+                    <div class="card lg:col-span-1 space-y-4">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center text-white font-bold text-lg" id="client-avatar"></div>
+                            <div>
+                                <h3 class="text-lg font-bold" id="client-name"></h3>
+                                <p class="text-xs text-text-muted" id="client-code"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="common.phone">Phone</span><span id="client-phone"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.total_sent">Total Sent</span><span class="font-mono tabular-nums" id="client-total-sent"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.transfers">Transfers</span><span class="font-mono tabular-nums" id="client-transfer-count"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.detail.income_verified">Income Verified</span><span id="client-verified"></span></div>
+                            <div id="client-income-doc-row" class="hidden flex justify-between"><span class="text-text-muted" data-i18n="clients.detail.income_doc">Income Doc</span><a id="client-income-doc-link" href="#" target="_blank" class="text-accent text-xs hover:underline" data-i18n="clients.detail.view_document">View Document</a></div>
+                        </div>
+                        <div class="pt-4 border-t border-border">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="clients.detail.monthly_limit">Monthly Limit</span>
+                                <span class="text-sm font-mono tabular-nums" id="client-usage-text"></span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="client-progress" style="width:0%"></div>
+                            </div>
+                            <p class="text-xs text-text-muted mt-1" id="client-remaining"></p>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button id="edit-client-btn" class="btn-secondary flex-1 justify-center text-xs" data-i18n="action.edit">Edit</button>
+                            <button id="verify-income-btn" class="btn-primary flex-1 justify-center text-xs" data-i18n="clients.verify_income">Verify Income</button>
+                        </div>
+                    </div>
+
+                    <!-- Transfers -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="card" id="company-breakdown-card">
+                            <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3" data-i18n="clients.company_breakdown">Money by Company</h4>
+                            <div class="space-y-2" id="company-breakdown"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="clients.transfer_history">Transfer History</h3>
+                            <button id="add-transfer-btn" class="btn-primary text-xs py-1.5 px-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                <span data-i18n="clients.add_transfer">Add Transfer</span>
+                            </button>
+                        </div>
+                        <div id="transfers-list" class="space-y-2 max-h-[min(70vh,40rem)] overflow-y-auto pr-1"></div>
+
+                        <!-- Monthly Summary -->
+                        <div class="card">
+                            <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3" data-i18n="clients.monthly_summary">Monthly Summary</h4>
+                            <div class="space-y-2" id="monthly-summary"></div>
+                        </div>
+
+                        <!-- Sender ID (IRS/FinCEN) -->
+                        <div class="card">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="clients.sender_id.title">Sender ID (IRS/FinCEN)</h4>
+                            </div>
+                            <div id="sender-id-section">
+                                <div id="sender-id-exists" class="hidden">
+                                    <div class="flex items-center gap-4">
+                                        <img id="sender-id-thumb" class="w-40 h-28 object-cover rounded-xl border border-border cursor-pointer hover:opacity-80 transition-opacity" data-i18n-alt="clients.sender_id.alt" alt="Sender ID" onclick="this.src && window.open(this.src, '_blank')">
+                                        <div class="space-y-2">
+                                            <span class="badge badge-success" id="sender-id-type-badge"></span>
+                                            <div><button type="button" class="btn-secondary text-xs py-1 px-2.5" onclick="document.getElementById('sender-id-upload-form').classList.toggle('hidden')" data-i18n="clients.sender_id.replace">Replace ID</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="sender-id-missing" class="hidden">
+                                    <div class="flex items-center gap-3 p-3 rounded-xl bg-[oklch(0.8_0.15_85_/_0.08)] border border-[oklch(0.8_0.15_85_/_0.15)]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-warning shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                        <span class="text-sm text-warning" data-i18n="clients.sender_id.missing">No ID on file — required for IRS compliance</span>
+                                    </div>
+                                </div>
+                                <form id="sender-id-upload-form" class="mt-3 space-y-3" onsubmit="return uploadSenderId(event)">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" data-i18n="clients.sender_id.id_type">ID Type</label>
+                                            <select id="sender-id-type" class="input text-sm">
+                                                <option value="driver_license" data-i18n="clients.id_type.driver_license">Driver License</option>
+                                                <option value="passport" data-i18n="clients.id_type.passport">Passport</option>
+                                                <option value="state_id" data-i18n="clients.id_type.state_id">State ID</option>
+                                                <option value="matricula" data-i18n="clients.id_type.matricula">Matricula Consular</option>
+                                                <option value="itin" data-i18n="clients.id_type.itin">ITIN Card</option>
+                                                <option value="other" data-i18n="clients.id_type.other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" data-i18n="clients.sender_id.id_file">ID File</label>
+                                            <input type="file" id="sender-id-file" accept="image/*,.pdf" class="input text-sm py-1.5" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-primary text-xs py-1.5 px-3" data-i18n="clients.sender_id.upload">Upload ID</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Receivers / Beneficiaries -->
+                        <div class="card">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="clients.receivers.title">Receivers / Beneficiaries</h4>
+                                <button type="button" class="btn-primary text-xs py-1 px-2.5" onclick="App.openModal('receiver-modal'); document.getElementById('receiver-form').reset(); document.querySelector('#receiver-form [name=id]').value=''; document.getElementById('receiver-modal-title').textContent = App.t('clients.add_receiver');">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span data-i18n="clients.add_receiver">Add Receiver</span>
+                                </button>
+                            </div>
+                            <div id="receivers-list" class="space-y-2">
+                                <p class="text-sm text-text-muted" data-i18n="clients.loading_receivers">Loading receivers...</p>
+                            </div>
+                        </div>
+
+                        <!-- Security Alerts -->
+                        <div class="card hidden" id="security-alerts-card">
+                            <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-danger"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <span data-i18n="clients.security_alerts">Security Alerts</span>
+                            </h4>
+                            <div id="security-alerts-list" class="space-y-2"></div>
+                        </div>
+
+                        <!-- Activity Timeline -->
+                        <div class="card">
+                            <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-accent"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span data-i18n="clients.activity">Activity Timeline</span>
+                            </h4>
+                            <div id="activity-timeline" class="space-y-0"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Client Modal -->
+    <div class="modal-backdrop" id="client-modal-backdrop"></div>
+    <div class="modal-content" id="client-modal">
+        <h3 class="text-lg font-bold mb-4" id="client-modal-title" data-i18n="clients.add_client">Add Client</h3>
+        <form id="client-form" class="space-y-4">
+            <input type="hidden" name="id">
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.client_code">Client Code</label><input type="text" name="client_code" class="input" placeholder="A25506-XXXX"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.phone">Phone</label><input type="text" name="phone" class="input" data-i18n-placeholder="clients.modal.phone_placeholder" placeholder="Phone number"></div>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.full_name">Full Name</label><input type="text" name="name" class="input" required></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.monthly_limit">Monthly Limit ($)</label><input type="number" name="monthly_limit" class="input font-mono" step="0.01" value="3000"></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label><textarea name="notes" class="input" rows="2"></textarea></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('client-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add Transfer Modal -->
+    <div class="modal-backdrop" id="transfer-modal-backdrop"></div>
+    <div class="modal-content max-w-lg" id="transfer-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="clients.add_transfer">Add Transfer</h3>
+        <form id="transfer-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.date_sent">Date Sent</label><input type="datetime-local" name="date_sent" class="input" required></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.transaction_code">Transaction Code</label><input type="text" name="transaction_code" class="input"></div>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.col.beneficiary">Beneficiary</label><input type="text" name="beneficiary" class="input" required></div>
+            <div class="grid grid-cols-3 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.col.amount_usd">Amount USD</label><input type="number" name="amount_usd" step="0.01" class="input font-mono" required></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.local_amount">Local Amount</label><input type="number" name="amount_local" step="0.01" class="input font-mono"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.currency">Currency</label><input type="text" name="currency" class="input" value="MXN"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.paying_bank">Paying Bank</label><input type="text" name="paying_bank" class="input"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.company">Company</label><input type="text" name="company" class="input" data-i18n-placeholder="clients.modal.company_placeholder" placeholder="Barri, Via, etc."></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.destination_country">Destination Country</label><input type="text" name="destination_country" class="input"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.destination_city">Destination City</label><input type="text" name="destination_city" class="input"></div>
+            </div>
+            <div id="transfer-warning" class="hidden text-sm text-warning bg-[oklch(0.8_0.15_85_/_0.1)] rounded-xl px-4 py-2.5"></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('transfer-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="clients.modal.save_transfer">Save Transfer</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Verify Income Modal -->
+    <div class="modal-backdrop" id="income-modal-backdrop"></div>
+    <div class="modal-content max-w-md" id="income-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="clients.modal.verify_income_title">Verify Income & Increase Limit</h3>
+        <form id="income-form" class="space-y-4" onsubmit="return submitIncomeVerification(event)">
+            <div class="p-3 rounded-xl bg-[oklch(0.72_0.15_195_/_0.08)] border border-[oklch(0.72_0.15_195_/_0.15)]">
+                <p class="text-sm text-accent" data-i18n="clients.modal.verify_income_desc">Upload proof of income to increase this client's monthly sending limit beyond $3,000.</p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.new_monthly_limit">New Monthly Limit ($)</label>
+                <input type="number" id="income-new-limit" class="input font-mono" step="100" min="3000" value="5000" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.proof_of_income">Proof of Income Document</label>
+                <input type="file" id="income-file" accept="image/*,.pdf,.doc,.docx" class="input text-sm py-1.5" required>
+                <p class="text-xs text-text-muted mt-1" data-i18n="clients.modal.proof_hint">Tax return, pay stubs, bank statements, etc.</p>
+            </div>
+            <div id="income-doc-existing" class="hidden">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-bg-elevated">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-success shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span class="text-sm text-success" data-i18n="clients.modal.income_doc_exists">Income document already on file</span>
+                </div>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('income-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="clients.modal.verify_update_btn">Verify & Update Limit</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Receiver Modal -->
+    <div class="modal-backdrop" id="receiver-modal-backdrop"></div>
+    <div class="modal-content max-w-md" id="receiver-modal">
+        <h3 class="text-lg font-bold mb-4" id="receiver-modal-title" data-i18n="clients.add_receiver">Add Receiver</h3>
+        <form id="receiver-form" class="space-y-4">
+            <input type="hidden" name="id">
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.name">Name</label><input type="text" name="name" class="input" required></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.phone">Phone</label><input type="text" name="phone" class="input"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.country">Country</label><input type="text" name="destination_country" class="input"></div>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.city">City</label><input type="text" name="destination_city" class="input"></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label><textarea name="notes" class="input" rows="2"></textarea></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('receiver-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Receiver ID Upload Modal -->
+    <div class="modal-backdrop" id="receiver-id-modal-backdrop"></div>
+    <div class="modal-content max-w-sm" id="receiver-id-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="clients.modal.upload_receiver_id">Upload Receiver ID</h3>
+        <form id="receiver-id-form" class="space-y-4" onsubmit="return uploadReceiverId(event)">
+            <input type="hidden" id="recv-id-target">
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.sender_id.id_type">ID Type</label>
+                <select id="recv-id-type" class="input text-sm">
+                    <option value="passport" data-i18n="clients.id_type.passport">Passport</option>
+                    <option value="national_id" data-i18n="clients.id_type.national_id">National ID</option>
+                    <option value="other" data-i18n="clients.id_type.other">Other</option>
+                </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.sender_id.id_file">ID File</label><input type="file" id="recv-id-file" accept="image/*,.pdf" class="input text-sm py-1.5" required></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('receiver-id-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="clients.modal.upload">Upload</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Records by Name Modal -->
+    <div class="modal-backdrop" id="records-modal-backdrop"></div>
+    <div class="modal-content max-w-2xl" id="records-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="clients.records_by_name">Records by Name</h3>
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="records-search-input" class="input flex-1" data-i18n-placeholder="clients.records_search" placeholder="Search by client name…" minlength="2">
+            <button id="records-search-btn" class="btn-primary text-sm" data-i18n="clients.records_search_btn">Search</button>
+        </div>
+        <div id="records-results" class="space-y-2 max-h-[50vh] overflow-y-auto"></div>
+        <div class="mt-4 pt-3 border-t border-border">
+            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2" data-i18n="clients.log_request">Log Request</p>
+            <div class="flex gap-2">
+                <input type="text" id="records-requester-name" class="input flex-1 text-sm" data-i18n-placeholder="clients.log_request_name" placeholder="Requester Name">
+                <button id="records-log-request-btn" class="btn-secondary text-sm" data-i18n="clients.log_request">Log Request</button>
+            </div>
+        </div>
+        <div class="flex justify-end mt-3">
+            <button class="btn-secondary" onclick="App.closeModal('records-modal')" data-i18n="action.close">Close</button>
+        </div>
+    </div>
+
+    <!-- Client Dossier Modal -->
+    <div class="modal-backdrop" id="dossier-modal-backdrop"></div>
+    <div class="modal-content max-w-4xl max-h-[85vh] overflow-y-auto" id="dossier-modal">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold" id="dossier-modal-title" data-i18n="clients.view_full_record">Full Record</h3>
+            <div class="flex gap-2">
+                <button id="dossier-export-btn" class="btn-primary text-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="clients.export_csv">Export CSV</span>
+                </button>
+                <button class="btn-secondary text-xs" onclick="App.closeModal('dossier-modal')" data-i18n="action.close">Close</button>
+            </div>
+        </div>
+        <div id="dossier-content" class="space-y-4"></div>
+    </div>
+
+    <!-- Otros servicios / Money Orders ledger -->
+    <div class="modal-backdrop" id="other-services-modal-backdrop"></div>
+    <div class="modal-content max-w-4xl max-h-[85vh] overflow-y-auto" id="other-services-modal">
+        <div class="flex items-start justify-between gap-3 mb-4">
+            <div>
+                <h3 class="text-lg font-bold" data-i18n="clients.other_services">Otros servicios</h3>
+                <p class="text-xs text-text-muted mt-1" data-i18n="clients.other_services.hint">Money Orders without client names (Viamericas Estado de Cuenta). Not counted as FinCEN senders.</p>
+            </div>
+            <button class="btn-secondary text-xs shrink-0" onclick="App.closeModal('other-services-modal')" data-i18n="action.close">Close</button>
+        </div>
+        <div id="other-services-summary" class="finance-side-banner mb-4 text-sm"></div>
+        <div id="other-services-list" class="space-y-2"></div>
+    </div>
+
+    <script src="assets/js/i18n.js?v=20260714f"></script>
+    <script src="assets/js/app.js?v=20260714e"></script>
+    <script>
+        function escHtml(s) {
+            if (!s) return '';
+            const d = document.createElement('div');
+            d.textContent = String(s);
+            return d.innerHTML;
+        }
+
+        function i18nLabel(key, fallback) {
+            const v = App.t(key);
+            return (!v || v === key) ? fallback : v;
+        }
+
+        function transferMeta(t) {
+            const company = (t.company || t.report_company || '').trim() || i18nLabel('empty.none', '—');
+            const sourceKey = String(t.source || 'manual').toLowerCase();
+            const sourceLabel = App.t('clients.source.' + sourceKey);
+            const sourceText = sourceLabel !== ('clients.source.' + sourceKey) ? sourceLabel : (t.source || 'manual');
+            const reportName = (t.report_original_name || t.report_filename || '').trim();
+            const reportType = (t.report_type || '').trim();
+            const reportRef = (t.report_reference || t.transaction_code || '').trim();
+            const dest = [t.destination_country, t.destination_city].filter(Boolean).join(' · ');
+            let reportHtml;
+            if (t.report_id && reportName) {
+                const period = (t.report_date_from && t.report_date_to)
+                    ? `${App.formatDate(t.report_date_from)} – ${App.formatDate(t.report_date_to)}`
+                    : '';
+                reportHtml = `
+                    <a href="reports?report_id=${encodeURIComponent(t.report_id)}" class="text-accent hover:underline font-medium break-words" title="${escHtml(reportName)}">${escHtml(reportName)}</a>
+                    <span class="block text-[11px] text-text-muted mt-0.5">
+                        ${reportType ? escHtml(reportType.toUpperCase()) : ''}${reportType && period ? ' · ' : ''}${period ? escHtml(period) : ''}
+                        ${reportRef ? `<br>${i18nLabel('clients.txn.meta_ref', 'Ref')}: ${escHtml(reportRef)}` : ''}
+                    </span>`;
+            } else if (sourceKey === 'manual') {
+                reportHtml = `<span class="text-text-muted">${i18nLabel('clients.origin.manual', 'Manual')}</span>`;
+            } else if (sourceKey === 'excel_import') {
+                reportHtml = `<span class="text-text-muted">${i18nLabel('clients.origin.excel', 'Excel')}${reportRef ? ' · ' + escHtml(reportRef) : ''}</span>`;
+            } else {
+                reportHtml = `<span class="text-text-muted">${escHtml(sourceText)}${reportRef ? ' · ' + escHtml(reportRef) : ''}</span>`;
+            }
+            return { company, sourceText, reportHtml, dest, reportRef };
+        }
+
+        function renderTransferCard(t) {
+            const m = transferMeta(t);
+            const bank = (t.paying_bank || '').trim();
+            const fee = parseFloat(t.fee || 0);
+            const typeRaw = String(t.transaction_type || '').toLowerCase().replace(/\s+/g, '_');
+            const isMo = typeRaw === 'money_order';
+            const typeBadge = isMo
+                ? `<span class="badge badge-side-finances text-[10px]">${i18nLabel('reports.type.money_order', 'Money Order')}</span>`
+                : '';
+            const refLine = m.reportRef
+                ? `<p class="font-mono text-xs text-text-secondary mt-0.5">${i18nLabel('clients.txn.meta_ref', 'Ref')}: <span class="font-semibold text-text-primary">${escHtml(m.reportRef)}</span></p>`
+                : '';
+            const feeLine = fee > 0
+                ? `<p class="text-[11px] text-text-muted font-mono">${i18nLabel('clients.txn.meta_fee', 'Fee')}: ${App.money(fee)}</p>`
+                : '';
+            return `
+            <article class="rounded-xl border border-border bg-bg-surface p-3.5 sm:p-4 hover:border-accent/30 transition-colors ${isMo ? 'finance-side-row' : ''}">
+                <div class="flex flex-wrap items-start justify-between gap-2 gap-y-1">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="text-xs text-text-muted">${App.formatDate(t.date_sent)}</p>
+                            ${typeBadge}
+                        </div>
+                        <p class="font-medium text-sm text-text-primary truncate" title="${escHtml(t.beneficiary || '')}">${escHtml(t.beneficiary || i18nLabel('empty.none', '—'))}</p>
+                        ${refLine}
+                    </div>
+                    <div class="text-right shrink-0">
+                        <p class="font-mono tabular-nums font-semibold text-base">${App.money(t.amount_usd)}</p>
+                        ${feeLine}
+                        <span class="badge badge-info text-[10px] uppercase mt-1">${escHtml(m.company)}</span>
+                    </div>
+                </div>
+                <dl class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div>
+                        <dt class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_source', 'Fuente')}</dt>
+                        <dd class="text-text-secondary">${escHtml(m.sourceText)}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_report', 'Reporte')}</dt>
+                        <dd class="break-words">${m.reportHtml}</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_destination', 'Destino')}</dt>
+                        <dd class="text-text-secondary break-words">${escHtml(m.dest || i18nLabel('empty.none', '—'))}${bank ? ` · ${escHtml(bank)}` : ''}</dd>
+                    </div>
+                </dl>
+            </article>`;
+        }
+
+        function renderOtherServiceCard(t) {
+            const ref = (t.reference_number || '').trim() || '—';
+            const company = (t.report_company || '').trim() || '—';
+            const reportName = (t.report_original_name || t.report_filename || '').trim();
+            const fee = parseFloat(t.fee || 0);
+            const reportLink = t.report_id && reportName
+                ? `<a href="reports?report_id=${encodeURIComponent(t.report_id)}" class="text-accent hover:underline break-words">${escHtml(reportName)}</a>`
+                : escHtml(reportName || '—');
+            return `
+            <article class="rounded-xl border border-border finance-side-row p-3.5">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="text-xs text-text-muted">${App.formatDate(t.transaction_date)}</p>
+                            <span class="badge badge-side-finances text-[10px]">${i18nLabel('reports.type.money_order', 'Money Order')}</span>
+                        </div>
+                        <p class="font-mono text-sm font-semibold mt-0.5">${i18nLabel('clients.txn.meta_ref', 'Ref')}: ${escHtml(ref)}</p>
+                        <p class="text-xs text-text-muted mt-1">${escHtml(t.store_name || '')}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <p class="font-mono tabular-nums font-semibold text-base">${App.money(t.principal)}</p>
+                        ${fee > 0 ? `<p class="text-[11px] text-text-muted font-mono">${i18nLabel('clients.txn.meta_fee', 'Fee')}: ${App.money(fee)}</p>` : ''}
+                        <span class="badge badge-info text-[10px] uppercase mt-1">${escHtml(company)}</span>
+                    </div>
+                </div>
+                <p class="text-sm mt-2"><span class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_report', 'Reporte')}</span><br>${reportLink}</p>
+            </article>`;
+        }
+
+        async function openOtherServices() {
+            const summary = document.getElementById('other-services-summary');
+            const list = document.getElementById('other-services-list');
+            summary.innerHTML = `<span class="text-text-muted">${App.t('common.loading') || 'Loading…'}</span>`;
+            list.innerHTML = '';
+            App.openModal('other-services-modal');
+            try {
+                const res = await App.api('GET', '/api/clients?action=other_services&limit=200');
+                const shown = res.shown || (res.transactions || []).length;
+                const total = res.total || shown;
+                summary.innerHTML = `
+                    <p class="font-semibold finance-side-text">${i18nLabel('clients.other_services', 'Otros servicios')}</p>
+                    <p class="mt-1">${i18nLabel('clients.other_services.summary', 'Showing {shown} of {total} · Principal {principal} · Fees {fees}')
+                        .replace('{shown}', shown)
+                        .replace('{total}', total)
+                        .replace('{principal}', App.money(res.sum_principal || 0))
+                        .replace('{fees}', App.money(res.sum_fees || 0))}</p>
+                    <p class="text-xs mt-1 opacity-90">${escHtml(res.note || i18nLabel('clients.other_services.hint', ''))}</p>`;
+                if (!(res.transactions || []).length) {
+                    list.innerHTML = `<p class="text-sm text-text-muted py-6 text-center">${i18nLabel('clients.other_services.empty', 'No nameless money orders found')}</p>`;
+                } else {
+                    list.innerHTML = res.transactions.map(renderOtherServiceCard).join('');
+                }
+            } catch (err) {
+                summary.innerHTML = `<p class="text-danger text-sm">${escHtml(err.message)}</p>`;
+            }
+        }
+
+        let currentClientId = null;
+        let currentPage = 1;
+        let fincenFilterActive = false;
+        let globalFincenLimit = 2500;
+        let globalLimitSaveState = 2500;
+        let fincenPeriod = 'month';
+        let fincenPeriodLabel = '';
+        let fincenPeriodRange = '';
+        let fincenPeriodSaveState = 'month';
+        let lastClientsResponse = null;
+        let persistGlobalLimitTimer = null;
+        let reloadClientsTimer = null;
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            applyClientsAttrI18n();
+
+            // Deep-link from Reports Center / bookmarks: /clients?client_id=123 or ?id=123
+            const deepLinkId = parseInt(
+                new URLSearchParams(window.location.search).get('client_id')
+                || new URLSearchParams(window.location.search).get('id')
+                || '',
+                10
+            );
+            if (Number.isFinite(deepLinkId) && deepLinkId > 0) {
+                await openClient(deepLinkId, { fromDeepLink: true });
+            } else {
+                loadClients();
+            }
+
+            window.addEventListener('popstate', () => {
+                const id = parseInt(new URLSearchParams(window.location.search).get('client_id') || '', 10);
+                if (Number.isFinite(id) && id > 0) {
+                    openClient(id, { skipHistory: true });
+                } else if (currentClientId) {
+                    document.getElementById('client-detail').classList.add('hidden');
+                    document.getElementById('client-list-view').classList.remove('hidden');
+                    currentClientId = null;
+                    loadClients();
+                }
+            });
+
+            document.addEventListener('language-changed', () => {
+                applyClientsAttrI18n();
+                if (currentClientId) loadClientDetail(currentClientId);
+                else loadClients();
+            });
+
+            document.getElementById('search-input').addEventListener('input', App.debounce(() => { currentPage = 1; loadClients(); }, 400));
+            document.getElementById('sort-select').addEventListener('change', () => { currentPage = 1; loadClients(); });
+
+            document.getElementById('fincen-filter-btn').addEventListener('click', () => {
+                fincenFilterActive = !fincenFilterActive;
+                currentPage = 1;
+                if (fincenFilterActive) {
+                    document.getElementById('sort-select').value = 'fincen';
+                }
+                updateFincenButtonState();
+                loadClients();
+            });
+
+            document.getElementById('global-fincen-limit').addEventListener('input', onGlobalFincenLimitInput);
+            document.getElementById('global-fincen-limit').addEventListener('change', onGlobalFincenLimitInput);
+            document.getElementById('fincen-period-select').addEventListener('change', onFincenPeriodChange);
+
+            document.getElementById('add-client-btn').addEventListener('click', () => {
+                document.getElementById('client-modal-title').textContent = App.t('clients.add_client');
+                document.getElementById('client-form').reset();
+                document.querySelector('#client-form [name=id]').value = '';
+                App.openModal('client-modal');
+            });
+
+            document.getElementById('client-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const id = fd.get('id');
+                try {
+                    await App.api('POST', '/api/clients', {
+                        action: id ? 'update' : 'create',
+                        id: id ? parseInt(id) : undefined,
+                        client_code: fd.get('client_code'),
+                        name: fd.get('name'),
+                        phone: fd.get('phone'),
+                        monthly_limit: parseFloat(fd.get('monthly_limit')) || 3000,
+                        notes: fd.get('notes'),
+                    });
+                    App.closeModal('client-modal');
+                    App.toast(id ? App.t('clients.toast.client_updated') : App.t('clients.toast.client_added'), 'success');
+                    if (currentClientId) loadClientDetail(currentClientId);
+                    else loadClients();
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+
+            document.getElementById('back-to-clients').addEventListener('click', () => {
+                document.getElementById('client-detail').classList.add('hidden');
+                document.getElementById('client-list-view').classList.remove('hidden');
+                currentClientId = null;
+                const url = new URL(window.location.href);
+                url.searchParams.delete('client_id');
+                url.searchParams.delete('id');
+                history.pushState({}, '', url.pathname + (url.search || '') + url.hash);
+                loadClients();
+            });
+
+            document.getElementById('add-transfer-btn').addEventListener('click', () => {
+                document.getElementById('transfer-form').reset();
+                document.getElementById('transfer-warning').classList.add('hidden');
+                App.openModal('transfer-modal');
+            });
+
+            document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                try {
+                    const res = await App.api('POST', '/api/clients', {
+                        action: 'add_transfer',
+                        client_id: currentClientId,
+                        transaction_code: fd.get('transaction_code'),
+                        beneficiary: fd.get('beneficiary'),
+                        date_sent: fd.get('date_sent'),
+                        amount_usd: parseFloat(fd.get('amount_usd')),
+                        amount_local: parseFloat(fd.get('amount_local')) || 0,
+                        currency: fd.get('currency'),
+                        paying_bank: fd.get('paying_bank'),
+                        company: fd.get('company'),
+                        destination_country: fd.get('destination_country'),
+                        destination_city: fd.get('destination_city'),
+                    });
+                    if (res.warning) {
+                        const w = document.getElementById('transfer-warning');
+                        w.textContent = res.warning;
+                        w.classList.remove('hidden');
+                    }
+                    App.closeModal('transfer-modal');
+                    App.toastKey('clients.toast.transfer_added', 'success');
+                    loadClientDetail(currentClientId);
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+
+            document.getElementById('edit-client-btn').addEventListener('click', () => {
+                document.getElementById('client-modal-title').textContent = App.t('clients.edit_client');
+                App.openModal('client-modal');
+            });
+
+            document.getElementById('verify-income-btn').addEventListener('click', () => {
+                document.getElementById('income-form').reset();
+                document.getElementById('income-new-limit').value = '5000';
+                document.getElementById('income-doc-existing').classList.add('hidden');
+                App.openModal('income-modal');
+            });
+
+            window.addEventListener('store-changed', loadClients);
+
+            // Records by Name
+            document.getElementById('records-by-name-btn').addEventListener('click', () => {
+                document.getElementById('records-search-input').value = '';
+                document.getElementById('records-results').innerHTML = '';
+                document.getElementById('records-requester-name').value = '';
+                App.openModal('records-modal');
+                setTimeout(() => document.getElementById('records-search-input').focus(), 100);
+            });
+            document.getElementById('other-services-btn').addEventListener('click', () => openOtherServices());
+            document.getElementById('service-bucket-open-ledger')?.addEventListener('click', () => openOtherServices());
+
+            document.getElementById('records-search-btn').addEventListener('click', searchRecordsByName);
+            document.getElementById('records-search-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); searchRecordsByName(); }
+            });
+
+            document.getElementById('records-log-request-btn').addEventListener('click', logRecordRequest);
+            document.getElementById('dossier-export-btn').addEventListener('click', exportDossierCsv);
+        })();
+
+        function applyClientsAttrI18n() {
+            document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+                const key = el.getAttribute('data-i18n-title');
+                if (key) el.title = App.t(key);
+            });
+            document.querySelectorAll('[data-i18n-alt]').forEach((el) => {
+                const key = el.getAttribute('data-i18n-alt');
+                if (key) el.alt = App.t(key);
+            });
+        }
+
+        function getFincenPeriodLabel(period) {
+            const p = period || fincenPeriod || 'month';
+            const key = 'clients.fincen_period.' + p;
+            const translated = App.t(key);
+            return translated !== key ? translated : p;
+        }
+
+        function updateFincenPeriodRange(rangeLabel, dateFrom, dateTo) {
+            const el = document.getElementById('fincen-period-range');
+            if (!el) return;
+            if (rangeLabel) {
+                fincenPeriodRange = rangeLabel;
+            } else if (dateFrom && dateTo) {
+                fincenPeriodRange = dateFrom + ' → ' + dateTo;
+            } else if (dateTo) {
+                fincenPeriodRange = '→ ' + dateTo;
+            } else {
+                fincenPeriodRange = '';
+            }
+            el.textContent = fincenPeriodRange;
+            el.title = fincenPeriodRange
+                ? App.t('clients.fincen_period_range_title', { range: fincenPeriodRange })
+                : '';
+        }
+
+        /** Changing limit/period should actually filter — otherwise users think FinCEN is broken. */
+        function ensureFincenFilterActive() {
+            if (fincenFilterActive) return;
+            fincenFilterActive = true;
+            document.getElementById('sort-select').value = 'fincen';
+            updateFincenButtonState();
+        }
+
+        function formatIdType(type) {
+            if (!type) return App.t('clients.id_type.other');
+            const key = 'clients.id_type.' + type;
+            const translated = App.t(key);
+            return translated !== key ? translated : type.replace(/_/g, ' ');
+        }
+
+        function updateFincenButtonState(count) {
+            const btn = document.getElementById('fincen-filter-btn');
+            const label = document.getElementById('fincen-filter-label');
+            if (fincenFilterActive) {
+                btn.classList.add('bg-danger/10', 'border-danger', 'ring-2', 'ring-danger/20');
+                btn.classList.remove('border-danger/20');
+                label.textContent = count != null ? App.t('clients.fincen_count', { count }) : App.t('clients.fincen');
+            } else {
+                btn.classList.remove('bg-danger/10', 'border-danger', 'ring-2', 'ring-danger/20');
+                btn.classList.add('border-danger/20');
+                label.textContent = App.t('clients.fincen');
+            }
+        }
+
+        function getLiveGlobalLimit() {
+            const input = document.getElementById('global-fincen-limit');
+            const value = parseFloat(input?.value);
+            return Number.isFinite(value) && value >= 0 ? value : globalFincenLimit;
+        }
+
+        function getLiveFincenPeriod() {
+            return document.getElementById('fincen-period-select')?.value || fincenPeriod;
+        }
+
+        function updateUsageColumnLabel(label) {
+            const el = document.getElementById('usage-column-label');
+            if (el) el.textContent = label || App.t('clients.col.period_usage');
+        }
+
+        function clientRowHtml(c, threshold) {
+            const periodUsage = parseFloat(c.period_usage ?? c.month_usage) || 0;
+            const periodLimit = threshold;
+            const pct = periodLimit > 0 ? Math.min(100, (periodUsage / periodLimit) * 100) : 0;
+            const barClass = pct >= 90 ? 'progress-fill-danger' : pct >= 70 ? 'progress-fill-warning' : 'progress-fill';
+            const totalSent = parseFloat(c.total_sent) || 0;
+            const txnCount = parseInt(c.transfer_count) || 0;
+            const isFincen = periodUsage >= threshold;
+            const atLimit = pct >= 90 && !isFincen;
+
+            return `
+            <tr class="cursor-pointer ${isFincen ? 'bg-danger/[0.03]' : ''}" data-client-id="${c.id}" onclick="openClient(${c.id})">
+                <td>
+                    <div>
+                        <p class="font-medium">${c.name}</p>
+                        <p class="text-[10px] font-mono text-text-muted">${c.client_code || ''}</p>
+                    </div>
+                </td>
+                <td class="text-sm">${c.phone || App.t('empty.none')}</td>
+                <td>
+                    <div class="w-28">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-mono tabular-nums ${isFincen ? 'text-danger font-semibold' : ''}">${App.money(periodUsage)}</span>
+                            <span class="text-text-muted">/ ${App.money(periodLimit)}</span>
+                        </div>
+                        <div class="progress-bar"><div class="${barClass}" style="width:${pct}%"></div></div>
+                    </div>
+                </td>
+                <td class="font-mono tabular-nums text-sm ${isFincen && fincenPeriod === 'lifetime' ? 'text-danger font-bold' : ''}">${App.money(totalSent)}</td>
+                <td class="font-mono tabular-nums text-sm text-text-secondary">${txnCount}</td>
+                <td onclick="event.stopPropagation()">
+                    <div class="flex items-center gap-1">
+                        <span class="text-text-muted text-xs">$</span>
+                        <input type="number"
+                            class="input font-mono text-sm py-1 px-2 w-24 client-limit-input"
+                            data-client-id="${c.id}"
+                            value="${periodLimit}"
+                            min="0"
+                            step="100"
+                            title="${App.t('clients.limit_input_title')}"
+                            onclick="event.stopPropagation()"
+                            onkeydown="event.stopPropagation()"
+                            onchange="updateClientLimit(${c.id}, this)">
+                    </div>
+                </td>
+                <td>
+                    ${c.income_verified ? `<span class="badge badge-success">${App.t('clients.badge.verified')}</span>` : `<span class="badge badge-warning">${App.t('clients.badge.standard')}</span>`}
+                    ${isFincen ? `<span class="badge badge-danger ml-1">${App.t('clients.badge.fincen')}</span>` : ''}
+                    ${atLimit ? `<span class="badge badge-warning ml-1">${App.t('clients.badge.at_limit')}</span>` : ''}
+                </td>
+                <td onclick="event.stopPropagation()"><button class="btn-secondary text-xs py-1 px-2.5" onclick="openClient(${c.id})">${App.t('common.view')}</button></td>
+            </tr>`;
+        }
+
+        function renderClientsTable(res, threshold = getLiveGlobalLimit()) {
+            const tbody = document.getElementById('clients-tbody');
+            const pag = document.getElementById('pagination');
+            globalFincenLimit = threshold;
+            fincenPeriod = res.fincen_period ?? fincenPeriod;
+            fincenPeriodLabel = getFincenPeriodLabel(fincenPeriod);
+            updateFincenPeriodRange(res.fincen_period_range, res.fincen_period_from, res.fincen_period_to);
+            updateUsageColumnLabel(
+                fincenPeriodRange
+                    ? `${fincenPeriodLabel} (${fincenPeriodRange})`
+                    : fincenPeriodLabel
+            );
+            document.getElementById('fincen-filter-btn').title = App.t('clients.fincen_filter_title', {
+                amount: '$' + Number(threshold).toLocaleString(),
+                period: fincenPeriodRange ? `${fincenPeriodLabel} · ${fincenPeriodRange}` : fincenPeriodLabel,
+            });
+
+            let clients = [...(res.clients || [])];
+            if (fincenFilterActive) {
+                updateFincenButtonState(res.total ?? clients.length);
+            }
+
+            if (!clients.length) {
+                const emptyMsg = fincenFilterActive
+                    ? App.t('clients.empty.no_fincen', {
+                        amount: '$' + Number(threshold).toLocaleString(),
+                        period: fincenPeriodLabel,
+                    })
+                    : App.t('clients.empty.no_clients');
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-text-muted py-8">${emptyMsg}</td></tr>`;
+                pag.innerHTML = `<span class="text-sm text-text-muted">${App.t('clients.pagination.zero_clients')}</span><div></div>`;
+                return;
+            }
+
+            tbody.innerHTML = clients.map((c) => clientRowHtml(c, threshold)).join('');
+
+            const countStr = Number(res.total).toLocaleString();
+            const mainLabel = fincenFilterActive
+                ? App.t('clients.pagination.label_fincen', { count: countStr })
+                : App.t('clients.pagination.label', { count: countStr });
+            const pageLabel = App.t('clients.pagination.page_of', { page: res.page, pages: res.pages });
+            const fincenExtra = fincenFilterActive
+                ? App.t('clients.pagination.fincen_detail', {
+                    amount: '$' + Number(threshold).toLocaleString(),
+                    period: fincenPeriodLabel,
+                })
+                : '';
+            pag.innerHTML = `
+                <span class="text-sm text-text-muted">${mainLabel} ${pageLabel}${fincenExtra}</span>
+                <div class="flex gap-2">
+                    <button class="btn-secondary text-xs py-1.5 px-3" ${res.page <= 1 ? 'disabled' : ''} onclick="currentPage=${res.page - 1};loadClients()">${App.t('common.prev')}</button>
+                    <button class="btn-secondary text-xs py-1.5 px-3" ${res.page >= res.pages ? 'disabled' : ''} onclick="currentPage=${res.page + 1};loadClients()">${App.t('common.next')}</button>
+                </div>`;
+        }
+
+        function applyLiveGlobalFincenLimit() {
+            if (!lastClientsResponse) return;
+            const threshold = getLiveGlobalLimit();
+            if (!Number.isFinite(threshold) || threshold < 0) return;
+
+            lastClientsResponse.clients = lastClientsResponse.clients.map((c) => ({
+                ...c,
+                monthly_limit: threshold,
+            }));
+            renderClientsTable(lastClientsResponse, threshold);
+        }
+
+        function onGlobalFincenLimitInput() {
+            ensureFincenFilterActive();
+            applyLiveGlobalFincenLimit();
+            scheduleFincenReloadAndPersist();
+        }
+
+        function onFincenPeriodChange() {
+            ensureFincenFilterActive();
+            fincenPeriod = getLiveFincenPeriod();
+            currentPage = 1;
+            scheduleFincenReloadAndPersist();
+        }
+
+        function scheduleFincenReloadAndPersist() {
+            clearTimeout(reloadClientsTimer);
+            reloadClientsTimer = setTimeout(() => loadClients({ silent: true }), 300);
+            clearTimeout(persistGlobalLimitTimer);
+            persistGlobalLimitTimer = setTimeout(persistGlobalFincenLimit, 700);
+        }
+
+        function syncFincenControlsFromResponse(res, liveThreshold) {
+            const threshold = document.activeElement?.id === 'global-fincen-limit'
+                ? liveThreshold
+                : (res.fincen_global_limit ?? res.fincen_threshold ?? liveThreshold);
+
+            globalLimitSaveState = res.fincen_global_limit ?? res.fincen_threshold ?? globalLimitSaveState;
+            const globalInput = document.getElementById('global-fincen-limit');
+            if (globalInput && document.activeElement !== globalInput) {
+                globalInput.value = threshold;
+                globalLimitSaveState = threshold;
+            }
+
+            fincenPeriod = res.fincen_period ?? fincenPeriod;
+            fincenPeriodLabel = getFincenPeriodLabel(fincenPeriod);
+            updateFincenPeriodRange(res.fincen_period_range, res.fincen_period_from, res.fincen_period_to);
+            fincenPeriodSaveState = fincenPeriod;
+            const periodSelect = document.getElementById('fincen-period-select');
+            if (periodSelect && document.activeElement !== periodSelect) {
+                periodSelect.value = fincenPeriod;
+            }
+
+            return threshold;
+        }
+
+        async function loadClients(options = {}) {
+            const search = document.getElementById('search-input').value;
+            const sort = document.getElementById('sort-select').value;
+            const liveThreshold = getLiveGlobalLimit();
+            const livePeriod = getLiveFincenPeriod();
+            const filterParam = fincenFilterActive ? '&filter=fincen' : '';
+            const thresholdParam = `&fincen_threshold=${encodeURIComponent(liveThreshold)}`;
+            const periodParam = `&fincen_period=${encodeURIComponent(livePeriod)}`;
+            try {
+                const res = await App.api('GET', `/api/clients?search=${encodeURIComponent(search)}&sort=${sort}&page=${currentPage}${filterParam}${thresholdParam}${periodParam}`);
+                const threshold = syncFincenControlsFromResponse(res, liveThreshold);
+
+                res.clients = (res.clients || []).map((c) => ({
+                    ...c,
+                    monthly_limit: threshold,
+                }));
+                lastClientsResponse = res;
+
+                if (fincenFilterActive) updateFincenButtonState(res.total);
+                renderClientsTable(res, threshold);
+            } catch (err) {
+                if (!options.silent) App.toast(err.message, 'danger');
+            }
+        }
+
+        const limitSaveState = new Map();
+
+        async function persistGlobalFincenLimit() {
+            const input = document.getElementById('global-fincen-limit');
+            const newLimit = parseFloat(input.value);
+            if (!Number.isFinite(newLimit) || newLimit < 0) {
+                App.toastKey('clients.toast.valid_fincen_limit', 'danger');
+                input.value = globalLimitSaveState;
+                applyLiveGlobalFincenLimit();
+                return;
+            }
+            const livePeriod = getLiveFincenPeriod();
+            if (newLimit === globalLimitSaveState && livePeriod === fincenPeriodSaveState) return;
+            if (input.dataset.saving === '1') return;
+
+            input.dataset.saving = '1';
+            try {
+                await App.api('POST', '/api/clients', {
+                    action: 'update_fincen_global_limit',
+                    fincen_global_limit: newLimit,
+                    fincen_period: livePeriod,
+                });
+                globalFincenLimit = newLimit;
+                globalLimitSaveState = newLimit;
+                fincenPeriod = livePeriod;
+                fincenPeriodSaveState = livePeriod;
+                if (fincenFilterActive) {
+                    currentPage = 1;
+                    await loadClients();
+                }
+            } catch (err) {
+                App.toast(err.message, 'danger');
+                input.value = globalLimitSaveState;
+                applyLiveGlobalFincenLimit();
+            } finally {
+                delete input.dataset.saving;
+            }
+        }
+
+        async function updateClientLimit(clientId, input) {
+            const newLimit = parseFloat(input.value);
+            if (!Number.isFinite(newLimit) || newLimit < 0) {
+                App.toastKey('clients.toast.valid_limit_amount', 'danger');
+                input.value = limitSaveState.get(clientId) ?? input.defaultValue;
+                return;
+            }
+            const prev = limitSaveState.get(clientId);
+            if (prev !== undefined && prev === newLimit) return;
+            if (input.dataset.saving === '1') return;
+
+            input.dataset.saving = '1';
+            try {
+                await App.api('POST', '/api/clients', {
+                    action: 'update_limit',
+                    id: clientId,
+                    monthly_limit: newLimit,
+                });
+                limitSaveState.set(clientId, newLimit);
+                App.toastKey('clients.toast.limit_updated', 'success', { amount: '$' + newLimit.toLocaleString() });
+            } catch (err) {
+                App.toast(err.message, 'danger');
+                if (prev !== undefined) input.value = prev;
+            } finally {
+                delete input.dataset.saving;
+            }
+        }
+
+        async function openClient(id, options = {}) {
+            currentClientId = id;
+            document.getElementById('client-list-view').classList.add('hidden');
+            document.getElementById('client-detail').classList.remove('hidden');
+            if (!options.skipHistory) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('client_id', String(id));
+                url.searchParams.delete('id');
+                const next = url.pathname + '?' + url.searchParams.toString() + url.hash;
+                if (options.fromDeepLink) history.replaceState({ clientId: id }, '', next);
+                else history.pushState({ clientId: id }, '', next);
+            }
+            await loadClientDetail(id);
+        }
+
+        async function loadClientDetail(id) {
+            try {
+                const res = await App.api('GET', `/api/clients?action=detail&id=${id}`);
+                const c = res.client;
+
+                document.getElementById('client-name').textContent = c.name;
+                document.getElementById('client-code').textContent = c.client_code || App.t('clients.no_code');
+                document.getElementById('client-phone').textContent = c.phone || App.t('empty.none');
+                document.getElementById('client-verified').innerHTML = c.income_verified
+                    ? `<span class="badge badge-success">${App.t('common.yes')}</span>`
+                    : `<span class="badge badge-warning">${App.t('common.no')}</span>`;
+
+                const serviceBanner = document.getElementById('service-bucket-banner');
+                if (res.is_service_bucket) {
+                    serviceBanner?.classList.remove('hidden');
+                    App.applyI18n?.();
+                } else {
+                    serviceBanner?.classList.add('hidden');
+                }
+
+                // Total sent & transfer count
+                const totalSent = res.transfers.reduce((s, t) => s + parseFloat(t.amount_usd || 0), 0);
+                const txnCount = res.transfers.length;
+                document.getElementById('client-total-sent').textContent = App.money(totalSent);
+                document.getElementById('client-total-sent').className = `font-mono tabular-nums ${totalSent >= 10000 ? 'text-danger font-bold' : ''}`;
+                document.getElementById('client-transfer-count').textContent = txnCount;
+
+                // Income doc
+                const incomeDocRow = document.getElementById('client-income-doc-row');
+                if (c.income_doc_path) {
+                    incomeDocRow.classList.remove('hidden');
+                    document.getElementById('client-income-doc-link').href = c.income_doc_path_url || ('/' + c.income_doc_path);
+                } else {
+                    incomeDocRow.classList.add('hidden');
+                }
+
+                const avatar = document.getElementById('client-avatar');
+                avatar.textContent = c.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+                const pct = res.month_limit > 0 ? Math.min(100, (res.month_usage / res.month_limit) * 100) : 0;
+                document.getElementById('client-usage-text').textContent = `${App.money(res.month_usage)} / ${App.money(res.month_limit)}`;
+                const bar = document.getElementById('client-progress');
+                bar.style.width = pct + '%';
+                bar.className = `progress-fill${pct >= 90 ? '-danger' : pct >= 70 ? '-warning' : ''}`;
+                document.getElementById('client-remaining').textContent = App.t('clients.remaining_this_month', {
+                    amount: '$' + (res.month_limit - res.month_usage).toFixed(2),
+                });
+
+                // Populate edit form
+                const form = document.getElementById('client-form');
+                form.querySelector('[name=id]').value = c.id;
+                form.querySelector('[name=client_code]').value = c.client_code || '';
+                form.querySelector('[name=name]').value = c.name;
+                form.querySelector('[name=phone]').value = c.phone || '';
+                form.querySelector('[name=monthly_limit]').value = c.monthly_limit;
+                form.querySelector('[name=notes]').value = c.notes || '';
+
+                // Company breakdown
+                const companyBox = document.getElementById('company-breakdown');
+                const companyCard = document.getElementById('company-breakdown-card');
+                const companies = res.company_breakdown || [];
+                if (!companies.length) {
+                    companyBox.innerHTML = `<p class="text-sm text-text-muted">${App.t('clients.empty.no_company_data')}</p>`;
+                } else {
+                    const maxCompany = Math.max(...companies.map(c => parseFloat(c.total) || 0), 1);
+                    companyBox.innerHTML = companies.map(row => {
+                        const total = parseFloat(row.total) || 0;
+                        const pct = Math.min(100, (total / maxCompany) * 100);
+                        return `
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-semibold w-28 truncate" title="${escHtml(row.company)}">${escHtml(row.company)}</span>
+                            <div class="flex-1 progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                            <span class="text-xs font-mono tabular-nums w-24 text-right">${App.money(total)}</span>
+                            <span class="text-xs text-text-muted w-14 text-right">${App.t('clients.txns_count', { count: row.cnt })}</span>
+                        </div>`;
+                    }).join('');
+                }
+                companyCard?.classList.remove('hidden');
+
+                // Transfers — stacked cards so company / source / report stay visible
+                const list = document.getElementById('transfers-list');
+                if (!res.transfers.length) {
+                    list.innerHTML = `<div class="card text-center text-text-muted py-6">${App.t('clients.empty.no_transfers')}</div>`;
+                } else {
+                    list.innerHTML = res.transfers.map(t => renderTransferCard(t)).join('');
+                }
+
+                // Monthly summary
+                const summary = document.getElementById('monthly-summary');
+                summary.innerHTML = (res.monthly_summary || []).map(m => {
+                    const mPct = res.month_limit > 0 ? Math.min(100, (parseFloat(m.total) / res.month_limit) * 100) : 0;
+                    return `
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs font-mono text-text-muted w-16">${m.month}</span>
+                        <div class="flex-1 progress-bar"><div class="progress-fill${mPct >= 90 ? '-danger' : mPct >= 70 ? '-warning' : ''}" style="width:${mPct}%"></div></div>
+                        <span class="text-xs font-mono tabular-nums w-20 text-right">${App.money(m.total)}</span>
+                        <span class="text-xs text-text-muted">${App.t('clients.txns_count', { count: m.cnt })}</span>
+                    </div>`;
+                }).join('');
+
+                // Sender ID
+                const idExists = document.getElementById('sender-id-exists');
+                const idMissing = document.getElementById('sender-id-missing');
+                const idForm = document.getElementById('sender-id-upload-form');
+                if (c.sender_id_path) {
+                    idExists.classList.remove('hidden');
+                    idMissing.classList.add('hidden');
+                    idForm.classList.add('hidden');
+                    document.getElementById('sender-id-thumb').src = c.sender_id_path_url || ('/' + c.sender_id_path);
+                    document.getElementById('sender-id-thumb').alt = App.t('clients.sender_id.alt');
+                    document.getElementById('sender-id-type-badge').textContent = formatIdType(c.sender_id_type);
+                } else {
+                    idExists.classList.add('hidden');
+                    idMissing.classList.remove('hidden');
+                    idForm.classList.remove('hidden');
+                }
+
+                // Receivers
+                const recvList = document.getElementById('receivers-list');
+                const receivers = res.receivers || [];
+                if (!receivers.length) {
+                    recvList.innerHTML = `<p class="text-sm text-text-muted">${App.t('clients.empty.no_receivers')}</p>`;
+                } else {
+                    recvList.innerHTML = receivers.map(r => `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-bg-elevated">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-bg-base flex items-center justify-center text-xs font-bold text-accent">${r.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}</div>
+                                <div>
+                                    <p class="text-sm font-medium">${r.name}</p>
+                                    <p class="text-xs text-text-muted">${r.destination_country || ''} ${r.destination_city ? '- '+r.destination_city : ''} ${r.phone ? '| '+r.phone : ''}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${r.id_path ? `<span class="badge badge-success text-[10px]">${App.t('clients.badge.id_on_file')}</span>` : `<span class="badge badge-danger text-[10px]">${App.t('clients.badge.no_id')}</span>`}
+                                <button class="btn-secondary text-[10px] py-0.5 px-2" onclick="openReceiverIdUpload(${r.id})">${App.t('clients.upload_id')}</button>
+                                <button class="text-text-muted hover:text-danger transition-colors" onclick="deleteReceiver(${r.id})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Security alerts
+                const alertsCard = document.getElementById('security-alerts-card');
+                const alertsList = document.getElementById('security-alerts-list');
+                const alerts = res.security_alerts || [];
+                if (alerts.length) {
+                    alertsCard.classList.remove('hidden');
+                    alertsList.innerHTML = alerts.map(a => {
+                        const sev = (a.severity || 'low').toLowerCase();
+                        const badgeClass = sev === 'high' ? 'badge-danger' : sev === 'medium' ? 'badge-warning' : 'badge-info';
+                        const sevLabel = App.t('clients.security_alerts.severity.' + sev);
+                        return `
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-bg-elevated border border-border">
+                            <span class="badge ${badgeClass} shrink-0 mt-0.5">${escHtml(sevLabel)}</span>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-medium">${escHtml(a.title || a.alert_type || '')}</p>
+                                <p class="text-xs text-text-secondary mt-0.5">${escHtml(a.details || '')}</p>
+                                <p class="text-[10px] text-text-muted mt-1">${App.formatDate(a.detected_at || a.created_at)}</p>
+                            </div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    alertsCard.classList.add('hidden');
+                    alertsList.innerHTML = '';
+                }
+
+                // Activity timeline
+                const timeline = document.getElementById('activity-timeline');
+                const activity = res.activity || [];
+                if (!activity.length) {
+                    timeline.innerHTML = `<p class="text-sm text-text-muted py-4">${App.t('clients.activity_empty')}</p>`;
+                } else {
+                    timeline.innerHTML = activity.map((ev, i) => {
+                        const isLast = i === activity.length - 1;
+                        const typeColors = {
+                            transfer_added: 'bg-accent/20 text-accent',
+                            limit_updated: 'bg-warning/20 text-warning',
+                            income_uploaded: 'bg-success/20 text-success',
+                            income_verified: 'bg-success/20 text-success',
+                            id_uploaded: 'bg-info/20 text-info',
+                            client_updated: 'bg-accent/20 text-accent',
+                            receiver_added: 'bg-accent/10 text-accent',
+                            record_exported: 'bg-info/20 text-info',
+                            record_fulfilled: 'bg-success/20 text-success',
+                        };
+                        const dotColor = typeColors[ev.event_type] || 'bg-bg-elevated text-text-muted';
+                        const actor = ev.actor_name ? `<span class="text-text-secondary"> · ${escHtml(ev.actor_name)}</span>` : '';
+                        return `
+                        <div class="flex gap-3 ${isLast ? '' : 'pb-3'}">
+                            <div class="flex flex-col items-center">
+                                <div class="w-6 h-6 rounded-full ${dotColor} flex items-center justify-center text-[10px] font-bold shrink-0">${(ev.event_type || '?')[0].toUpperCase()}</div>
+                                ${isLast ? '' : '<div class="w-px flex-1 bg-border mt-1"></div>'}
+                            </div>
+                            <div class="min-w-0 flex-1 pb-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded ${dotColor}">${escHtml(ev.event_type || '')}</span>
+                                    <span class="text-[10px] text-text-muted">${App.formatDate(ev.created_at)}</span>
+                                    ${actor}
+                                </div>
+                                <p class="text-sm text-text-primary mt-0.5">${escHtml(ev.summary || '')}</p>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function submitIncomeVerification(e) {
+            e.preventDefault();
+            const fd = new FormData();
+            fd.append('action', 'upload_income');
+            fd.append('client_id', currentClientId);
+            fd.append('new_limit', document.getElementById('income-new-limit').value);
+            const fileInput = document.getElementById('income-file');
+            if (fileInput.files[0]) {
+                fd.append('income_file', fileInput.files[0]);
+            }
+            try {
+                await App.apiForm('/api/clients', fd);
+                App.closeModal('income-modal');
+                App.toastKey('clients.toast.income_verified', 'success', { amount: '$' + parseFloat(document.getElementById('income-new-limit').value).toLocaleString() });
+                loadClientDetail(currentClientId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+            return false;
+        }
+
+        async function uploadSenderId(e) {
+            e.preventDefault();
+            const fd = new FormData();
+            fd.append('action', 'upload_id');
+            fd.append('client_id', currentClientId);
+            fd.append('id_type', document.getElementById('sender-id-type').value);
+            fd.append('id_file', document.getElementById('sender-id-file').files[0]);
+            try {
+                await App.apiForm('/api/clients', fd);
+                App.toastKey('clients.toast.sender_id_uploaded', 'success');
+                loadClientDetail(currentClientId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+            return false;
+        }
+
+        function openReceiverIdUpload(receiverId) {
+            document.getElementById('recv-id-target').value = receiverId;
+            document.getElementById('receiver-id-form').reset();
+            document.getElementById('recv-id-target').value = receiverId;
+            App.openModal('receiver-id-modal');
+        }
+
+        async function uploadReceiverId(e) {
+            e.preventDefault();
+            const fd = new FormData();
+            fd.append('action', 'upload_receiver_id');
+            fd.append('receiver_id', document.getElementById('recv-id-target').value);
+            fd.append('id_type', document.getElementById('recv-id-type').value);
+            fd.append('id_file', document.getElementById('recv-id-file').files[0]);
+            try {
+                await App.apiForm('/api/clients', fd);
+                App.toastKey('clients.toast.receiver_id_uploaded', 'success');
+                App.closeModal('receiver-id-modal');
+                loadClientDetail(currentClientId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+            return false;
+        }
+
+        async function deleteReceiver(id) {
+            if (!App.confirmKey('clients.confirm.delete_receiver')) return;
+            try {
+                await App.api('POST', '/api/clients', { action: 'delete_receiver', id });
+                App.toastKey('clients.toast.receiver_deleted', 'success');
+                loadClientDetail(currentClientId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        // ── Records by Name ──
+        let currentDossierClientId = null;
+
+        async function searchRecordsByName() {
+            const name = document.getElementById('records-search-input').value.trim();
+            if (name.length < 2) { App.toast(App.t('clients.records_search'), 'warning'); return; }
+            const container = document.getElementById('records-results');
+            container.innerHTML = `<p class="text-sm text-text-muted py-4">${App.t('common.loading')}</p>`;
+            try {
+                const res = await App.api('GET', `/api/client-records?action=search&name=${encodeURIComponent(name)}`);
+                const clients = res.clients || [];
+                if (!clients.length) {
+                    container.innerHTML = `<p class="text-sm text-text-muted py-4">${App.t('clients.records_no_results')}</p>`;
+                    return;
+                }
+                container.innerHTML = clients.map(c => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-bg-elevated border border-border">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">${escHtml(c.name)}</p>
+                            <p class="text-xs text-text-muted">${escHtml(c.phone || '')} · ${App.t('clients.col.total_sent')}: ${App.money(c.total_sent || 0)} · ${App.t('clients.col.transfers')}: ${c.transfer_count || 0}</p>
+                            ${c.last_transfer ? `<p class="text-[10px] text-text-muted mt-0.5">Last: ${App.formatDate(c.last_transfer)}</p>` : ''}
+                        </div>
+                        <button class="btn-primary text-xs py-1 px-2.5 shrink-0 ml-3" onclick="openDossier(${c.id})">${App.t('clients.view_full_record')}</button>
+                    </div>`).join('');
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function openDossier(clientId) {
+            currentDossierClientId = clientId;
+            const content = document.getElementById('dossier-content');
+            content.innerHTML = `<p class="text-sm text-text-muted py-4">${App.t('common.loading')}</p>`;
+            App.openModal('dossier-modal');
+            try {
+                const res = await App.api('GET', `/api/client-records?action=dossier&client_id=${clientId}`);
+                const c = res.client || {};
+                document.getElementById('dossier-modal-title').textContent = escHtml(c.name || App.t('clients.view_full_record'));
+
+                let html = '';
+
+                // Profile
+                html += `<div class="card"><h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">${App.t('clients.dossier_profile')}</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                        <div><span class="text-text-muted block text-xs">${App.t('common.name')}</span><span class="font-medium">${escHtml(c.name)}</span></div>
+                        <div><span class="text-text-muted block text-xs">${App.t('common.phone')}</span><span>${escHtml(c.phone || '-')}</span></div>
+                        <div><span class="text-text-muted block text-xs">${App.t('clients.col.total_sent')}</span><span class="font-mono">${App.money(c.total_sent || 0)}</span></div>
+                        <div><span class="text-text-muted block text-xs">${App.t('common.status')}</span><span>${c.income_verified ? App.t('clients.badge.verified') : App.t('clients.badge.standard')}</span></div>
+                    </div></div>`;
+
+                // Company breakdown
+                const companies = res.company_breakdown || [];
+                if (companies.length) {
+                    html += `<div class="card"><h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">${App.t('clients.company_breakdown')}</h4>
+                        <div class="space-y-1">${companies.map(row => `
+                            <div class="flex items-center justify-between text-sm p-2 rounded-lg bg-bg-elevated">
+                                <span class="font-medium">${escHtml(row.company)}</span>
+                                <span class="font-mono tabular-nums">${App.money(row.total)} · ${App.t('clients.txns_count', { count: row.cnt })}</span>
+                            </div>`).join('')}</div></div>`;
+                }
+
+                // Monthly summary
+                const ms = res.monthly_summary || [];
+                if (ms.length) {
+                    html += `<div class="card"><h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">${App.t('clients.dossier_monthly')}</h4>
+                        <div class="table-container mobile-cards"><table><thead><tr>
+                            <th>${App.t('common.month') || 'Month'}</th><th>${App.t('clients.col.transfers')}</th><th>${App.t('clients.col.total_sent')}</th>
+                        </tr></thead><tbody>${ms.map(m => `<tr><td class="font-mono text-sm">${m.month}</td><td class="text-sm">${m.cnt}</td><td class="font-mono text-sm">${App.money(m.total)}</td></tr>`).join('')}</tbody></table></div></div>`;
+                }
+
+                // Transfers
+                const txns = res.transfers || [];
+                html += `<div class="card"><h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">${App.t('clients.dossier_transfers')} (${txns.length}${res.transfers_total > txns.length ? ' of ' + res.transfers_total : ''})</h4>`;
+                if (txns.length) {
+                    html += `<div class="space-y-2 max-h-[50vh] overflow-y-auto pr-1">${txns.map(t => renderTransferCard(t)).join('')}</div>`;
+                } else {
+                    html += `<p class="text-sm text-text-muted">${App.t('clients.empty.no_transfers')}</p>`;
+                }
+                html += `</div>`;
+
+                // Receivers
+                const recvs = res.receivers || [];
+                if (recvs.length) {
+                    html += `<div class="card"><h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">${App.t('clients.dossier_receivers')}</h4>
+                        <div class="space-y-1">${recvs.map(r => `
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-bg-elevated text-sm">
+                                <span class="font-medium">${escHtml(r.name)}</span>
+                                <span class="text-text-muted text-xs">${escHtml(r.destination_country || '')} ${r.destination_city ? '- ' + escHtml(r.destination_city) : ''}</span>
+                                ${r.phone ? `<span class="text-text-muted text-xs ml-auto">${escHtml(r.phone)}</span>` : ''}
+                            </div>`).join('')}</div></div>`;
+                }
+
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = `<p class="text-sm text-danger">${escHtml(err.message)}</p>`;
+            }
+        }
+
+        async function exportDossierCsv() {
+            if (!currentDossierClientId) return;
+            try {
+                const res = await App.api('POST', '/api/client-records', { action: 'export_csv', client_id: currentDossierClientId });
+                if (res.csv) {
+                    const blob = new Blob([res.csv], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = res.filename || 'export.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                    App.toast(App.t('clients.toast.export_ready', { rows: res.rows }), 'success');
+                }
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function logRecordRequest() {
+            const name = document.getElementById('records-requester-name').value.trim();
+            if (!name) { App.toast(App.t('clients.log_request_name'), 'warning'); return; }
+            try {
+                await App.api('POST', '/api/client-records', { action: 'request', requester_name: name });
+                App.toast(App.t('clients.toast.request_logged'), 'success');
+                document.getElementById('records-requester-name').value = '';
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        // Receiver form submit
+        document.getElementById('receiver-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const id = fd.get('id');
+            try {
+                await App.api('POST', '/api/clients', {
+                    action: id ? 'update_receiver' : 'add_receiver',
+                    id: id ? parseInt(id) : undefined,
+                    client_id: currentClientId,
+                    name: fd.get('name'),
+                    phone: fd.get('phone'),
+                    destination_country: fd.get('destination_country'),
+                    destination_city: fd.get('destination_city'),
+                    notes: fd.get('notes'),
+                });
+                App.closeModal('receiver-modal');
+                App.toast(id ? App.t('clients.toast.receiver_updated') : App.t('clients.toast.receiver_added'), 'success');
+                document.getElementById('receiver-modal-title').textContent = App.t('clients.add_receiver');
+                loadClientDetail(currentClientId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+        });
+    </script>
+</body>
+</html>

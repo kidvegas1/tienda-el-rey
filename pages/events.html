@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div><h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="page.events.heading">Events</p></div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.events.heading">Events</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="status-filter" class="input py-2 px-3 text-sm w-full sm:w-44">
+                    <option value="" data-i18n="common.all">All</option>
+                    <option value="booked" data-i18n="event.status.booked">Booked</option>
+                    <option value="confirmed" data-i18n="event.status.confirmed">Confirmed</option>
+                    <option value="completed" data-i18n="event.status.completed">Completed</option>
+                    <option value="cancelled" data-i18n="event.status.cancelled">Cancelled</option>
+                </select>
+                <button id="add-event-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="events.add_event">Add Event</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card card-hover flex items-center gap-4">
+                    <div class="stat-icon stat-icon-accent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="events.upcoming">Upcoming Events</p>
+                        <p class="text-2xl font-bold font-mono tabular-nums mt-0.5" id="stat-upcoming">—</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container mobile-cards">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="events.col.client_name">Client Name</th>
+                            <th data-i18n="common.phone">Phone</th>
+                            <th data-i18n="events.col.event_date">Event Date</th>
+                            <th data-i18n="events.col.deposit">Deposit</th>
+                            <th data-i18n="common.balance">Balance</th>
+                            <th data-i18n="common.total">Total</th>
+                            <th data-i18n="events.col.color_theme">Color Theme</th>
+                            <th data-i18n="common.status">Status</th>
+                            <th data-i18n="common.actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-tbody">
+                        <tr><td colspan="9" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Event Modal -->
+    <div class="modal-backdrop" id="event-modal-backdrop"></div>
+    <div class="modal-content max-w-lg" id="event-modal">
+        <h3 class="text-lg font-bold mb-4" id="event-modal-title" data-i18n="events.add_event">Add Event</h3>
+        <form id="event-form" class="space-y-4">
+            <input type="hidden" name="id">
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.col.client_name">Client Name</label><input type="text" name="client_name" class="input" required></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.phone">Phone</label><input type="text" name="phone" class="input" data-i18n-placeholder="events.phone_placeholder" placeholder="Phone number"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.col.event_date">Event Date</label><input type="date" name="event_date" class="input" required></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.col.color_theme">Color Theme</label><input type="text" name="color_theme" class="input" data-i18n-placeholder="events.color_theme_placeholder" placeholder="e.g. Pink & Gold"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.deposit_amount">Deposit ($)</label><input type="number" name="deposit" class="input font-mono" step="0.01" value="0"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.balance_amount">Balance ($)</label><input type="number" name="balance" class="input font-mono" step="0.01" value="0"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.package">Package</label><input type="text" name="package" class="input" data-i18n-placeholder="events.package_placeholder" placeholder="e.g. Premium, Basic"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.payment_method">Payment Method</label><input type="text" name="payment_method" class="input" data-i18n-placeholder="events.payment_method_placeholder" placeholder="e.g. Cash, Card"></div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.status">Status</label>
+                <select name="status" class="input">
+                    <option value="booked" data-i18n="event.status.booked">Booked</option>
+                    <option value="confirmed" data-i18n="event.status.confirmed">Confirmed</option>
+                    <option value="completed" data-i18n="event.status.completed">Completed</option>
+                    <option value="cancelled" data-i18n="event.status.cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label><textarea name="notes" class="input" rows="2"></textarea></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('event-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        function eventStatusLabel(status) {
+            const key = `event.status.${status}`;
+            const label = App.t(key);
+            return label === key ? status : label;
+        }
+
+        function statusBadge(s) {
+            const map = { booked: 'badge-info', confirmed: 'badge-success', completed: 'badge-accent', cancelled: 'badge-danger' };
+            return `<span class="badge ${map[s] || 'badge-info'}">${eventStatusLabel(s)}</span>`;
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            loadData();
+            window.addEventListener('store-changed', loadData);
+
+            document.getElementById('status-filter').addEventListener('change', loadData);
+
+            document.getElementById('add-event-btn').addEventListener('click', () => {
+                document.getElementById('event-modal-title').textContent = App.t('events.add_event');
+                document.getElementById('event-form').reset();
+                document.querySelector('#event-form [name=id]').value = '';
+                App.openModal('event-modal');
+            });
+
+            document.getElementById('event-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const id = fd.get('id');
+                try {
+                    await App.api('POST', '/api/events', {
+                        action: id ? 'update' : 'create',
+                        id: id ? parseInt(id) : undefined,
+                        client_name: fd.get('client_name'),
+                        phone: fd.get('phone'),
+                        event_date: fd.get('event_date'),
+                        deposit: parseFloat(fd.get('deposit')) || 0,
+                        balance: parseFloat(fd.get('balance')) || 0,
+                        color_theme: fd.get('color_theme'),
+                        package: fd.get('package'),
+                        payment_method: fd.get('payment_method'),
+                        status: fd.get('status'),
+                        notes: fd.get('notes'),
+                    });
+                    App.closeModal('event-modal');
+                    App.toastKey(id ? 'toast.event_updated' : 'toast.event_added', 'success');
+                    loadData();
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+        })();
+
+        async function loadData() {
+            const status = document.getElementById('status-filter').value;
+            const empty = App.t('empty.none');
+            try {
+                const res = await App.api('GET', `/api/events?status=${encodeURIComponent(status)}`);
+                document.getElementById('stat-upcoming').textContent = res.upcoming ?? 0;
+
+                const tbody = document.getElementById('events-tbody');
+                if (!res.events.length) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-text-muted py-8">${App.t('events.no_events_found')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = res.events.map(ev => {
+                    const total = (parseFloat(ev.deposit) || 0) + (parseFloat(ev.balance) || 0);
+                    return `
+                    <tr>
+                        <td class="font-medium">${ev.client_name}</td>
+                        <td class="text-sm">${ev.phone || empty}</td>
+                        <td class="text-sm">${App.formatDate(ev.event_date)}</td>
+                        <td class="font-mono tabular-nums text-sm">${App.money(ev.deposit)}</td>
+                        <td class="font-mono tabular-nums text-sm">${App.money(ev.balance)}</td>
+                        <td class="font-mono tabular-nums font-semibold">${App.money(total)}</td>
+                        <td class="text-sm">${ev.color_theme || empty}</td>
+                        <td>${statusBadge(ev.status)}</td>
+                        <td>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editEvent(${ev.id})" class="btn-secondary text-xs py-1 px-2.5">${App.t('action.edit')}</button>
+                                <button onclick="deleteEvent(${ev.id})" class="p-1.5 rounded-lg hover:bg-[oklch(0.65_0.2_25_/_0.15)] text-text-muted hover:text-danger transition-colors" title="${App.t('action.delete')}" aria-label="${App.t('action.delete')}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (err) { App.toast(err.message || App.t('toast.error_generic'), 'danger'); }
+        }
+
+        async function editEvent(id) {
+            try {
+                const res = await App.api('GET', `/api/events?status=`);
+                const ev = res.events.find(e => e.id === id);
+                if (!ev) return App.toastKey('toast.event_not_found', 'danger');
+
+                document.getElementById('event-modal-title').textContent = App.t('events.edit_event');
+                const form = document.getElementById('event-form');
+                form.querySelector('[name=id]').value = ev.id;
+                form.querySelector('[name=client_name]').value = ev.client_name || '';
+                form.querySelector('[name=phone]').value = ev.phone || '';
+                form.querySelector('[name=event_date]').value = ev.event_date || '';
+                form.querySelector('[name=deposit]').value = ev.deposit || 0;
+                form.querySelector('[name=balance]').value = ev.balance || 0;
+                form.querySelector('[name=color_theme]').value = ev.color_theme || '';
+                form.querySelector('[name=package]').value = ev.package || '';
+                form.querySelector('[name=payment_method]').value = ev.payment_method || '';
+                form.querySelector('[name=status]').value = ev.status || 'booked';
+                form.querySelector('[name=notes]').value = ev.notes || '';
+                App.openModal('event-modal');
+            } catch (err) { App.toast(err.message || App.t('toast.error_generic'), 'danger'); }
+        }
+
+        async function deleteEvent(id) {
+            if (!App.confirmKey('confirm.delete_event')) return;
+            try {
+                await App.api('POST', '/api/events', { action: 'delete', id });
+                App.toastKey('toast.event_deleted', 'success');
+                loadData();
+            } catch (err) { App.toast(err.message || App.t('toast.error_generic'), 'danger'); }
+        }
+
+        document.addEventListener('language-changed', () => {
+            const modal = document.getElementById('event-modal');
+            if (modal?.classList.contains('open')) {
+                const id = document.querySelector('#event-form [name=id]')?.value;
+                document.getElementById('event-modal-title').textContent = App.t(id ? 'events.edit_event' : 'events.add_event');
+            }
+            loadData();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme { --color-bg-base: oklch(0.97 0.018 230); --color-bg-surface: oklch(1 0 0); --color-bg-elevated: oklch(0.94 0.035 225); --color-accent: oklch(0.48 0.09 55); --color-accent-hover: oklch(0.42 0.08 50); --color-success: oklch(0.52 0.14 155); --color-danger: oklch(0.55 0.18 25); --color-warning: oklch(0.60 0.14 85); --color-text-primary: oklch(0.27 0.04 55); --color-text-secondary: oklch(0.43 0.035 55); --color-text-muted: oklch(0.54 0.025 55); --color-border: oklch(0.87 0.025 225); --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif; --font-mono: "JetBrains Mono", ui-monospace, monospace; }
+        .mode-toggle button[aria-pressed="true"] { @apply bg-accent text-white shadow-sm; }
+        .barcode-input { @apply text-xl sm:text-2xl font-mono tracking-[0.08em] py-5 pl-14 pr-4; }
+        .product-thumb { @apply h-11 w-11 rounded-lg object-cover bg-bg-elevated border border-border; }
+        .product-card-thumb { width: 4.25rem; height: 4.25rem; border-radius: 0.9rem; overflow: hidden; background: oklch(0.94 0.035 225); border: 1px solid oklch(0.87 0.025 225); flex-shrink: 0; }
+        .product-card { border-bottom: 1px solid oklch(0.92 0.01 70); padding: 0.95rem 1rem; }
+        .product-card:last-child { border-bottom: 0; }
+        .product-card-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-top: 0.75rem; }
+        .product-card-meta > div { background: oklch(0.97 0.018 230); border-radius: 0.7rem; padding: 0.45rem 0.55rem; }
+        .product-card-meta p:first-child { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: oklch(0.54 0.025 55); }
+        .product-card-meta p:last-child { margin-top: 0.1rem; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .scanner-shell { position: relative; aspect-ratio: 3/4; max-height: min(62dvh, 520px); overflow: hidden; border-radius: 1rem; background: #0b1220; }
+        .scanner-shell video, .scanner-shell #camera-reader { width: 100%; height: 100%; object-fit: cover; }
+        .scanner-frame { position: absolute; inset: 18% 12%; border: 2px solid oklch(0.78 0.12 85); border-radius: 0.85rem; box-shadow: 0 0 0 999px oklch(0 0 0 / 0.35); pointer-events: none; }
+        .btn-success {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            background: oklch(0.48 0.15 145); color: white; font-weight: 700;
+            border-radius: 0.9rem; padding: 0.85rem 1.25rem; border: none; cursor: pointer;
+            box-shadow: 0 4px 18px oklch(0.48 0.15 145 / 0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            min-height: 3rem;
+        }
+        .btn-success:hover { background: oklch(0.42 0.14 145); transform: translateY(-1px); box-shadow: 0 6px 22px oklch(0.48 0.15 145 / 0.42); }
+        .btn-success:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .ops-cta-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+        @media (min-width: 640px) {
+            .ops-cta-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .ops-cta-grid .btn-success[aria-pressed="true"],
+        .ops-cta-grid .btn-secondary[aria-pressed="true"] {
+            outline: 2px solid oklch(0.48 0.15 145);
+            outline-offset: 2px;
+        }
+        .ops-cta-grid .btn-secondary[aria-pressed="true"] {
+            outline-color: oklch(0.55 0.08 55);
+            background: oklch(0.95 0.02 55);
+            border-color: oklch(0.75 0.06 55);
+        }
+        #confirm-operation.btn-success { width: 100%; justify-content: center; }
+        @media (max-width: 1023px) {
+            #store-selector { min-width: 9rem; }
+            #inventory-store-context {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.45rem 0.75rem;
+                border-radius: 0.75rem;
+                border: 1px solid oklch(0.87 0.025 225);
+                background: oklch(1 0 0 / 88%);
+            }
+            #inventory-store-name {
+                font-size: 0.875rem;
+                font-weight: 700;
+                color: oklch(0.27 0.04 55);
+                white-space: nowrap;
+            }
+            .inventory-store-locked {
+                opacity: 1;
+                cursor: default;
+            }
+            .inventory-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+            .inventory-stats .card { padding: 0.7rem 0.65rem; }
+            .inventory-stats .card p:last-child { font-size: 1.15rem; }
+            #scan-result .scan-actions { width: 100%; display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.5rem; }
+            #scan-result .scan-actions .btn-primary { width: 100%; justify-content: center; }
+        }
+        @media (max-width: 640px) {
+            .barcode-input { padding-right: 6.5rem; font-size: 1.05rem; letter-spacing: 0.04em; }
+            #camera-scan-btn { padding-left: 0.65rem; padding-right: 0.65rem; font-size: 0.8rem; }
+            #product-modal { max-height: 92dvh; }
+            #page-title + p { display: none; }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="nav.inventory">Inventario</p></div></div></div>
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="nav-label" data-i18n="nav.caja">Caja</span></a>
+            <a href="clients" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/></svg><span class="nav-label" data-i18n="nav.clients">Clientes</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span class="nav-label" data-i18n="nav.schedule">Horario</span></a>
+            <a href="employees" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg><span class="nav-label" data-i18n="nav.employees">Empleados</span></a>
+            <a href="statistics" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 20v-6M12 20V4m6 16v-10"/></svg><span class="nav-label" data-i18n="nav.statistics">Estadísticas</span></a>
+            <a href="reports" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2h9l3 3v17H6zM9 13h6M9 17h6"/></svg><span class="nav-label" data-i18n="nav.reports">Reportes</span></a>
+            <a href="analytics" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 17 6-6 4 4 8-9"/></svg><span class="nav-label" data-i18n="nav.analytics">Análisis</span></a>
+            <a href="security" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Seguridad</span></a>
+            <a href="reports-center" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2h9l3 3v17H6zM9 13h6M9 17h6"/></svg><span class="nav-label" data-i18n="nav.reports_center">Centro de reportes</span></a>
+            <a href="accounting" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Contabilidad</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventario</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M12 3v12m-5-7 5-5 5 5"/></svg><span class="nav-label" data-i18n="nav.import">Importar Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10h18v11H3zM2 4h20l-2 6H4zM9 21v-6h6v6"/></svg><span class="nav-label" data-i18n="nav.stores">Tiendas</span></a>
+        </nav>
+        <div class="p-4 border-t border-border"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div><div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div><button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" title="Cerrar sesión" aria-label="Cerrar sesión">↪</button></div></div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3"><button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated" aria-label="Abrir menú">☰</button><div><h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.inventory.heading">Inventario</h2><p class="text-xs text-text-muted" data-i18n="inventory.scan_barcode">Venta y existencias por código de barras</p></div></div>
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <button type="button" id="vender-cta-header" class="btn-success !py-2 !px-3 !text-sm !min-h-0 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span data-i18n="inventory.sale">Venta</span>
+                </button>
+                <button type="button" id="tax-settings-btn" class="inline-flex items-center gap-2 rounded-xl border border-border bg-bg-surface px-3 py-2 hover:border-accent/40 transition-colors" title="Ajustar impuesto">
+                    <span class="hidden sm:inline text-xs font-semibold text-text-secondary uppercase tracking-wide" data-i18n="inventory.tax_rate">Impuesto</span>
+                    <span class="badge badge-info font-mono" id="tax-rate">8.25%</span>
+                    <span class="text-xs font-semibold text-accent" id="tax-adjust-hint">Ajustar</span>
+                </button>
+                <a href="finances" id="tax-to-finances" class="inline-flex items-center gap-2 rounded-xl border border-border bg-bg-surface px-3 py-2 hover:border-accent/40 transition-colors text-xs font-semibold text-accent" title="Ver impuestos en Finanzas">
+                    <span id="tax-collected-badge" class="font-mono text-text-primary">$0</span>
+                    <span data-i18n="inventory.to_finances">→ Finanzas</span>
+                </a>
+                <div id="inventory-store-context" title="">
+                    <span class="hidden sm:inline text-xs font-semibold text-text-secondary uppercase tracking-wide" data-i18n="inventory.store_label">Tienda</span>
+                    <strong id="inventory-store-name">—</strong>
+                    <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-4 sm:p-6 lg:p-8 space-y-6">
+            <section class="card p-4 sm:p-6">
+                <div>
+                    <p class="text-xs font-semibold text-text-muted uppercase tracking-[0.14em]" data-i18n="page.inventory.heading">Terminal de inventario</p>
+                    <h3 class="text-xl font-bold mt-1" id="terminal-title" data-i18n="inventory.terminal_sale_title">Venta: escanear inventario existente</h3>
+                </div>
+                <div class="ops-cta-grid mt-5" role="group" aria-label="Operación">
+                    <button type="button" id="venta-cta" class="btn-success w-full text-base sm:text-lg" data-mode="sale" aria-pressed="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        <span data-i18n="inventory.sale">Venta</span>
+                        <span class="opacity-90 font-medium text-sm sm:text-base" data-i18n="inventory.vender_hint">— escanear y cobrar</span>
+                    </button>
+                    <button type="button" id="stock-in-cta" class="btn-secondary w-full text-base sm:text-lg justify-center" data-mode="stock_in" aria-pressed="false">
+                        <span data-i18n="inventory.stock_in">Agregar inventario</span>
+                    </button>
+                </div>
+                <button type="button" id="vender-cta" class="hidden" tabindex="-1" aria-hidden="true"></button>
+                <button type="button" id="camera-scan-cta" class="hidden" tabindex="-1" aria-hidden="true"></button>
+                <form id="barcode-form" class="mt-5">
+                    <label for="barcode-input" class="text-sm font-semibold" data-i18n="inventory.barcode">Código de barras</label>
+                    <div class="relative mt-2">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-accent text-xl">▥</span>
+                        <input id="barcode-input" class="input barcode-input pr-[9.5rem] sm:pr-44" autocomplete="off" inputmode="numeric" data-i18n-placeholder="inventory.scan_barcode" placeholder="Escanea o escribe el código y presiona Enter" aria-describedby="barcode-help">
+                        <button type="button" id="camera-scan-btn" class="absolute right-2 top-1/2 -translate-y-1/2 btn-success !py-2.5 !px-3 sm:!px-4 !text-sm !min-h-0 !rounded-lg whitespace-nowrap">
+                            <span data-i18n="inventory.scan_camera">Cámara</span>
+                        </button>
+                    </div>
+                    <p id="barcode-help" class="mt-3 text-xs text-text-muted" data-i18n="inventory.sale_help">Toca <strong>Venta</strong> para escanear un producto que ya está en inventario y cobrarlo. No crea productos nuevos.</p>
+                </form>
+                <div id="scan-result" class="hidden mt-5 rounded-xl border border-border bg-bg-base p-4 sm:p-5" aria-live="polite"></div>
+            </section>
+
+            <section class="inventory-stats grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="card p-4"><p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="inventory.col.product">Productos</p><p id="stat-products" class="mt-1 text-2xl font-bold font-mono">—</p></div>
+                <div class="card p-4"><p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="inventory.col.quantity">Unidades</p><p id="stat-units" class="mt-1 text-2xl font-bold font-mono">—</p></div>
+                <div class="card p-4"><p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="inventory.low_stock">Stock bajo</p><p id="stat-low-stock" class="mt-1 text-2xl font-bold font-mono text-danger">—</p></div>
+            </section>
+
+            <section class="card p-0 overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-border flex flex-col gap-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <h3 class="font-bold" data-i18n="page.inventory.heading">Catálogo de productos</h3>
+                            <p class="text-xs text-text-muted mt-1" id="inventory-catalog-store-note"></p>
+                        </div>
+                        <a href="sales-log" class="btn-secondary whitespace-nowrap shrink-0 !text-xs" data-i18n="nav.sales_log">Sales Log</a>
+                        <button id="add-product-btn" type="button" class="btn-primary whitespace-nowrap shrink-0" data-i18n="inventory.add_product">+ Producto</button>
+                    </div>
+                    <input type="search" id="search-input" class="input py-2.5 px-3 text-sm w-full" data-i18n-placeholder="inventory.search_placeholder" placeholder="Buscar producto o código">
+                </div>
+
+                <!-- Mobile-native product list -->
+                <div id="products-mobile" class="md:hidden divide-y divide-border" aria-live="polite">
+                    <p class="text-center text-text-muted py-10 px-4" data-i18n="inventory.no_products">Cargando productos…</p>
+                </div>
+
+                <!-- Desktop table -->
+                <div class="table-container border-0 rounded-none hidden md:block">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="inventory.col.product">Producto</th>
+                                <th id="products-store-col" class="hidden" data-i18n="inventory.store_label">Tienda</th>
+                                <th data-i18n="inventory.barcode">Código</th>
+                                <th data-i18n="inventory.col.quantity">Existencias</th>
+                                <th data-i18n="inventory.col.cost">Costo</th>
+                                <th data-i18n="inventory.col.retail">Venta</th>
+                                <th data-i18n="inventory.col.catalog">Catálogo</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <tr><td colspan="8" class="text-center text-text-muted py-10" data-i18n="inventory.no_products">Cargando productos…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="product-modal-backdrop"></div>
+    <section class="modal-content max-w-2xl max-h-[90dvh] overflow-y-auto" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+        <div class="flex items-start justify-between gap-4 mb-5"><div><p id="product-modal-eyebrow" class="text-xs font-semibold text-accent uppercase tracking-wider" data-i18n="inventory.new_product">Nuevo producto</p><h3 class="text-xl font-bold" id="product-modal-title" data-i18n="inventory.add_product">Crear producto</h3></div><button type="button" class="text-text-muted hover:text-text-primary text-xl" data-close-modal="product-modal" aria-label="Cerrar">×</button></div>
+        <form id="product-form" class="space-y-4"><input type="hidden" name="product_id" id="product-id-field"><input type="hidden" name="barcode"><div class="grid sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-text-secondary mb-2" for="product-name" data-i18n="inventory.col.product">Nombre</label><input id="product-name" name="name" class="input" required></div><div><label class="block text-xs font-semibold text-text-secondary mb-2" for="product-barcode" data-i18n="inventory.barcode">Código de barras</label><div class="relative"><input id="product-barcode" name="barcode_display" class="input font-mono pr-28" required autocomplete="off" inputmode="numeric" placeholder="Escanea o escribe"><button type="button" id="product-scan-barcode-btn" class="absolute right-1.5 top-1/2 -translate-y-1/2 btn-primary !py-2 !px-3 !text-xs whitespace-nowrap"><span data-i18n="inventory.scan_camera">Cámara</span></button></div><p class="text-[11px] text-text-muted mt-1" data-i18n="inventory.product_scan_hint">Usa la misma cámara que en ventas</p></div></div><div><label class="block text-xs font-semibold text-text-secondary mb-2" for="product-description">Descripción</label><textarea id="product-description" name="description" class="input" rows="2"></textarea></div><div class="grid sm:grid-cols-3 gap-4"><div><label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="inventory.col.cost">Costo</label><input type="number" name="cost_price" class="input font-mono" min="0" step="0.01" value="0"></div><div><label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="inventory.col.retail">Precio de venta</label><input type="number" name="retail_price" class="input font-mono" min="0" step="0.01" value="0"></div><div><label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="inventory.col.quantity">Cantidad inicial</label><input type="number" name="quantity" class="input font-mono" min="0" step="1" value="0"></div></div><div class="flex flex-wrap gap-4 items-end"><label class="flex items-center gap-2 text-sm font-medium text-text-secondary" title="Todas las ventas cobran impuesto"><input type="checkbox" name="taxable" checked disabled> Gravable (siempre)</label><label class="flex items-start gap-2 text-sm font-medium text-text-secondary flex-1 min-w-[220px]"><input type="checkbox" name="published" id="product-published" class="mt-0.5" checked><span><span data-i18n="inventory.publish_catalog">Publicar en catálogo web</span><span class="block text-[11px] text-text-muted font-normal mt-0.5" data-i18n="inventory.publish_catalog_hint">Si está publicado y hay existencias, puede aparecer en /tienda para clientes.</span></span></label><div class="flex-1 min-w-[180px]"><label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="inventory.low_stock_threshold">Alerta de stock bajo</label><input type="number" name="low_stock_threshold" class="input font-mono" min="0" value="5"></div></div><div class="rounded-xl border border-dashed border-border p-4 bg-bg-base">
+                <div>
+                    <p class="text-sm font-semibold">Fotos del producto</p>
+                    <p class="text-xs text-text-muted mt-1">Toma una foto con la cámara o elige de la galería para que la IA complete el producto.</p>
+                </div>
+                <input type="file" id="product-images" name="images" accept="image/*" multiple class="sr-only" tabindex="-1">
+                <input type="file" id="product-camera" accept="image/*" capture="environment" class="sr-only" tabindex="-1">
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button type="button" id="take-photo-btn" class="btn-primary justify-center" data-i18n="inventory.take_photo">Tomar foto</button>
+                    <button type="button" id="choose-photos-btn" class="btn-secondary justify-center" data-i18n="inventory.choose_gallery">Elegir de galería</button>
+                </div>
+                <input type="hidden" name="image_path" id="product-image-path" value="">
+                <div id="image-preview" class="hidden mt-3 flex gap-2 flex-wrap"></div>
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button id="analyze-image-btn" type="button" class="btn-secondary justify-center" data-i18n="inventory.parse_ai">✦ Analizar con IA</button>
+                    <button id="find-web-images-btn" type="button" class="btn-primary justify-center" data-i18n="inventory.find_web_images">Buscar imágenes en la web</button>
+                </div>
+                <div id="web-image-suggestions" class="hidden mt-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold">Imágenes del producto</p>
+                            <p class="text-xs text-text-muted truncate" id="web-image-query"></p>
+                        </div>
+                        <button type="button" id="refresh-web-images-btn" class="btn-secondary text-xs py-1.5 px-2.5 shrink-0">Buscar de nuevo</button>
+                    </div>
+                    <div id="web-image-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+                    <p id="web-image-empty" class="hidden text-xs text-warning mt-2">No encontramos fotos exactas del producto. Prueba un nombre más completo (marca + tamaño).</p>
+                </div>
+            </div><div class="flex flex-col-reverse sm:flex-row gap-3 pt-2"><button type="button" class="btn-secondary flex-1 justify-center" data-close-modal="product-modal">Cancelar</button><button type="submit" class="btn-primary flex-1 justify-center">Guardar producto</button></div></form>
+    </section>
+
+    <div class="modal-backdrop" id="tax-modal-backdrop"></div>
+    <section class="modal-content max-w-md" id="tax-modal" role="dialog" aria-modal="true" aria-labelledby="tax-modal-title">
+        <div class="flex items-start justify-between gap-4 mb-5">
+            <div>
+                <p class="text-xs font-semibold text-accent uppercase tracking-wider" data-i18n="inventory.tax_rate">Impuesto</p>
+                <h3 class="text-xl font-bold" id="tax-modal-title" data-i18n="inventory.adjust_tax">Ajustar porcentaje de impuesto</h3>
+            </div>
+            <button type="button" class="text-text-muted hover:text-text-primary text-xl" data-close-modal="tax-modal" aria-label="Cerrar">×</button>
+        </div>
+        <form id="tax-form" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary mb-2" for="tax-rate-input">Porcentaje (%)</label>
+                <div class="relative">
+                    <input id="tax-rate-input" name="tax_rate" type="number" min="0" max="100" step="0.01" class="input font-mono pr-10" required>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted font-mono">%</span>
+                </div>
+                <p class="mt-2 text-xs text-text-muted">Ejemplo Texas: 8.25. Se aplica a productos marcados como gravables.</p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary mb-2" for="tax-label-input">Etiqueta</label>
+                <input id="tax-label-input" name="tax_label" type="text" class="input" maxlength="80" placeholder="Texas Sales Tax">
+            </div>
+            <p id="tax-admin-note" class="hidden text-sm text-warning">Solo un administrador puede cambiar el impuesto.</p>
+            <div class="flex flex-col-reverse sm:flex-row gap-3 pt-1">
+                <button type="button" class="btn-secondary flex-1 justify-center" data-close-modal="tax-modal">Cancelar</button>
+                <button type="submit" id="tax-save-btn" class="btn-primary flex-1 justify-center">Guardar impuesto</button>
+            </div>
+        </form>
+    </section>
+
+    <div class="modal-backdrop" id="scanner-modal-backdrop"></div>
+    <section class="modal-content max-w-lg w-[calc(100%-1rem)]" id="scanner-modal" role="dialog" aria-modal="true" aria-labelledby="scanner-modal-title">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <p class="text-xs font-semibold text-accent uppercase tracking-wider" data-i18n="inventory.scan_camera">Cámara</p>
+                <h3 class="text-xl font-bold" id="scanner-modal-title">Escanear código de barras</h3>
+            </div>
+            <button type="button" class="text-text-muted hover:text-text-primary text-xl" data-close-modal="scanner-modal" aria-label="Cerrar">×</button>
+        </div>
+        <div class="scanner-shell">
+            <video id="scanner-video" playsinline muted autoplay class="hidden"></video>
+            <div id="camera-reader" class="hidden"></div>
+            <div class="scanner-frame" aria-hidden="true"></div>
+        </div>
+        <p id="scanner-status" class="mt-3 text-sm text-text-muted">Apunta la cámara al código. Se detecta automáticamente.</p>
+        <button type="button" id="scanner-stop-btn" class="btn-secondary w-full justify-center mt-4" data-close-modal="scanner-modal">Cerrar cámara</button>
+    </section>
+
+    <script src="assets/js/i18n.js"></script><script src="assets/js/app.js"></script>
+    <script>
+    (() => {
+        const state = {
+            mode: 'sale',
+            product: null,
+            editingProduct: null,
+            viewAllStores: false,
+            barcode: '',
+            taxRate: 0.0825,
+            taxLabel: 'Texas Sales Tax',
+            products: [],
+            imageFiles: [],
+            webImagePath: '',
+            webImageUrl: '',
+            suggestedImages: [],
+            imageSearchQuery: '',
+            scanner: { stream: null, raf: 0, html5: null, lastCode: '', lastAt: 0, target: 'sale' },
+        };
+        const $ = (id) => document.getElementById(id);
+        const esc = (v = '') => String(v).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+        const number = (v) => Number(v) || 0;
+        const isAdmin = () => App.user?.role === 'admin';
+        const productName = (p) => p?.name || p?.product_name || '';
+        const isProductPublished = (p) => p && (p.published === true || p.active === true || p.active === 1 || p.active === '1' || p.active === 't' || p.active == null);
+        const currentStoreId = () => {
+            if (state.viewAllStores) return null;
+            return App.currentStore?.id ? Number(App.currentStore.id) : null;
+        };
+        const storeQuery = () => {
+            if (state.viewAllStores) return '&store_id=all';
+            const id = currentStoreId();
+            return id ? `&store_id=${encodeURIComponent(String(id))}` : '';
+        };
+        const productStoreId = (product = null) => {
+            if (product?.store_id) return Number(product.store_id);
+            return currentStoreId();
+        };
+        const withStorePayload = (payload, product = null) => {
+            const storeId = productStoreId(product);
+            if (storeId) payload.store_id = storeId;
+            return payload;
+        };
+        function syncProductsTableHeader() {
+            $('products-store-col')?.classList.toggle('hidden', !state.viewAllStores);
+        }
+        function syncAddProductButton() {
+            const btn = $('add-product-btn');
+            if (!btn) return;
+            btn.disabled = state.viewAllStores;
+            btn.title = state.viewAllStores ? t('inventory.pick_store_to_create') : '';
+            btn.classList.toggle('opacity-50', state.viewAllStores);
+            btn.classList.toggle('cursor-not-allowed', state.viewAllStores);
+        }
+        function initInventoryStoreSelector() {
+            const sel = $('store-selector');
+            if (!sel) return;
+            if (!isAdmin()) {
+                sel.classList.add('hidden');
+                return;
+            }
+            const storageKey = 'inventory_view_all_stores';
+            state.viewAllStores = sessionStorage.getItem(storageKey) === '1';
+            const options = [`<option value="all"${state.viewAllStores ? ' selected' : ''}>${esc(t('inventory.all_stores'))}</option>`];
+            App.stores.forEach((s) => {
+                const selected = !state.viewAllStores && s.id == App.currentStore?.id;
+                options.push(`<option value="${s.id}"${selected ? ' selected' : ''}>${esc(s.name)}</option>`);
+            });
+            sel.innerHTML = options.join('');
+            sel.classList.remove('hidden');
+            sel.addEventListener('change', async (e) => {
+                const val = String(e.target.value || '');
+                if (val === 'all') {
+                    state.viewAllStores = true;
+                    sessionStorage.setItem(storageKey, '1');
+                    syncStoreContext(t('inventory.all_stores'));
+                    syncProductsTableHeader();
+                    syncAddProductButton();
+                    $('barcode-input').value = '';
+                    $('scan-result').classList.add('hidden');
+                    state.product = null;
+                    await loadData();
+                    return;
+                }
+                state.viewAllStores = false;
+                sessionStorage.removeItem(storageKey);
+                try {
+                    await App.api('POST', '/api/auth', { action: 'switch_store', store_id: parseInt(val, 10) });
+                    App.currentStore = App.stores.find(s => String(s.id) === val) || App.currentStore;
+                    App.toast(App.t('store.switched', { name: App.currentStore?.name || '' }), 'success');
+                    syncStoreContext(App.currentStore?.name);
+                    syncProductsTableHeader();
+                    syncAddProductButton();
+                    $('barcode-input').value = '';
+                    $('scan-result').classList.add('hidden');
+                    state.product = null;
+                    await loadData();
+                } catch (err) {
+                    App.toast(err.message, 'danger');
+                }
+            });
+        }
+        function syncStoreContext(storeName) {
+            const name = storeName || App.currentStore?.name || '—';
+            const nameEl = $('inventory-store-name');
+            if (nameEl) nameEl.textContent = name;
+            const note = $('inventory-catalog-store-note');
+            if (note) {
+                note.textContent = state.viewAllStores
+                    ? t('inventory.all_stores_scope_note')
+                    : t('inventory.store_scope_note', { store: name });
+            }
+            const ctx = $('inventory-store-context');
+            if (ctx) {
+                ctx.title = state.viewAllStores
+                    ? t('inventory.all_stores_scope_note')
+                    : t('inventory.store_scope_note', { store: name });
+            }
+            const sel = $('store-selector');
+            if (sel && App.user?.role !== 'admin') {
+                sel.classList.add('hidden');
+            }
+            syncProductsTableHeader();
+            syncAddProductButton();
+        }
+        const storeBadge = (p) => state.viewAllStores && p?.store_name
+            ? `<span class="badge badge-info text-[10px]">${esc(p.store_name)}</span>`
+            : '';
+        const publishBadge = (p) => isProductPublished(p)
+            ? `<span class="badge badge-success">${esc(t('inventory.published_badge'))}</span>`
+            : `<span class="badge badge-warning">${esc(t('inventory.unpublished_badge'))}</span>`;
+        const publishButton = (p, mobile = false) => {
+            const cls = mobile ? 'justify-center text-sm py-2.5 w-full' : 'text-xs py-1.5 px-2.5';
+            if (isProductPublished(p)) {
+                return `<button type="button" class="btn-secondary ${cls}" data-unpublish-product="${p.id}">${esc(t('inventory.unpublish'))}</button>`;
+            }
+            return `<button type="button" class="btn-primary ${cls}" data-publish-product="${p.id}">${esc(t('inventory.publish'))}</button>`;
+        };
+        const resolveStoredImage = (raw) => {
+            if (!raw) return '';
+            const value = String(raw);
+            if (value.startsWith('http') || value.startsWith('/api/files')) return value;
+            const path = value.startsWith('/') ? value.slice(1) : value;
+            if (path.startsWith('assets/uploads/')) {
+                return `/api/files?ref=${encodeURIComponent(path)}&inline=1`;
+            }
+            return value.startsWith('/') ? value : `/${value}`;
+        };
+        const productImage = (p) => resolveStoredImage(
+            p?.image_url || p?.image_path || p?.image || p?.thumbnail_url || (Array.isArray(p?.images) ? p.images[0] : '') || ''
+        );
+        const normalizeTaxRate = (raw) => {
+            const value = number(raw);
+            if (!value) return 0.0825;
+            return value > 1 ? value / 100 : value;
+        };
+        const taxPercent = () => +(state.taxRate * 100).toFixed(2);
+        const syncTaxBadge = () => {
+            $('tax-rate').textContent = `${taxPercent().toFixed(2)}%`;
+            const hint = $('tax-adjust-hint');
+            if (hint) hint.classList.toggle('hidden', !isAdmin());
+        };
+        const focusBarcode = () => {
+            if ($('product-modal').classList.contains('open') || $('scanner-modal').classList.contains('open') || $('tax-modal').classList.contains('open')) return;
+            $('barcode-input').focus();
+        };
+        const setMode = (mode) => {
+            state.mode = mode === 'stock_in' ? 'stock_in' : 'sale';
+            document.querySelectorAll('#venta-cta, #stock-in-cta, [data-mode]').forEach(b => {
+                if (!b.dataset.mode) return;
+                b.setAttribute('aria-pressed', b.dataset.mode === state.mode ? 'true' : 'false');
+            });
+            const title = $('terminal-title');
+            const help = $('barcode-help');
+            const camBtn = $('camera-scan-btn');
+            if (state.mode === 'sale') {
+                if (title) title.textContent = t('inventory.terminal_sale_title');
+                if (help) help.textContent = t('inventory.sale_help');
+                camBtn?.classList.remove('btn-secondary');
+                camBtn?.classList.add('btn-success');
+            } else {
+                if (title) title.textContent = t('inventory.terminal_stock_title');
+                if (help) help.textContent = t('inventory.stock_in_help');
+                camBtn?.classList.remove('btn-success');
+                camBtn?.classList.add('btn-secondary');
+            }
+            $('scan-result').classList.add('hidden');
+            state.product = null;
+            focusBarcode();
+        };
+        const closeProductModal = () => { App.closeModal('product-modal'); focusBarcode(); };
+        const closeTaxModal = () => { App.closeModal('tax-modal'); focusBarcode(); };
+        const openTaxModal = () => {
+            $('tax-rate-input').value = taxPercent().toFixed(2);
+            $('tax-label-input').value = state.taxLabel || 'Texas Sales Tax';
+            const canEdit = isAdmin();
+            $('tax-rate-input').disabled = !canEdit;
+            $('tax-label-input').disabled = !canEdit;
+            $('tax-save-btn').classList.toggle('hidden', !canEdit);
+            $('tax-admin-note').classList.toggle('hidden', canEdit);
+            App.openModal('tax-modal');
+            if (canEdit) setTimeout(() => $('tax-rate-input').focus(), 0);
+        };
+        async function saveTax(event) {
+            event.preventDefault();
+            if (!isAdmin()) return App.toast('Solo un administrador puede cambiar el impuesto.', 'warning');
+            const rate = number($('tax-rate-input').value);
+            const label = $('tax-label-input').value.trim() || 'Sales Tax';
+            if (rate < 0 || rate > 100) return App.toast('El impuesto debe estar entre 0 y 100.', 'warning');
+            try {
+                const res = await App.api('POST', '/api/inventory', { action: 'update_tax_settings', tax_rate: rate, tax_label: label });
+                state.taxRate = normalizeTaxRate(res.tax_rate ?? rate);
+                state.taxLabel = res.tax_label || label;
+                syncTaxBadge();
+                App.toast('Impuesto actualizado', 'success');
+                closeTaxModal();
+                if (state.product) showResult(state.product);
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+        const openProductModal = (product = null, barcode = '') => {
+            if (!product && state.viewAllStores) {
+                App.toast(t('inventory.pick_store_to_create'), 'warning');
+                return;
+            }
+            const form = $('product-form'); form.reset();
+            state.editingProduct = product;
+            state.imageFiles = [];
+            state.webImagePath = '';
+            state.webImageUrl = '';
+            state.suggestedImages = [];
+            state.imageSearchQuery = '';
+            $('product-images').value = '';
+            $('product-camera').value = '';
+            $('product-image-path').value = '';
+            renderImagePreviews();
+            renderWebImageSuggestions([], '', false);
+            $('product-id-field').value = product?.id ? String(product.id) : '';
+            form.elements.barcode.value = barcode || product?.barcode || ''; form.elements.barcode_display.value = barcode || product?.barcode || '';
+            $('product-modal-eyebrow').textContent = product ? 'Catálogo' : 'Código no encontrado';
+            $('product-modal-title').textContent = product ? 'Editar producto' : 'Crear producto';
+            if (product) {
+                form.elements.name.value = productName(product);
+                ['description','cost_price','retail_price','quantity','low_stock_threshold'].forEach(k => {
+                    if (form.elements[k]) form.elements[k].value = product[k] ?? (k === 'low_stock_threshold' ? 5 : '');
+                });
+                if (product.image_path || product.image_url) {
+                    state.webImagePath = product.image_path || '';
+                    state.webImageUrl = product.image_url || resolveStoredImage(product.image_path);
+                    $('product-image-path').value = state.webImagePath;
+                }
+            }
+            form.elements.taxable.checked = product ? Boolean(Number(product.taxable ?? 1)) : true;
+            const publishedInput = $('product-published');
+            if (publishedInput) publishedInput.checked = product ? isProductPublished(product) : true;
+            App.openModal('product-modal');
+            setTimeout(() => $('product-name').focus(), 0);
+        };
+        const showResult = (product) => {
+            state.product = product;
+            const price = number(product.retail_price);
+            const stock = number(product.quantity);
+            const taxable = true; // every sale collects tax
+            const confirmLabel = state.mode === 'sale' ? t('inventory.confirm_sale') : t('inventory.confirm_stock_in');
+            const img = productImage(product);
+            $('scan-result').innerHTML = `
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="product-card-thumb">${img ? `<img src="${esc(img)}" class="w-full h-full object-cover" alt="">` : '<div class="h-full grid place-items-center text-text-muted">▣</div>'}</div>
+                        <div class="min-w-0 flex-1">
+                            <p class="font-bold leading-snug">${esc(productName(product))}</p>
+                            <p class="text-xs text-text-muted font-mono mt-1 break-all">${esc(product.barcode || state.barcode)}</p>
+                            <p class="text-xs text-text-secondary mt-1">${esc(t('inventory.col.quantity'))}: <span class="font-mono font-bold ${stock <= number(product.low_stock_threshold ?? 5) ? 'text-danger' : ''}">${stock}</span></p>
+                        </div>
+                    </div>
+                    ${state.mode === 'sale' ? `
+                    <div class="product-card-meta">
+                        <div><p>${esc(t('inventory.unit_price'))}</p><p>${App.money(price)}</p></div>
+                        <div><p>${esc(t('inventory.tax_amount'))}</p><p id="result-tax">$0.00</p></div>
+                        <div><p>${esc(t('inventory.total'))}</p><p class="text-accent" id="result-total">$0.00</p></div>
+                    </div>` : ''}
+                    <div class="scan-actions flex items-center gap-2">
+                        <label class="sr-only" for="operation-qty">${esc(t('inventory.col.quantity'))}</label>
+                        <input id="operation-qty" type="number" min="1" value="1" class="input py-2.5 font-mono" aria-label="${esc(t('inventory.col.quantity'))}">
+                        <button id="confirm-operation" class="${state.mode === 'sale' ? 'btn-success' : 'btn-primary'} whitespace-nowrap flex-1 justify-center">${esc(confirmLabel)}</button>
+                    </div>
+                </div>`;
+            const updateTotals = () => {
+                if (state.mode !== 'sale') return;
+                const qty = Math.max(1, parseInt($('operation-qty').value, 10) || 1);
+                const subtotal = price * qty;
+                const tax = subtotal * state.taxRate;
+                $('result-tax').textContent = App.money(tax);
+                $('result-total').textContent = App.money(subtotal + tax);
+            };
+            $('scan-result').classList.remove('hidden');
+            $('operation-qty').addEventListener('input', updateTotals);
+            $('confirm-operation').addEventListener('click', confirmOperation);
+            updateTotals();
+        };
+        const barcodeVariants = (raw) => {
+            const trimmed = String(raw || '').trim();
+            const digits = trimmed.replace(/\D+/g, '');
+            const out = new Set();
+            if (trimmed) out.add(trimmed);
+            if (digits) {
+                out.add(digits);
+                if (digits.length === 12) out.add(`0${digits}`);
+                if (digits.length === 13 && digits.startsWith('0')) out.add(digits.slice(1));
+                const core = digits.replace(/^0+/, '') || digits;
+                out.add(core);
+                if (core.length <= 12) {
+                    out.add(core.padStart(12, '0'));
+                    out.add(core.padStart(13, '0'));
+                }
+                if (digits.length <= 12) {
+                    out.add(digits.padStart(12, '0'));
+                    out.add(digits.padStart(13, '0'));
+                }
+            }
+            return [...out];
+        };
+        const normalizeBarcodeInput = (raw) => {
+            const trimmed = String(raw || '').trim();
+            const digits = trimmed.replace(/\D+/g, '');
+            return (digits.length >= 8 && digits.length <= 14) ? digits : trimmed;
+        };
+        const findLocalProductByBarcode = (barcode) => {
+            const variants = new Set(barcodeVariants(barcode));
+            return state.products.find((p) => barcodeVariants(p.barcode || '').some((v) => variants.has(v))) || null;
+        };
+        const showSaleNotFound = (barcode) => {
+            state.product = null;
+            $('scan-result').innerHTML = `
+                <div class="space-y-3">
+                    <p class="font-bold text-danger">${esc(t('inventory.product_not_found'))}</p>
+                    <p class="text-sm text-text-secondary">${esc(t('inventory.sale_not_in_stock'))}</p>
+                    <p class="text-xs font-mono text-text-muted break-all">${esc(barcode)}</p>
+                    <button type="button" id="rescan-sale-btn" class="btn-success w-full justify-center">${esc(t('inventory.sale'))} — ${esc(t('inventory.scan_camera'))}</button>
+                </div>`;
+            $('scan-result').classList.remove('hidden');
+            $('rescan-sale-btn')?.addEventListener('click', () => {
+                setMode('sale');
+                startCameraScan('sale');
+            });
+        };
+        async function lookupBarcode() {
+            const raw = $('barcode-input').value.trim();
+            if (!raw) return;
+            const barcode = normalizeBarcodeInput(raw);
+            $('barcode-input').value = barcode;
+            state.barcode = barcode;
+            try {
+                if (state.viewAllStores) {
+                    const local = findLocalProductByBarcode(barcode);
+                    if (local) {
+                        showResult(local);
+                        return;
+                    }
+                    App.toast(t('inventory.pick_store_for_scan'), 'warning');
+                    return;
+                }
+                const payload = withStorePayload({ action: 'lookup_barcode', barcode });
+                const res = await App.api('POST', '/api/inventory', payload);
+                if (res.tax_rate != null) state.taxRate = normalizeTaxRate(res.tax_rate);
+                if (res.tax_label) state.taxLabel = res.tax_label;
+                syncTaxBadge();
+                let product = (res.found !== false && res.product && res.product.id) ? res.product : null;
+                if (!product) product = findLocalProductByBarcode(barcode);
+                if (!product) {
+                    if (state.mode === 'sale') {
+                        showSaleNotFound(barcode);
+                        App.toast(t('inventory.sale_not_in_stock'), 'warning');
+                        return;
+                    }
+                    openProductModal(null, barcode);
+                    return;
+                }
+                if (product.barcode) state.barcode = product.barcode;
+                showResult(product);
+            } catch (err) {
+                const local = findLocalProductByBarcode(barcode);
+                if (local) {
+                    state.barcode = local.barcode || barcode;
+                    showResult(local);
+                    return;
+                }
+                if (/not found|no encontrado|404/i.test(err.message)) {
+                    if (state.mode === 'sale') {
+                        showSaleNotFound(barcode);
+                        App.toast(t('inventory.sale_not_in_stock'), 'warning');
+                    } else {
+                        openProductModal(null, barcode);
+                    }
+                } else App.toast(err.message, 'danger');
+            }
+        }
+        async function confirmOperation() {
+            if (!state.product) return;
+            const quantity = Math.max(1, parseInt($('operation-qty').value, 10) || 1);
+            try {
+                const action = state.mode === 'sale' ? 'sale' : 'stock_in';
+                const payload = withStorePayload({ action, id: state.product.id, product_id: state.product.id, barcode: state.barcode, quantity }, state.product);
+                await App.api('POST', '/api/inventory', payload);
+                App.toast(state.mode === 'sale' ? t('inventory.confirm_sale') : t('inventory.confirm_stock_in'), 'success');
+                $('barcode-input').value = '';
+                $('scan-result').classList.add('hidden');
+                state.product = null;
+                await loadData();
+                focusBarcode();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+        async function loadData() {
+            try {
+                const search = $('search-input').value.trim();
+                const res = await App.api('GET', `/api/inventory?search=${encodeURIComponent(search)}${storeQuery()}`);
+                state.products = res.products || [];
+                state.viewAllStores = res.scope === 'all' || state.viewAllStores;
+                syncStoreContext(res.store_name || (state.viewAllStores ? t('inventory.all_stores') : App.currentStore?.name));
+                state.taxRate = normalizeTaxRate(res.tax_rate ?? res.global_tax_rate ?? res.tax?.rate);
+                state.taxLabel = res.tax_label || state.taxLabel;
+                syncTaxBadge();
+                // Feed Finances: month-to-date inventory tax collected
+                try {
+                    const from = new Date(); const y = from.getFullYear(); const m = String(from.getMonth()+1).padStart(2,'0');
+                    const taxSum = await App.api('GET', `/api/inventory?action=tax_summary&date_from=${y}-${m}-01&date_to=${y}-${m}-${String(new Date(y, from.getMonth()+1, 0).getDate()).padStart(2,'0')}${storeQuery()}`);
+                    const badge = $('tax-collected-badge');
+                    if (badge) badge.textContent = App.money(taxSum.tax_collected || 0);
+                    const link = $('tax-to-finances');
+                    if (link && taxSum.finances_url) link.href = taxSum.finances_url.replace(/^\//, '');
+                } catch (_) { /* non-blocking */ }
+                $('stat-products').textContent = res.total_products ?? state.products.length;
+                $('stat-units').textContent = res.total_units ?? state.products.reduce((sum, p) => sum + number(p.quantity), 0);
+                $('stat-low-stock').textContent = res.low_stock ?? state.products.filter(p => number(p.quantity) <= number(p.low_stock_threshold ?? 5)).length;
+                renderProducts();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+        function renderProducts() {
+            const tbody = $('products-tbody');
+            const mobile = $('products-mobile');
+            const emptyColspan = state.viewAllStores ? 9 : 8;
+            if (!state.products.length) {
+                tbody.innerHTML = `<tr><td colspan="${emptyColspan}" class="text-center text-text-muted py-10">${esc(t('inventory.no_products'))}</td></tr>`;
+                mobile.innerHTML = `<p class="text-center text-text-muted py-10 px-4">${esc(t('inventory.no_products'))}</p>`;
+                return;
+            }
+            tbody.innerHTML = state.products.map(p => {
+                const low = number(p.quantity) <= number(p.low_stock_threshold ?? 5);
+                const image = productImage(p);
+                const storeCell = state.viewAllStores ? `<td class="text-xs font-semibold text-text-secondary">${esc(p.store_name || '—')}</td>` : '';
+                return `<tr><td><div class="flex items-center gap-3"><div class="product-thumb overflow-hidden shrink-0">${image ? `<img src="${esc(image)}" class="w-full h-full object-cover" alt="${esc(productName(p))}" loading="lazy">` : '<div class="h-full grid place-items-center text-text-muted">▣</div>'}</div><div><p class="font-semibold">${esc(productName(p))}</p><p class="text-xs text-text-muted truncate max-w-48">${esc(p.description || '—')}</p></div></div></td>${storeCell}<td class="font-mono text-xs">${esc(p.barcode || '—')}</td><td><span class="font-mono font-bold ${low ? 'text-danger' : ''}">${number(p.quantity)}</span></td><td class="font-mono text-sm">${App.money(p.cost_price)}</td><td class="font-mono text-sm">${App.money(p.retail_price)}</td><td>${publishBadge(p)}</td><td>${low ? `<span class="badge badge-danger">${esc(t('inventory.low_badge'))}</span>` : `<span class="badge badge-success">${esc(t('inventory.received'))}</span>`}</td><td><div class="flex flex-wrap gap-2">${publishButton(p)}<button class="btn-secondary text-xs py-1.5 px-2.5" data-edit-product="${p.id}">${esc(t('inventory.edit_product'))}</button><button class="text-xs text-danger font-semibold" data-delete-product="${p.id}">${esc(t('inventory.remove'))}</button></div></td></tr>`;
+            }).join('');
+
+            mobile.innerHTML = state.products.map(p => {
+                const low = number(p.quantity) <= number(p.low_stock_threshold ?? 5);
+                const image = productImage(p);
+                return `
+                    <article class="product-card">
+                        <div class="flex items-start gap-3">
+                            <div class="product-card-thumb">${image ? `<img src="${esc(image)}" class="w-full h-full object-cover" alt="${esc(productName(p))}" loading="lazy">` : '<div class="h-full grid place-items-center text-text-muted text-lg">▣</div>'}</div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="font-bold leading-snug">${esc(productName(p))}</h4>
+                                    <div class="flex flex-col items-end gap-1 shrink-0">${storeBadge(p)}${publishBadge(p)}${low ? `<span class="badge badge-danger">${esc(t('inventory.low_badge'))}</span>` : `<span class="badge badge-success">${esc(t('inventory.received'))}</span>`}</div>
+                                </div>
+                                <p class="text-xs text-text-muted font-mono mt-1 break-all">${esc(p.barcode || '—')}</p>
+                                ${p.description ? `<p class="text-xs text-text-secondary mt-1 line-clamp-2">${esc(p.description)}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="product-card-meta">
+                            <div><p>${esc(t('inventory.col.quantity'))}</p><p class="${low ? 'text-danger' : ''}">${number(p.quantity)}</p></div>
+                            <div><p>${esc(t('inventory.col.cost'))}</p><p>${App.money(p.cost_price)}</p></div>
+                            <div><p>${esc(t('inventory.col.retail'))}</p><p>${App.money(p.retail_price)}</p></div>
+                        </div>
+                        <div class="mt-3 flex flex-col gap-2">
+                            ${publishButton(p, true)}
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" class="btn-secondary justify-center text-sm py-2.5" data-edit-product="${p.id}">${esc(t('inventory.edit_product'))}</button>
+                                <button type="button" class="btn-secondary justify-center text-sm py-2.5 text-danger border-danger/20" data-delete-product="${p.id}">${esc(t('inventory.remove'))}</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+        async function setProductPublish(id, publish) {
+            try {
+                const product = state.products.find(p => String(p.id) === String(id));
+                const payload = withStorePayload({ action: 'set_publish', id, publish: publish ? 1 : 0 }, product);
+                await App.api('POST', '/api/inventory', payload);
+                App.toastKey(publish ? 'inventory.toast_published' : 'inventory.toast_unpublished', 'success');
+                await loadData();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+        async function deleteProduct(id) {
+            if (!confirm('¿Eliminar este producto?')) return;
+            try {
+                const product = state.products.find(p => String(p.id) === String(id));
+                const payload = withStorePayload({ action: 'delete', id }, product);
+                await App.api('POST', '/api/inventory', payload);
+                App.toast('Producto eliminado', 'success');
+                loadData();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+        function syncImageInput() {
+            const transfer = new DataTransfer();
+            state.imageFiles.forEach((file) => transfer.items.add(file));
+            $('product-images').files = transfer.files;
+        }
+        function renderImagePreviews() {
+            const preview = $('image-preview');
+            const parts = [];
+            if (state.webImagePath || state.webImageUrl) {
+                const src = state.webImageUrl || resolveStoredImage(state.webImagePath);
+                parts.push(`
+                    <div class="relative">
+                        <img class="h-20 w-20 rounded-lg object-cover border-2 border-accent" src="${esc(src)}" alt="Imagen elegida" onerror="this.style.opacity='0.3'">
+                        <span class="absolute bottom-1 left-1 text-[10px] font-bold bg-accent text-white px-1.5 py-0.5 rounded">OK</span>
+                        <button type="button" class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-danger text-white text-xs font-bold" data-clear-web-image aria-label="Quitar imagen web">×</button>
+                    </div>
+                `);
+            }
+            state.imageFiles.forEach((file, index) => {
+                parts.push(`
+                    <div class="relative">
+                        <img class="h-20 w-20 rounded-lg object-cover border border-border" src="${URL.createObjectURL(file)}" alt="Vista previa">
+                        <button type="button" class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-danger text-white text-xs font-bold" data-remove-image="${index}" aria-label="Quitar foto">×</button>
+                    </div>
+                `);
+            });
+            preview.innerHTML = parts.join('');
+            preview.classList.toggle('hidden', !parts.length);
+        }
+        function renderWebImageSuggestions(images, query = '', showPanel = true) {
+            state.suggestedImages = Array.isArray(images) ? images : [];
+            state.imageSearchQuery = query || state.imageSearchQuery;
+            const wrap = $('web-image-suggestions');
+            const grid = $('web-image-grid');
+            const qEl = $('web-image-query');
+            const empty = $('web-image-empty');
+            if (!showPanel && !state.suggestedImages.length) {
+                wrap.classList.add('hidden');
+                grid.innerHTML = '';
+                empty?.classList.add('hidden');
+                return;
+            }
+            wrap.classList.remove('hidden');
+            qEl.textContent = state.imageSearchQuery
+                ? `Producto: ${state.imageSearchQuery}`
+                : 'Elige la foto exacta del producto.';
+            if (!state.suggestedImages.length) {
+                grid.innerHTML = '';
+                empty?.classList.remove('hidden');
+                return;
+            }
+            empty?.classList.add('hidden');
+            grid.innerHTML = state.suggestedImages.map((img, index) => `
+                <button type="button" class="group relative overflow-hidden rounded-lg border border-border bg-bg-elevated aspect-square" data-select-web-image="${index}" title="${esc(img.title || img.source || '')}">
+                    <img src="${esc(img.thumb || img.url)}" alt="${esc(img.title || 'Producto')}" class="h-full w-full object-cover group-hover:scale-105 transition-transform" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('button')?.classList.add('opacity-40')">
+                    <span class="absolute inset-x-0 bottom-0 bg-black/55 text-white text-[10px] px-1 py-0.5 truncate">${esc(img.title || img.source || 'producto')}</span>
+                </button>
+            `).join('');
+        }
+        function looksLikeImage(file) {
+            if (!file) return false;
+            const type = (file.type || '').toLowerCase();
+            if (type.startsWith('image/')) return true;
+            // Mobile camera often sends empty MIME — trust extension / any capture blob
+            return !type || /\.(jpe?g|png|webp|gif|heic|heif|bmp)$/i.test(file.name || '');
+        }
+        /** Re-encode to JPEG ≤1600px so phone HEIC/huge photos always upload. */
+        async function prepareImageFile(file) {
+            if (!file) throw new Error('No image');
+            // Already small JPEG — still normalize through canvas when possible
+            const url = URL.createObjectURL(file);
+            try {
+                let bitmap = null;
+                if (typeof createImageBitmap === 'function') {
+                    try { bitmap = await createImageBitmap(file); } catch (_) { /* HEIC etc. */ }
+                }
+                const draw = (w, h, paint) => {
+                    const max = 1600;
+                    const scale = Math.min(1, max / Math.max(w, h));
+                    const cw = Math.max(1, Math.round(w * scale));
+                    const ch = Math.max(1, Math.round(h * scale));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cw;
+                    canvas.height = ch;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, cw, ch);
+                    paint(ctx, cw, ch);
+                    return new Promise((resolve, reject) => {
+                        canvas.toBlob((blob) => {
+                            if (!blob) return reject(new Error('Could not process image'));
+                            resolve(new File([blob], (file.name || 'product').replace(/\.[^.]+$/, '') + '.jpg', {
+                                type: 'image/jpeg',
+                                lastModified: Date.now(),
+                            }));
+                        }, 'image/jpeg', 0.85);
+                    });
+                };
+                if (bitmap) {
+                    const out = await draw(bitmap.width, bitmap.height, (ctx, cw, ch) => {
+                        ctx.drawImage(bitmap, 0, 0, cw, ch);
+                        bitmap.close?.();
+                    });
+                    return out;
+                }
+                const img = await new Promise((resolve, reject) => {
+                    const el = new Image();
+                    el.onload = () => resolve(el);
+                    el.onerror = () => reject(new Error('Could not read that photo. Try the in-app camera (JPEG).'));
+                    el.src = url;
+                });
+                return await draw(img.naturalWidth || img.width, img.naturalHeight || img.height, (ctx, cw, ch) => {
+                    ctx.drawImage(img, 0, 0, cw, ch);
+                });
+            } finally {
+                URL.revokeObjectURL(url);
+            }
+        }
+        async function addImageFiles(fileList) {
+            const incoming = [...(fileList || [])].filter(looksLikeImage);
+            if (!incoming.length) {
+                App.toast('Elige una foto JPEG/PNG (no uses solo Live Photo/HEIC).', 'warning');
+                return;
+            }
+            const button = $('analyze-image-btn');
+            const prev = button?.textContent;
+            if (button) { button.disabled = true; button.textContent = 'Preparando foto…'; }
+            try {
+                const prepared = [];
+                for (const file of incoming.slice(0, 8)) {
+                    try {
+                        prepared.push(await prepareImageFile(file));
+                    } catch (e) {
+                        // Fall back to original if already jpeg/png/webp
+                        const ok = /image\/(jpeg|jpg|png|webp)/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || '');
+                        if (ok) prepared.push(file);
+                        else App.toast(e.message || 'No se pudo leer la imagen', 'warning');
+                    }
+                }
+                if (!prepared.length) return;
+                state.imageFiles = [...state.imageFiles, ...prepared].slice(0, 8);
+                syncImageInput();
+                renderImagePreviews();
+            } finally {
+                if (button) { button.disabled = false; button.textContent = prev || t('inventory.parse_ai'); }
+            }
+        }
+        async function onGallerySelected(event) {
+            await addImageFiles(event.target.files);
+            event.target.value = '';
+        }
+        async function onCameraSelected(event) {
+            await addImageFiles(event.target.files);
+            event.target.value = '';
+            if (state.imageFiles.length) {
+                App.toast('Foto lista. Puedes analizarla con IA.', 'success');
+            }
+        }
+        async function analyzeImage() {
+            let file = state.imageFiles[0] || $('product-images').files[0];
+            if (!file) return App.toast('Toma una foto o elige una imagen primero.', 'warning');
+            const button = $('analyze-image-btn');
+            button.disabled = true;
+            button.textContent = 'Preparando…';
+            try {
+                if (file.type !== 'image/jpeg') {
+                    file = await prepareImageFile(file);
+                    state.imageFiles[0] = file;
+                    syncImageInput();
+                    renderImagePreviews();
+                }
+                button.textContent = 'Analizando…';
+                const data = new FormData();
+                data.append('action', 'parse_product_image');
+                data.append('image', file, file.name || 'product.jpg');
+                data.append('file', file, file.name || 'product.jpg');
+                const barcode = $('product-form').elements.barcode_display.value.trim() || $('product-form').elements.barcode.value.trim();
+                if (barcode) data.append('barcode', barcode);
+                const result = await App.apiForm('/api/inventory', data);
+                const product = result.product || result;
+                const form = $('product-form');
+                const name = product.name || product.product_name;
+                if (name) form.elements.name.value = name;
+                if (product.description != null) form.elements.description.value = product.description;
+                const retail = product.retail_price ?? product.suggested_retail_price;
+                if (retail != null && retail !== '') form.elements.retail_price.value = retail;
+                if (product.cost_price != null && product.cost_price !== '') form.elements.cost_price.value = product.cost_price;
+                if (product.taxable !== undefined) form.elements.taxable.checked = Boolean(product.taxable);
+                if (product.barcode && !form.elements.barcode.value) {
+                    form.elements.barcode.value = product.barcode;
+                    if (form.elements.barcode_display) form.elements.barcode_display.value = product.barcode;
+                }
+                const query = result.image_search_query || product.image_search_query || name || '';
+                state.imageSearchQuery = query;
+                renderWebImageSuggestions(result.suggested_images || [], query);
+                const count = (result.suggested_images || []).length;
+                App.toast(count ? `IA lista. ${count} imágenes web sugeridas.` : 'Campos completados con IA. Revísalos antes de guardar.', 'success');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            } finally {
+                button.disabled = false;
+                button.textContent = t('inventory.parse_ai');
+            }
+        }
+        async function refreshWebImages() {
+            const form = $('product-form');
+            const query = form.elements.name.value.trim() || state.imageSearchQuery;
+            const barcode = form.elements.barcode_display.value.trim() || form.elements.barcode.value.trim();
+            if (!query && !barcode) return App.toast('Escribe el nombre del producto (marca + tamaño) para buscar su foto.', 'warning');
+            const buttons = [$('refresh-web-images-btn'), $('find-web-images-btn')].filter(Boolean);
+            buttons.forEach((btn) => { btn.disabled = true; });
+            const findBtn = $('find-web-images-btn');
+            const prevLabel = findBtn?.textContent;
+            if (findBtn) findBtn.textContent = 'Buscando…';
+            try {
+                const res = await App.api('POST', '/api/inventory', {
+                    action: 'suggest_web_images',
+                    query,
+                    barcode,
+                    product_name: form.elements.name.value.trim(),
+                });
+                const list = res.suggested_images || [];
+                renderWebImageSuggestions(list, res.query || query, true);
+                App.toast(list.length ? `${list.length} fotos del producto encontradas.` : 'No hay fotos exactas. Usa marca + nombre + tamaño.', list.length ? 'success' : 'warning');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            } finally {
+                buttons.forEach((btn) => { btn.disabled = false; });
+                if (findBtn) findBtn.textContent = prevLabel || t('inventory.find_web_images');
+            }
+        }
+        async function selectWebImage(index) {
+            const item = state.suggestedImages[index];
+            if (!item?.url) return;
+            try {
+                App.toast('Importando imagen del producto…', 'info');
+                const res = await App.api('POST', '/api/inventory', { action: 'import_web_image', url: item.url });
+                state.webImagePath = res.image_path || '';
+                state.webImageUrl = res.image_url || resolveStoredImage(res.image_path);
+                $('product-image-path').value = state.webImagePath;
+                renderImagePreviews();
+                App.toast('Imagen del producto agregada.', 'success');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+        async function saveProduct(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            form.elements.barcode.value = form.elements.barcode_display.value.trim();
+            syncImageInput();
+            const data = new FormData(form);
+            data.delete('images');
+            state.imageFiles.forEach((file) => data.append('images[]', file));
+            state.imageFiles.forEach((file) => data.append('images', file));
+            if (state.imageFiles[0]) data.append('image', state.imageFiles[0]);
+            if (state.webImagePath && !state.imageFiles.length) data.set('image_path', state.webImagePath);
+            const productId = String($('product-id-field')?.value || '').trim();
+            data.set('product_id', productId);
+            if (productId) data.set('id', productId);
+            data.set('action', productId ? 'update' : 'create');
+            data.set('product_name', form.elements.name.value.trim());
+            data.set('taxable', '1');
+            data.set('active', ($('product-published')?.checked ?? form.elements.published?.checked) ? '1' : '0');
+            const storeId = productStoreId(state.editingProduct);
+            if (storeId) data.set('store_id', String(storeId));
+            else if (state.viewAllStores && !productId) {
+                App.toast(t('inventory.pick_store_to_create'), 'warning');
+                return;
+            }
+            try {
+                await App.apiForm('/api/inventory', data);
+                App.toast(productId ? 'Producto actualizado' : 'Producto creado', 'success');
+                state.editingProduct = null;
+                closeProductModal();
+                $('barcode-input').value = '';
+                loadData();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                if ([...document.scripts].some(s => s.src.includes(src))) return resolve();
+                const el = document.createElement('script');
+                el.src = src;
+                el.async = true;
+                el.onload = () => resolve();
+                el.onerror = () => reject(new Error('No se pudo cargar el escáner de cámara.'));
+                document.head.appendChild(el);
+            });
+        }
+
+        async function onBarcodeDetected(code) {
+            const value = String(code || '').trim();
+            if (!value) return;
+            const now = Date.now();
+            if (value === state.scanner.lastCode && now - state.scanner.lastAt < 1500) return;
+            state.scanner.lastCode = value;
+            state.scanner.lastAt = now;
+            $('scanner-status').textContent = `Código detectado: ${value}`;
+            await stopCameraScan();
+            App.closeModal('scanner-modal');
+            // Same camera for sales terminal OR product add/edit form
+            if (state.scanner.target === 'product') {
+                const form = $('product-form');
+                form.elements.barcode.value = value;
+                form.elements.barcode_display.value = value;
+                App.toast('Código listo para el producto', 'success');
+                state.scanner.target = 'sale';
+                return;
+            }
+            $('barcode-input').value = value;
+            await lookupBarcode();
+        }
+
+        async function stopCameraScan() {
+            if (state.scanner.raf) {
+                cancelAnimationFrame(state.scanner.raf);
+                state.scanner.raf = 0;
+            }
+            if (state.scanner.stream) {
+                state.scanner.stream.getTracks().forEach(track => track.stop());
+                state.scanner.stream = null;
+            }
+            const video = $('scanner-video');
+            if (video) {
+                video.pause();
+                video.srcObject = null;
+                video.classList.add('hidden');
+            }
+            if (state.scanner.html5) {
+                try { await state.scanner.html5.stop(); } catch (_) {}
+                try { await state.scanner.html5.clear(); } catch (_) {}
+                state.scanner.html5 = null;
+            }
+            const reader = $('camera-reader');
+            if (reader) {
+                reader.innerHTML = '';
+                reader.classList.add('hidden');
+            }
+        }
+
+        async function startNativeScan() {
+            const video = $('scanner-video');
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            });
+            state.scanner.stream = stream;
+            video.srcObject = stream;
+            video.classList.remove('hidden');
+            await video.play();
+            const formats = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'codabar', 'qr_code'];
+            const detector = new BarcodeDetector({ formats });
+            const tick = async () => {
+                if (!$('scanner-modal').classList.contains('open')) return;
+                try {
+                    if (video.readyState >= 2) {
+                        const codes = await detector.detect(video);
+                        if (codes?.length) {
+                            await onBarcodeDetected(codes[0].rawValue);
+                            return;
+                        }
+                    }
+                } catch (_) {}
+                state.scanner.raf = requestAnimationFrame(tick);
+            };
+            state.scanner.raf = requestAnimationFrame(tick);
+        }
+
+        async function startHtml5Scan() {
+            await loadScript('https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js');
+            if (typeof Html5Qrcode === 'undefined') throw new Error('Escáner no disponible en este navegador.');
+            const reader = $('camera-reader');
+            reader.classList.remove('hidden');
+            const scanner = new Html5Qrcode('camera-reader');
+            state.scanner.html5 = scanner;
+            await scanner.start(
+                { facingMode: 'environment' },
+                { fps: 10, qrbox: { width: 260, height: 160 }, aspectRatio: 3 / 4 },
+                async (decoded) => { await onBarcodeDetected(decoded); },
+                () => {}
+            );
+        }
+
+        async function startCameraScan(target = 'sale') {
+            state.scanner.target = target === 'product' ? 'product' : 'sale';
+            if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                return App.toast('La cámara requiere HTTPS o localhost.', 'warning');
+            }
+            if (!navigator.mediaDevices?.getUserMedia) {
+                return App.toast('Este dispositivo no permite usar la cámara.', 'warning');
+            }
+            await stopCameraScan();
+            $('scanner-status').textContent = state.scanner.target === 'product'
+                ? 'Escanea el código para el producto nuevo.'
+                : (state.mode === 'sale'
+                    ? 'Venta: apunta al código de un producto ya en inventario.'
+                    : 'Agregar inventario: apunta al código para recibir mercancía.');
+            App.openModal('scanner-modal');
+            try {
+                if ('BarcodeDetector' in window) await startNativeScan();
+                else await startHtml5Scan();
+            } catch (err) {
+                await stopCameraScan();
+                App.closeModal('scanner-modal');
+                App.toast(err.message || 'No se pudo abrir la cámara.', 'danger');
+            }
+        }
+
+        async function closeScannerModal() {
+            await stopCameraScan();
+            App.closeModal('scanner-modal');
+            focusBarcode();
+        }
+
+        async function init() {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            initInventoryStoreSelector();
+            syncStoreContext(state.viewAllStores ? t('inventory.all_stores') : App.currentStore?.name);
+            App.initUserMenu();
+            if (App.user?.name) {
+                $('user-avatar').textContent = App.user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            }
+            syncTaxBadge();
+            function startVenderFlow() {
+                setMode('sale');
+                startCameraScan('sale');
+            }
+            function startStockInFlow() {
+                setMode('stock_in');
+                startCameraScan('sale');
+            }
+            $('venta-cta')?.addEventListener('click', startVenderFlow);
+            $('stock-in-cta')?.addEventListener('click', startStockInFlow);
+            $('barcode-form').addEventListener('submit', e => { e.preventDefault(); lookupBarcode(); });
+            $('vender-cta')?.addEventListener('click', startVenderFlow);
+            $('vender-cta-header')?.addEventListener('click', startVenderFlow);
+            $('camera-scan-btn').addEventListener('click', () => startCameraScan('sale'));
+            $('camera-scan-cta')?.addEventListener('click', () => startCameraScan('sale'));
+            $('product-scan-barcode-btn')?.addEventListener('click', () => startCameraScan('product'));
+            setMode('sale');
+            $('tax-settings-btn').addEventListener('click', openTaxModal);
+            $('tax-form').addEventListener('submit', saveTax);
+            $('search-input').addEventListener('input', App.debounce(loadData, 250));
+            $('add-product-btn').addEventListener('click', () => openProductModal());
+            $('product-form').addEventListener('submit', saveProduct);
+            $('product-images').addEventListener('change', onGallerySelected);
+            $('product-camera').addEventListener('change', onCameraSelected);
+            $('take-photo-btn').addEventListener('click', () => $('product-camera').click());
+            $('choose-photos-btn').addEventListener('click', () => $('product-images').click());
+            $('analyze-image-btn').addEventListener('click', analyzeImage);
+            $('refresh-web-images-btn').addEventListener('click', refreshWebImages);
+            $('find-web-images-btn').addEventListener('click', refreshWebImages);
+            $('image-preview').addEventListener('click', (e) => {
+                if (e.target.closest('[data-clear-web-image]')) {
+                    state.webImagePath = '';
+                    state.webImageUrl = '';
+                    $('product-image-path').value = '';
+                    renderImagePreviews();
+                    return;
+                }
+                const btn = e.target.closest('[data-remove-image]');
+                if (!btn) return;
+                state.imageFiles.splice(Number(btn.dataset.removeImage), 1);
+                syncImageInput();
+                renderImagePreviews();
+            });
+            $('web-image-grid').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-select-web-image]');
+                if (!btn) return;
+                selectWebImage(Number(btn.dataset.selectWebImage));
+            });
+            $('product-modal-backdrop').addEventListener('click', closeProductModal);
+            $('tax-modal-backdrop').addEventListener('click', closeTaxModal);
+            $('scanner-modal-backdrop').addEventListener('click', closeScannerModal);
+            document.addEventListener('click', e => {
+                const close = e.target.closest('[data-close-modal]');
+                if (close) {
+                    const id = close.getAttribute('data-close-modal');
+                    if (id === 'scanner-modal') closeScannerModal();
+                    else if (id === 'tax-modal') closeTaxModal();
+                    else if (id === 'product-modal') closeProductModal();
+                    return;
+                }
+                const edit = e.target.closest('[data-edit-product]');
+                if (edit) openProductModal(state.products.find(p => String(p.id) === edit.dataset.editProduct));
+                const pub = e.target.closest('[data-publish-product]');
+                if (pub) setProductPublish(Number(pub.dataset.publishProduct), true);
+                const unpub = e.target.closest('[data-unpublish-product]');
+                if (unpub) setProductPublish(Number(unpub.dataset.unpublishProduct), false);
+                const del = e.target.closest('[data-delete-product]');
+                if (del) deleteProduct(Number(del.dataset.deleteProduct));
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key !== 'Escape') return;
+                if ($('scanner-modal').classList.contains('open')) closeScannerModal();
+                else if ($('tax-modal').classList.contains('open')) closeTaxModal();
+                else if ($('product-modal').classList.contains('open')) closeProductModal();
+            });
+            window.addEventListener('store-changed', () => {
+                if (state.viewAllStores) return;
+                $('barcode-input').value = '';
+                $('scan-result').classList.add('hidden');
+                state.product = null;
+                syncStoreContext(App.currentStore?.name);
+                loadData();
+            });
+            document.addEventListener('language-changed', loadData);
+            window.addEventListener('beforeunload', () => { stopCameraScan(); });
+            await loadData();
+            setTimeout(focusBarcode, 80);
+        }
+        init();
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Marca de Tienda Hispana El Rey</title>
+  <rect width="64" height="64" rx="14" fill="#dff3fa"/>
+  <path d="M15 25 21 14l11 9 11-9 6 11-4 8H19Z" fill="#dea957" stroke="#6f442f" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M20 37h24v12a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4Z" fill="#6f442f"/>
+  <path d="M26 37v16m12-16v16" stroke="#fffaf3" stroke-width="2" opacity=".55"/>
+  <circle cx="21" cy="14" r="2.5" fill="#277c9b"/>
+  <circle cx="32" cy="22" r="2.5" fill="#277c9b"/>
+  <circle cx="43" cy="14" r="2.5" fill="#277c9b"/>
+</svg>

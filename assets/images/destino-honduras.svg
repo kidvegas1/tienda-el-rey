@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title">
+  <title id="title">Paisaje ilustrado de Honduras</title>
+  <rect width="640" height="480" fill="#dff3fa"/>
+  <circle cx="505" cy="105" r="58" fill="#efc570"/>
+  <path d="M0 325 143 172l112 118L370 127l179 201 91-88v240H0Z" fill="#91cbdc"/>
+  <path d="M0 350 146 245l113 100 137-115 144 130 100-68v188H0Z" fill="#5f9d73"/>
+  <path d="m208 337 73-58 76 58v86H208Z" fill="#fffaf3"/>
+  <path d="m194 340 87-70 91 70" fill="none" stroke="#704633" stroke-width="14" stroke-linecap="round"/>
+  <path d="M246 423v-53h32v53M304 350h27v29h-27z" fill="#8a563c"/>
+  <path d="M74 421c15-59 44-87 87-80-7 42-31 72-72 89m410-7c-13-53 3-88 48-104 17 42 7 79-30 111" fill="#377b59"/>
+</svg>

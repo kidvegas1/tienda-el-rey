@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Excel — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div><h1 class="text-sm font-bold text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="nav.import">Import Excel</p></div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.import.heading">Import Excel</h2>
+                    <p class="text-xs text-text-muted" id="page-date"></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <select id="store-selector" class="input py-2 px-3 text-sm w-40"></select>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <!-- Upload Zone -->
+            <section id="upload-section">
+                <div id="drop-zone" class="border-2 border-dashed border-border rounded-2xl p-12 text-center hover:border-accent transition-colors cursor-pointer group">
+                    <input type="file" id="file-input" class="hidden" accept=".xlsx,.xls">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-bg-elevated flex items-center justify-center group-hover:bg-accent/10 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-text-muted group-hover:text-accent transition-colors"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-lg font-semibold text-text-primary" data-i18n="import.drop_title">Drop your Excel file here or click to browse</p>
+                            <p class="text-sm text-text-muted mt-1" data-i18n="import.drop_hint">Supports .xlsx and .xls files</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- File Info (shown after file selected) -->
+            <section id="file-info" class="hidden">
+                <div class="card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-[oklch(0.75_0.18_155_/_0.1)] flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-success"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-text-primary" id="file-name"></p>
+                                <p class="text-xs text-text-muted" id="file-meta"></p>
+                            </div>
+                        </div>
+                        <button id="clear-file-btn" class="btn-secondary text-xs py-1.5 px-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            <span data-i18n="import.clear">Clear</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sheet Previews -->
+            <section id="sheets-section" class="hidden space-y-4"></section>
+
+            <!-- Import Button -->
+            <section id="import-actions" class="hidden">
+                <div class="flex items-center gap-3">
+                    <button id="import-btn" class="btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span data-i18n="import.import_sheets">Import Selected Sheets</span>
+                    </button>
+                    <p class="text-sm text-text-muted" id="import-summary"></p>
+                </div>
+            </section>
+
+            <!-- Import Progress -->
+            <section id="import-progress" class="hidden">
+                <div class="card">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-sm font-semibold text-text-primary" data-i18n="import.importing">Importing data...</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill transition-all duration-300" id="import-progress-bar" style="width:0%"></div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" id="import-progress-text"></p>
+                </div>
+            </section>
+
+            <!-- Import History -->
+            <section>
+                <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4" data-i18n="import.history">Import History</h3>
+                <div class="table-container mobile-cards">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="common.date">Date</th>
+                                <th data-i18n="import.col.filename">Filename</th>
+                                <th data-i18n="import.col.module">Module</th>
+                                <th data-i18n="import.col.rows">Rows Imported</th>
+                                <th data-i18n="common.status">Status</th>
+                                <th data-i18n="common.user">User</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <tr><td colspan="6" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/personal-transfer-xlsx.js"></script>
+    <script>
+        let parsedWorkbook = null;
+        let selectedFile = null;
+        let sheetMappings = {};
+        let personalTransferParse = null;
+
+        const MODULE_RULES = [
+            { module: 'caja',       keywords: ['COMPANIA', 'ENTRADA', 'CHEQUES Y DEBITOS', 'CAJERA'] },
+            { module: 'transfers',  keywords: ['REFERENCIA', 'BENEFICIARIO', 'PRINCIPAL', 'FECHA', 'TIENDA'] },
+            { module: 'inventory',  keywords: ['PRODUCTO', 'QTY', 'CANTIDAD', 'SKU', 'PRECIO', 'STOCK'] },
+            { module: 'clients',    keywords: ['CLIENTE', 'TELEFONO', 'PHONE', 'CLIENT_CODE', 'LIMITE MENSUAL'] },
+            { module: 'statistics', keywords: ['BARRI', 'VIA', 'INTER', 'DINEX', 'LAKE JUNE', 'GIROS', 'TOTAL'] },
+            { module: 'internal_ledger', keywords: ['DEBO A SULY', 'SULY ME DEBE', 'DIFERENCIA', 'SULY DEBE'] },
+            { module: 'accounting', keywords: ['FALTANTE', 'CASH', 'DEBE', 'A FAVOR'] },
+        ];
+
+        const SHEET_NAME_MAP = {
+            'caja': 'caja',
+            'transferencias': 'transfers',
+            'estadisticas giros': 'statistics',
+            'estadisticas': 'statistics',
+            'libro': 'internal_ledger',
+            'interno': 'internal_ledger',
+            'contabilidad': 'accounting',
+            'inventario medicina': 'inventory',
+            'base de datos clientes': 'clients',
+            'horarios': 'skip',
+            'aseguranzas': 'skip',
+        };
+
+        function detectModule(headers, sheetName, allRows) {
+            const nameLower = (sheetName || '').toLowerCase().trim();
+            if (SHEET_NAME_MAP[nameLower]) return SHEET_NAME_MAP[nameLower];
+            for (const [pattern, mod] of Object.entries(SHEET_NAME_MAP)) {
+                if (nameLower.includes(pattern)) return mod;
+            }
+
+            // Scan first 5 rows for keyword matches (not just headers)
+            const scanRows = [headers, ...(allRows || []).slice(0, 4)];
+            const allText = scanRows.flat().map(h => String(h).toUpperCase().trim());
+            let best = null;
+            let bestScore = 0;
+            for (const rule of MODULE_RULES) {
+                const score = rule.keywords.filter(k => allText.some(h => h.includes(k))).length;
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = rule.module;
+                }
+            }
+
+            return best || 'skip';
+        }
+
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function importStatusLabel(status) {
+            const key = 'import.status.' + status;
+            const label = App.t(key);
+            return label !== key ? label : status;
+        }
+
+        function importModuleLabel(module) {
+            if (!module) return App.t('empty.none');
+            const key = 'import.option.' + module;
+            const label = App.t(key);
+            return label !== key ? label : module;
+        }
+
+        function updatePageDate() {
+            const el = document.getElementById('page-date');
+            if (!el) return;
+            el.textContent = new Date().toLocaleDateString(App.lang === 'es' ? 'es-US' : 'en-US', {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+            });
+        }
+
+        function fmtMoney(n) {
+            return (parseFloat(n) || 0).toLocaleString(App.lang === 'es' ? 'es-US' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function renderPersonalTransferPreview(parsed) {
+            const container = document.getElementById('sheets-section');
+            container.innerHTML = '';
+            const preview = parsed.transactions.slice(0, 8);
+            const fmtLabel = parsed.format === 'personal_viamericas'
+                ? App.t('import.personal_viamericas')
+                : App.t('import.option.transfers');
+
+            sheetMappings = { [parsed.sheetName]: 'transfers' };
+
+            const card = document.createElement('div');
+            card.className = 'card space-y-4';
+            card.innerHTML = `
+                <div class="flex items-start justify-between flex-wrap gap-3">
+                    <div>
+                        <p class="text-sm font-semibold text-text-primary">${escapeHtml(fmtLabel)}</p>
+                        <p class="text-xs text-text-muted mt-1">${escapeHtml(parsed.sheetName)} · ${App.t('import.personal_meta', { count: parsed.transactions.length })}</p>
+                    </div>
+                    <span class="badge badge-info">${App.t('import.auto_detected')}</span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.personal.agency')}</p>
+                        <p class="text-sm font-semibold font-mono mt-1">${escapeHtml(parsed.agency_number || App.t('empty.none'))}</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.personal.date_range')}</p>
+                        <p class="text-sm font-semibold mt-1">${escapeHtml(parsed.date_from || '—')} → ${escapeHtml(parsed.date_to || '—')}</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.personal.total_usd')}</p>
+                        <p class="text-sm font-semibold font-mono mt-1">$${fmtMoney(parsed.totals.principal)}</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-xs text-text-muted uppercase tracking-wider">${App.t('import.personal.company')}</p>
+                        <p class="text-sm font-semibold mt-1">${escapeHtml(parsed.company || 'Viamericas')}</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto mobile-cards rounded-xl border border-border">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.reference')}</th>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.sender')}</th>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.beneficiary')}</th>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.created')}</th>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.paid')}</th>
+                                <th class="px-3 py-2 text-right text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.usd')}</th>
+                                <th class="px-3 py-2 text-right text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.mxn')}</th>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.bank')}</th>
+                                <th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${App.t('import.personal.col.destination')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${preview.map(tx => `<tr>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border font-mono">${escapeHtml(tx.reference)}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border">${escapeHtml(tx.sender_name)}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border">${escapeHtml(tx.beneficiary)}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border">${escapeHtml((tx.date_sent || '').slice(0, 19))}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border">${escapeHtml((tx.date_paid || '').slice(0, 19))}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border text-right font-mono">$${fmtMoney(tx.amount_usd)}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border text-right font-mono">${fmtMoney(tx.amount_local)}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border">${escapeHtml(tx.paying_bank || '')}</td>
+                                <td class="px-3 py-1.5 whitespace-nowrap border-t border-border">${escapeHtml(tx.destination_city || tx.destination_country || '')}</td>
+                            </tr>`).join('')}
+                            ${parsed.transactions.length > 8 ? `<tr><td colspan="9" class="px-3 py-2 text-center text-text-muted border-t border-border">${App.t('import.more_rows', { count: parsed.transactions.length - 8 })}</td></tr>` : ''}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.appendChild(card);
+            container.classList.remove('hidden');
+
+            const btn = document.getElementById('import-btn');
+            btn.querySelector('span').textContent = App.t('import.import_transfers', { count: parsed.transactions.length });
+            document.getElementById('import-summary').textContent = App.t('import.personal.summary', {
+                count: parsed.transactions.length,
+                agency: parsed.agency_number || parsed.company,
+            });
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('import-actions').classList.remove('hidden');
+        }
+
+        function renderSheets() {
+            const container = document.getElementById('sheets-section');
+            container.innerHTML = '';
+            const btn = document.getElementById('import-btn');
+            btn.querySelector('span').textContent = App.t('import.import_sheets');
+            const sheetNames = parsedWorkbook.SheetNames;
+
+            sheetNames.forEach((name, idx) => {
+                const ws = parsedWorkbook.Sheets[name];
+                const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                if (data.length === 0) return;
+
+                const headers = data[0];
+                const rows = data.slice(1).filter(r => r.some(c => c !== ''));
+                const preview = rows.slice(0, 5);
+                const detected = detectModule(headers.map(String), name, data.slice(1, 6));
+                sheetMappings[name] = detected;
+
+                const card = document.createElement('div');
+                card.className = 'card space-y-4';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-bg-elevated flex items-center justify-center text-xs font-bold text-accent">${idx + 1}</div>
+                            <div>
+                                <p class="text-sm font-semibold text-text-primary">${escapeHtml(name)}</p>
+                                <p class="text-xs text-text-muted">${App.t('import.sheet_meta', { rows: rows.length, cols: headers.length })}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-text-muted">${App.t('import.map_to')}</span>
+                            <select data-sheet="${escapeHtml(name)}" class="sheet-mapping input py-1.5 px-3 text-sm">
+                                <option value="skip" ${detected === 'skip' ? 'selected' : ''}>${App.t('import.option.skip')}</option>
+                                <option value="caja" ${detected === 'caja' ? 'selected' : ''}>${App.t('import.option.caja')}</option>
+                                <option value="clients" ${detected === 'clients' ? 'selected' : ''}>${App.t('import.option.clients')}</option>
+                                <option value="inventory" ${detected === 'inventory' ? 'selected' : ''}>${App.t('import.option.inventory')}</option>
+                                <option value="statistics" ${detected === 'statistics' ? 'selected' : ''}>${App.t('import.option.statistics')}</option>
+                                <option value="internal_ledger" ${detected === 'internal_ledger' ? 'selected' : ''}>${App.t('import.option.internal_ledger')}</option>
+                                <option value="accounting" ${detected === 'accounting' ? 'selected' : ''}>${App.t('import.option.accounting')}</option>
+                                <option value="transfers" ${detected === 'transfers' ? 'selected' : ''}>${App.t('import.option.transfers')}</option>
+                            </select>
+                            ${detected !== 'skip' ? `<span class="badge badge-${({caja:'accent',clients:'info',inventory:'success',statistics:'info',internal_ledger:'danger',accounting:'warning',transfers:'info'})[detected] || 'info'}">${App.t('import.auto_detected')}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto mobile-cards rounded-xl border border-border">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr>${headers.map(h => `<th class="px-3 py-2 text-left text-text-muted font-semibold uppercase tracking-wider whitespace-nowrap bg-bg-elevated">${escapeHtml(String(h))}</th>`).join('')}</tr>
+                            </thead>
+                            <tbody>
+                                ${preview.map(row => `<tr>${headers.map((_, ci) => `<td class="px-3 py-1.5 whitespace-nowrap border-t border-border text-text-secondary">${escapeHtml(String(row[ci] ?? ''))}</td>`).join('')}</tr>`).join('')}
+                                ${rows.length > 5 ? `<tr><td colspan="${headers.length}" class="px-3 py-2 text-center text-text-muted border-t border-border">${App.t('import.more_rows', { count: rows.length - 5 })}</td></tr>` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            container.querySelectorAll('.sheet-mapping').forEach(sel => {
+                sel.addEventListener('change', () => {
+                    sheetMappings[sel.dataset.sheet] = sel.value;
+                    updateImportSummary();
+                });
+            });
+
+            container.classList.remove('hidden');
+            updateImportSummary();
+        }
+
+        function updateImportSummary() {
+            const active = Object.entries(sheetMappings).filter(([, v]) => v !== 'skip');
+            const el = document.getElementById('import-summary');
+            const btn = document.getElementById('import-btn');
+            if (active.length === 0) {
+                el.textContent = App.t('import.no_sheets_selected');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                const list = active.map(([n, m]) => `${n} → ${App.t('import.option.' + m)}`).join(', ');
+                el.textContent = App.t('import.summary_will_import', { count: active.length, list });
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            document.getElementById('import-actions').classList.remove('hidden');
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['xlsx', 'xls'].includes(ext)) {
+                App.toastKey('toast.invalid_excel', 'danger');
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-meta').textContent = `${(file.size / 1024).toFixed(1)} KB`;
+            document.getElementById('file-info').classList.remove('hidden');
+            document.getElementById('drop-zone').classList.add('hidden');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    parsedWorkbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    sheetMappings = {};
+                    personalTransferParse = PersonalTransferXlsx.detectWorkbookPersonalTransfer(parsedWorkbook, XLSX);
+                    if (personalTransferParse?.transactions?.length) {
+                        renderPersonalTransferPreview(personalTransferParse);
+                    } else {
+                        personalTransferParse = null;
+                        renderSheets();
+                    }
+                } catch (err) {
+                    App.toastKey('toast.parse_excel_failed', 'danger', err.message);
+                    resetUpload();
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function resetUpload() {
+            selectedFile = null;
+            parsedWorkbook = null;
+            sheetMappings = {};
+            personalTransferParse = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-info').classList.add('hidden');
+            document.getElementById('sheets-section').classList.add('hidden');
+            document.getElementById('sheets-section').innerHTML = '';
+            document.getElementById('import-actions').classList.add('hidden');
+            document.getElementById('import-progress').classList.add('hidden');
+            document.getElementById('drop-zone').classList.remove('hidden');
+        }
+
+        async function runImport() {
+            const activeSheets = Object.entries(sheetMappings).filter(([, v]) => v !== 'skip');
+            if (!activeSheets.length || !selectedFile) return;
+
+            document.getElementById('import-actions').classList.add('hidden');
+            document.getElementById('import-progress').classList.remove('hidden');
+            const progressBar = document.getElementById('import-progress-bar');
+            const progressText = document.getElementById('import-progress-text');
+
+            try {
+                progressText.textContent = App.t('import.progress.uploading');
+                progressBar.style.width = '10%';
+
+                const fd = new FormData();
+                fd.append('file', selectedFile);
+                fd.append('action', 'upload');
+                const uploadRes = await App.apiForm('/api/import', fd);
+
+                progressBar.style.width = '40%';
+                progressText.textContent = App.t('import.progress.processing');
+
+                const sheetsData = {};
+                if (personalTransferParse?.transactions?.length) {
+                    sheetsData[personalTransferParse.sheetName] = {
+                        module: 'transfers',
+                        rows: personalTransferParse.transactions,
+                    };
+                } else {
+                    for (const [sheetName, module] of activeSheets) {
+                        const ws = parsedWorkbook.Sheets[sheetName];
+                        sheetsData[sheetName] = {
+                            module,
+                            rows: XLSX.utils.sheet_to_json(ws, { defval: '' }),
+                        };
+                    }
+                }
+
+                progressBar.style.width = '60%';
+                progressText.textContent = App.t('import.progress.sending');
+
+                const result = await App.api('POST', '/api/import', {
+                    action: 'confirm_import',
+                    import_id: uploadRes.import_id,
+                    sheet_mapping: sheetMappings,
+                    sheets: sheetsData,
+                });
+
+                progressBar.style.width = '100%';
+                progressText.textContent = App.t('import.progress.done', { count: result.rows_imported ?? 0 });
+
+                setTimeout(() => {
+                    App.toastKey('toast.import_complete', 'success', { count: result.rows_imported ?? 0 });
+                    resetUpload();
+                    loadImports();
+                }, 1500);
+
+            } catch (err) {
+                App.toastKey('toast.import_failed', 'danger', err.message);
+                document.getElementById('import-progress').classList.add('hidden');
+                document.getElementById('import-actions').classList.remove('hidden');
+            }
+        }
+
+        async function loadImports() {
+            try {
+                const res = await App.api('GET', '/api/import');
+                const tbody = document.getElementById('history-tbody');
+                if (!res.imports || !res.imports.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-text-muted py-8">${App.t('import.no_imports')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = res.imports.map(imp => {
+                    const statusMap = {
+                        completed: 'success',
+                        failed: 'danger',
+                        pending: 'warning',
+                        processing: 'info',
+                    };
+                    const badgeType = statusMap[imp.status] || 'info';
+                    return `
+                    <tr>
+                        <td class="text-sm">${App.formatDate ? App.formatDate(imp.created_at) : new Date(imp.created_at).toLocaleDateString()}</td>
+                        <td class="font-medium text-sm">${escapeHtml(imp.filename)}</td>
+                        <td class="text-xs text-text-muted">${escapeHtml(importModuleLabel(imp.module))}</td>
+                        <td class="font-mono tabular-nums text-sm">${imp.rows_imported ?? 0}</td>
+                        <td><span class="badge badge-${badgeType}">${importStatusLabel(imp.status)}</span></td>
+                        <td class="text-sm text-text-secondary">${escapeHtml(imp.user_name || App.t('empty.none'))}</td>
+                    </tr>`;
+                }).join('');
+            } catch (err) {
+                console.error('Failed to load import history:', err);
+                document.getElementById('history-tbody').innerHTML = `<tr><td colspan="6" class="text-center text-text-muted py-8">${App.t('import.load_failed')}</td></tr>`;
+            }
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            updatePageDate();
+
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file-input');
+
+            dropZone.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-accent', 'bg-accent/5');
+            });
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-accent', 'bg-accent/5');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-accent', 'bg-accent/5');
+                const file = e.dataTransfer.files[0];
+                if (file) handleFile(file);
+            });
+
+            document.getElementById('clear-file-btn').addEventListener('click', resetUpload);
+            document.getElementById('import-btn').addEventListener('click', runImport);
+
+            loadImports();
+            window.addEventListener('store-changed', loadImports);
+            document.addEventListener('language-changed', () => {
+                updatePageDate();
+                loadImports();
+                if (parsedWorkbook) {
+                    if (personalTransferParse?.transactions?.length) {
+                        renderPersonalTransferPreview(personalTransferParse);
+                    } else {
+                        renderSheets();
+                        updateImportSummary();
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

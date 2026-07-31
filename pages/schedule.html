@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule & Clock-In — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div><h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="nav.schedule">Schedule & Clock-In</p></div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.schedule.heading">Schedule & Clock-In</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <input type="date" id="filter-date" class="input py-2 px-3 text-sm w-full sm:w-44">
+                <button id="clock-in-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span data-i18n="action.clock_in">Clock In</span>
+                </button>
+                <button id="add-employee-btn" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="schedule.add_employee">Add Employee</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <!-- Today's Clock-Ins -->
+            <section>
+                <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4" data-i18n="schedule.today_attendance">Today's Attendance</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="clockin-cards">
+                    <p class="text-sm text-text-muted col-span-full" data-i18n="common.loading">Loading...</p>
+                </div>
+            </section>
+
+            <!-- Weekly Hours Summary (admin only) -->
+            <section class="card" id="weekly-hours-section">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="schedule.weekly_hours_summary">Weekly Hours Summary</h3>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <input type="date" id="week-start" class="input py-1.5 px-3 text-xs w-full sm:w-36">
+                        <input type="date" id="week-end" class="input py-1.5 px-3 text-xs w-full sm:w-36">
+                        <button id="load-history-btn" class="btn-secondary text-xs py-1.5 px-3" data-i18n="action.load">Load</button>
+                    </div>
+                </div>
+                <div id="hours-summary" class="space-y-3"></div>
+            </section>
+
+            <!-- History Table (admin only) -->
+            <div class="table-container mobile-cards" id="history-table-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="col.employee">Employee</th>
+                            <th data-i18n="col.clock_in">Clock In</th>
+                            <th data-i18n="col.clock_out">Clock Out</th>
+                            <th data-i18n="col.hours">Hours</th>
+                            <th data-i18n="col.photo">Photo</th>
+                            <th data-i18n="col.status">Status</th>
+                            <th data-i18n="col.actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <tr><td colspan="7" class="text-center text-text-muted py-8" data-i18n="schedule.select_date_range">Select date range to view history</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Clock-In Modal -->
+    <div class="modal-backdrop" id="clockin-modal-backdrop"></div>
+    <div class="modal-content max-w-lg" id="clockin-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="action.clock_in">Clock In</h3>
+        <form id="clockin-form" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="col.employee">Employee</label>
+                <select name="employee_id" class="input" required id="clockin-employee-select">
+                    <option value="" data-i18n="schedule.select_employee">Select employee...</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="schedule.photo_verification">Photo Verification (Required)</label>
+                <div class="relative rounded-xl overflow-hidden bg-bg-elevated border border-border" style="aspect-ratio:4/3">
+                    <video id="camera-preview" class="w-full h-full object-cover" autoplay playsinline></video>
+                    <canvas id="camera-canvas" class="hidden"></canvas>
+                    <img id="photo-preview" class="hidden w-full h-full object-cover absolute inset-0" alt="Vista previa de la foto de entrada">
+                    <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-text-muted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                        <p class="text-sm mt-2" data-i18n="schedule.camera_placeholder">Camera will activate</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button type="button" id="start-camera-btn" class="btn-secondary flex-1 justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                        <span data-i18n="schedule.start_camera">Start Camera</span>
+                    </button>
+                    <button type="button" id="take-photo-btn" class="btn-primary flex-1 justify-center" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/></svg>
+                        <span data-i18n="schedule.take_photo">Take Photo</span>
+                    </button>
+                    <button type="button" id="retake-btn" class="btn-secondary flex-1 justify-center hidden" data-i18n="schedule.retake">Retake</button>
+                </div>
+            </div>
+
+            <input type="hidden" id="photo-data" name="photo_data">
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" id="cancel-clockin" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" id="submit-clockin" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span data-i18n="action.confirm_clock_in">Confirm Clock In</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Photo View Modal -->
+    <div class="modal-backdrop" id="photo-view-modal-backdrop"></div>
+    <div class="modal-content max-w-md p-2" id="photo-view-modal">
+        <img id="photo-view-img" class="w-full rounded-xl" src="" alt="Foto de registro de entrada">
+        <button class="btn-secondary w-full mt-2 justify-center" onclick="App.closeModal('photo-view-modal')" data-i18n="action.close">Close</button>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        let cameraStream = null;
+        let capturedBlob = null;
+
+        function confirmClockInButtonHtml() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="20 6 9 17 4 12"/></svg> <span>${App.t('action.confirm_clock_in')}</span>`;
+        }
+
+        function scheduleStatusLabel(status) {
+            if (status === 'clocked_in') return App.t('status.clocked_in');
+            if (status === 'clocked_out') return App.t('status.clocked_out');
+            return status.replace('_', ' ');
+        }
+
+        function scheduleCardStatusLabel(status) {
+            return status === 'clocked_in' ? App.t('status.active') : App.t('status.done');
+        }
+
+        function applySchedulePageI18n() {
+            document.getElementById('photo-view-img').alt = App.t('schedule.clock_in_photo_alt');
+            const submitBtn = document.getElementById('submit-clockin');
+            if (submitBtn && !submitBtn.disabled && submitBtn.querySelector('span')) {
+                submitBtn.innerHTML = confirmClockInButtonHtml();
+            }
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            const isAdmin = App.user?.role === 'admin';
+
+            const dateInput = document.getElementById('filter-date');
+            dateInput.value = new Date().toISOString().split('T')[0];
+
+            const today = new Date();
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            document.getElementById('week-start').value = weekAgo.toISOString().split('T')[0];
+            document.getElementById('week-end').value = today.toISOString().split('T')[0];
+
+            if (!isAdmin) {
+                document.getElementById('weekly-hours-section')?.remove();
+                document.getElementById('history-table-section')?.remove();
+            }
+
+            applySchedulePageI18n();
+            loadToday();
+            dateInput.addEventListener('change', loadToday);
+
+            document.getElementById('clock-in-btn').addEventListener('click', openClockInModal);
+            document.getElementById('cancel-clockin').addEventListener('click', closeClockInModal);
+            document.getElementById('start-camera-btn').addEventListener('click', startCamera);
+            document.getElementById('take-photo-btn').addEventListener('click', takePhoto);
+            document.getElementById('retake-btn').addEventListener('click', retakePhoto);
+            document.getElementById('clockin-form').addEventListener('submit', submitClockIn);
+            if (isAdmin) {
+                document.getElementById('load-history-btn').addEventListener('click', loadHistory);
+            }
+
+            const addEmpBtn = document.getElementById('add-employee-btn');
+            if (isAdmin && addEmpBtn) {
+                addEmpBtn.addEventListener('click', async () => {
+                    const name = prompt(App.t('schedule.employee_name_prompt'));
+                    if (!name) return;
+                    const phone = prompt(App.t('schedule.phone_prompt')) || '';
+                    try {
+                        const fd = new FormData();
+                        fd.append('action', 'add_employee');
+                        fd.append('name', name);
+                        fd.append('phone', phone);
+                        await App.apiForm('/api/clock-in', fd);
+                        App.toast(App.t('schedule.employee_added'), 'success');
+                        loadToday();
+                    } catch (err) { App.toast(err.message, 'danger'); }
+                });
+            } else if (addEmpBtn) {
+                addEmpBtn.remove();
+            }
+
+            window.addEventListener('store-changed', loadToday);
+            document.addEventListener('language-changed', () => {
+                applySchedulePageI18n();
+                loadToday();
+                if (isAdmin && document.getElementById('hours-summary')?.innerHTML.trim()) {
+                    loadHistory();
+                }
+            });
+        })();
+
+        async function loadToday() {
+            const date = document.getElementById('filter-date').value;
+            const cards = document.getElementById('clockin-cards');
+            const sel = document.getElementById('clockin-employee-select');
+            const [todayResult, empResult] = await Promise.allSettled([
+                App.api('GET', `/api/clock-in?action=today&date=${date}`),
+                App.api('GET', '/api/clock-in?action=employees'),
+            ]);
+
+            if (todayResult.status === 'fulfilled') {
+                const todayRes = todayResult.value;
+                if (!todayRes.clock_ins.length) {
+                    cards.innerHTML = `<p class="text-sm text-text-muted col-span-full py-4">${App.t('schedule.no_clockins')}</p>`;
+                } else {
+                    const empty = App.t('empty.none');
+                    cards.innerHTML = todayRes.clock_ins.map(ci => `
+                        <div class="card card-hover">
+                            <div class="flex items-start gap-3">
+                                <div class="w-12 h-12 rounded-xl overflow-hidden bg-bg-elevated flex-shrink-0 cursor-pointer" onclick="viewPhoto('${ci.photo_path}')">
+                                    <img src="${ci.photo_path}" class="w-full h-full object-cover" alt="${App.t('schedule.clock_in_photo_alt')}" onerror="this.style.display='none'">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm">${ci.employee_name}</p>
+                                    <p class="text-xs text-text-muted">${App.t('schedule.time_in')} ${App.formatDateTime(ci.clock_in_time)}</p>
+                                    ${ci.clock_out_time ? `<p class="text-xs text-text-muted">${App.t('schedule.time_out')} ${App.formatDateTime(ci.clock_out_time)}</p>` : ''}
+                                    ${ci.hours_worked ? `<p class="text-xs font-mono text-accent">${ci.hours_worked}h</p>` : ''}
+                                </div>
+                                <span class="badge ${ci.status === 'clocked_in' ? 'badge-success' : 'badge-info'}">${scheduleCardStatusLabel(ci.status)}</span>
+                            </div>
+                            ${ci.status === 'clocked_in' ? `<button onclick="clockOut(${ci.id})" class="btn-danger w-full mt-3 justify-center text-xs">${App.t('action.clock_out')}</button>` : ''}
+                        </div>
+                    `).join('');
+                }
+            } else {
+                const msg = todayResult.reason?.message || App.t('schedule.failed_load_attendance');
+                cards.innerHTML = `<p class="text-sm text-danger col-span-full py-4">${App.t('schedule.failed_load_attendance')}</p>`;
+                App.toast(msg, 'danger');
+            }
+
+            if (empResult.status === 'fulfilled') {
+                sel.innerHTML = `<option value="">${App.t('schedule.select_employee')}</option>` +
+                    empResult.value.employees.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+                const me = App.user?.employee || empResult.value.current_employee;
+                if (me && App.user?.role !== 'admin') {
+                    sel.value = String(me.id);
+                    sel.disabled = true;
+                    sel.classList.add('opacity-70', 'cursor-not-allowed');
+                }
+            } else {
+                sel.innerHTML = `<option value="">${App.t('schedule.failed_employees')}</option>`;
+                App.toast(empResult.reason?.message || App.t('schedule.failed_employees'), 'danger');
+            }
+        }
+
+        async function loadHistory() {
+            const start = document.getElementById('week-start').value;
+            const end = document.getElementById('week-end').value;
+            try {
+                const res = await App.api('GET', `/api/clock-in?action=history&start=${start}&end=${end}`);
+
+                const summary = document.getElementById('hours-summary');
+                if (res.hours_summary.length) {
+                    summary.innerHTML = res.hours_summary.map(h => {
+                        const maxHours = 60;
+                        const pct = Math.min(100, (parseFloat(h.total_hours) / maxHours) * 100);
+                        return `
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm font-medium w-32 truncate">${h.name}</span>
+                            <div class="flex-1 progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                            <span class="text-sm font-mono tabular-nums w-16 text-right font-semibold">${parseFloat(h.total_hours).toFixed(1)}h</span>
+                            <span class="text-xs text-text-muted">${App.t('schedule.days_count', { n: h.days })}</span>
+                        </div>`;
+                    }).join('');
+                } else {
+                    summary.innerHTML = `<p class="text-sm text-text-muted">${App.t('schedule.no_data_period')}</p>`;
+                }
+
+                const tbody = document.getElementById('history-tbody');
+                const empty = App.t('empty.none');
+                if (!res.clock_ins.length) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-text-muted py-8">${App.t('schedule.no_records')}</td></tr>`;
+                } else {
+                    tbody.innerHTML = res.clock_ins.map(ci => `
+                        <tr>
+                            <td class="font-medium text-sm">${ci.employee_name}</td>
+                            <td class="text-sm">${App.formatDateTime(ci.clock_in_time)}</td>
+                            <td class="text-sm">${ci.clock_out_time ? App.formatDateTime(ci.clock_out_time) : empty}</td>
+                            <td class="font-mono tabular-nums text-sm font-semibold">${ci.hours_worked ? ci.hours_worked + 'h' : empty}</td>
+                            <td>
+                                ${ci.photo_path ? `<button onclick="viewPhoto('${ci.photo_path}')" class="w-8 h-8 rounded-lg overflow-hidden bg-bg-elevated hover:ring-2 hover:ring-accent transition-all"><img src="${ci.photo_path}" class="w-full h-full object-cover" alt="${App.t('schedule.clock_in_photo_alt')}" onerror="this.parentElement.innerHTML='${empty}'"></button>` : empty}
+                            </td>
+                            <td><span class="badge ${ci.status === 'clocked_in' ? 'badge-success' : ci.status === 'clocked_out' ? 'badge-info' : 'badge-danger'}">${scheduleStatusLabel(ci.status)}</span></td>
+                            <td>${ci.status === 'clocked_in' ? `<button onclick="clockOut(${ci.id})" class="btn-danger text-xs py-1 px-2">${App.t('action.clock_out')}</button>` : ''}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        function viewPhoto(path) {
+            const img = document.getElementById('photo-view-img');
+            img.src = path;
+            img.alt = App.t('schedule.clock_in_photo_alt');
+            App.openModal('photo-view-modal');
+        }
+
+        async function openClockInModal() {
+            capturedBlob = null;
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.getElementById('camera-placeholder').classList.remove('hidden');
+            document.getElementById('retake-btn').classList.add('hidden');
+            document.getElementById('take-photo-btn').disabled = true;
+            document.getElementById('submit-clockin').disabled = true;
+            document.getElementById('submit-clockin').innerHTML = confirmClockInButtonHtml();
+            const me = App.user?.employee;
+            const sel = document.getElementById('clockin-employee-select');
+            if (me && App.user?.role !== 'admin') {
+                sel.value = String(me.id);
+            }
+            App.openModal('clockin-modal');
+        }
+
+        function closeClockInModal() {
+            stopCamera();
+            App.closeModal('clockin-modal');
+        }
+
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                const video = document.getElementById('camera-preview');
+                video.srcObject = cameraStream;
+                video.classList.remove('hidden');
+                document.getElementById('camera-placeholder').classList.add('hidden');
+                document.getElementById('photo-preview').classList.add('hidden');
+                document.getElementById('take-photo-btn').disabled = false;
+                document.getElementById('start-camera-btn').disabled = true;
+            } catch (err) {
+                App.toast(App.t('schedule.camera_denied'), 'danger');
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            document.getElementById('camera-preview').srcObject = null;
+            document.getElementById('start-camera-btn').disabled = false;
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('camera-preview');
+            const canvas = document.getElementById('camera-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            canvas.toBlob(blob => {
+                capturedBlob = blob;
+                const url = URL.createObjectURL(blob);
+                const img = document.getElementById('photo-preview');
+                img.src = url;
+                img.classList.remove('hidden');
+                video.classList.add('hidden');
+                document.getElementById('take-photo-btn').classList.add('hidden');
+                document.getElementById('retake-btn').classList.remove('hidden');
+                document.getElementById('submit-clockin').disabled = false;
+                stopCamera();
+            }, 'image/jpeg', 0.85);
+        }
+
+        function retakePhoto() {
+            capturedBlob = null;
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.getElementById('retake-btn').classList.add('hidden');
+            document.getElementById('take-photo-btn').classList.remove('hidden');
+            document.getElementById('submit-clockin').disabled = true;
+            startCamera();
+        }
+
+        async function submitClockIn(e) {
+            e.preventDefault();
+            if (!capturedBlob) { App.toast(App.t('schedule.photo_required'), 'danger'); return; }
+            const employeeId = document.getElementById('clockin-employee-select').value;
+            if (!employeeId) { App.toast(App.t('schedule.select_employee_required'), 'danger'); return; }
+
+            const fd = new FormData();
+            fd.append('action', 'clock_in');
+            fd.append('employee_id', employeeId);
+            fd.append('photo', capturedBlob, 'clockin.jpg');
+
+            const submitBtn = document.getElementById('submit-clockin');
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = App.t('action.submitting');
+                await App.apiForm('/api/clock-in', fd);
+                closeClockInModal();
+                App.toast(App.t('schedule.clocked_in_success'), 'success');
+                loadToday();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = confirmClockInButtonHtml();
+            }
+        }
+
+        async function clockOut(clockInId) {
+            if (!confirm(App.t('schedule.confirm_clock_out'))) return;
+            const fd = new FormData();
+            fd.append('action', 'clock_out');
+            fd.append('clock_in_id', clockInId);
+            try {
+                const res = await App.apiForm('/api/clock-in', fd);
+                App.toast(App.t('schedule.clocked_out_toast', { hours: res.hours_worked }), 'success');
+                loadToday();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+    </script>
+</body>
+</html>

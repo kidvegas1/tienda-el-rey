@@ -1,0 +1,42 @@
+# Primary deploy target: Render (Docker)
+# Docs: https://render.com/docs/infrastructure-as-code
+#
+# 1. Push this target to a new GitHub repository (repository URL is intentionally unset)
+# 2. Render Dashboard → New → Blueprint → connect that new repository
+# 3. Set secret env vars marked sync: false in the dashboard
+#
+# Alternative: Railway — see railway.toml
+
+services:
+  - type: web
+    name: tienda-hispana-el-rey
+    runtime: docker
+    branch: main
+    autoDeployTrigger: commit
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_NAME
+        value: Tienda Hispana El Rey
+      - key: APP_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: MAX_UPLOAD_SIZE
+        value: "10485760"
+      - key: SESSION_LIFETIME
+        value: "86400"

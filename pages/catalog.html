@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore productos disponibles en Tienda Hispana El Rey. Pregunte al asistente por sugerencias.">
+    <meta name="theme-color" content="#E8F4F8">
+    <title>Productos — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/catalog.css">
+</head>
+<body class="catalog-page">
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="/" aria-label="Tienda Hispana El Rey, inicio">
+                <img src="/assets/images/el-rey-mark.svg" alt="" width="48" height="48">
+                <span><strong>Tienda Hispana</strong> El Rey</span>
+            </a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+                <span class="sr-only">Abrir menú</span>
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav" class="main-nav" aria-label="Navegación principal">
+                <a href="/" data-i18n="catalog.nav_home">Inicio</a>
+                <a href="/tienda" class="catalog-nav-active" data-i18n="catalog.nav_products">Productos</a>
+                <a class="staff-link" href="/login">Acceso del personal</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="contenido">
+        <section class="catalog-hero">
+            <div class="catalog-hero-inner">
+                <p class="eyebrow" data-i18n="catalog.eyebrow">Tienda en línea</p>
+                <h1 class="catalog-brand" data-i18n="catalog.heading">Lo que tenemos hoy</h1>
+                <p class="hero-lead" data-i18n="catalog.lead">Explore productos disponibles en nuestras tiendas. Pregunte al asistente si busca algo específico.</p>
+            </div>
+        </section>
+
+        <div class="catalog-layout">
+            <section aria-label="Catálogo de productos">
+                <div class="catalog-toolbar">
+                    <input type="search" id="catalog-search" class="catalog-search" data-i18n-placeholder="catalog.search_ph" placeholder="Buscar productos…" autocomplete="off">
+                    <select id="catalog-store" class="catalog-select" aria-label="Tienda"></select>
+                </div>
+                <div id="catalog-chips" class="catalog-chips" role="toolbar" aria-label="Categorías"></div>
+                <div id="catalog-grid" class="catalog-grid" aria-live="polite"></div>
+            </section>
+
+            <div id="catalog-chat-backdrop" class="catalog-chat-backdrop" aria-hidden="true"></div>
+            <div id="catalog-chat-panel" class="catalog-chat-panel">
+                <aside class="catalog-chat" aria-label="Asistente de productos">
+                    <div class="catalog-chat-head">
+                        <h2 data-i18n="catalog.chat_title">Asistente de productos</h2>
+                        <p data-i18n="catalog.chat_lead">Pregunte qué tenemos para sus necesidades.</p>
+                    </div>
+                    <div id="catalog-chat-log" class="catalog-chat-log"></div>
+                    <div id="catalog-chat-prompts" class="catalog-chat-prompts"></div>
+                    <form id="catalog-chat-form" class="catalog-chat-form">
+                        <input type="text" id="catalog-chat-input" class="catalog-chat-input" data-i18n-placeholder="catalog.chat_ph" placeholder="Ej.: Tengo fiebre, ¿qué me recomiendan?" maxlength="2000" autocomplete="off">
+                        <button type="submit" id="catalog-chat-send" class="catalog-chat-send" data-i18n="catalog.chat_send">Enviar</button>
+                    </form>
+                    <p class="catalog-disclaimer" data-i18n="catalog.chat_disclaimer">Las sugerencias no son consejo médico. Consulte a un profesional de salud cuando corresponda.</p>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <button type="button" id="catalog-chat-toggle" class="catalog-chat-toggle" aria-controls="catalog-chat-panel">
+        <span data-i18n="catalog.chat_title">Asistente</span>
+    </button>
+
+    <script src="/assets/js/i18n.js?v=20260730-catalog1"></script>
+    <script src="/assets/js/catalog.js?v=20260730-catalog1"></script>
+</body>
+</html>

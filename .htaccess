@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# Block environment/config secrets from direct HTTP access.
+RewriteRule ^(\.env|env\.config)$ - [F,L,NC]
+
+# Never expose HTML shells or locally stored uploads as public files.
+# Canonical routes pass through index.php; uploads are served by api/files.
+RewriteRule ^pages/.*\.html$ - [R=404,L,NC]
+RewriteRule ^assets/uploads(?:/.*)?$ - [R=404,L,NC]
+
+# API: route all /api/* requests through the front controller.
+RewriteRule ^api(?:/.*)?$ index.php [QSA,L]
+
+# Serve existing static files and directories directly (assets/css, assets/js, images, etc.).
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Front controller for application page routes.
+RewriteRule ^ index.php [QSA,L]

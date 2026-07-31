@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Analytics — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.analytics">Store Analytics</p>
+                </div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.analytics.heading">Store Analytics</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="store-filter" class="input py-2 px-3 text-sm w-full sm:w-40"></select>
+                <select id="year-selector" class="input py-2 px-3 text-sm w-full sm:w-28"></select>
+                <button id="csv-btn" class="btn-primary text-sm w-full sm:w-auto justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="analytics.download_csv">Download CSV</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <!-- Row 1: Summary Cards -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="summary-cards">
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.total_revenue">Total Revenue</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="card-revenue">$0.00</p>
+                        </div>
+                        <div class="stat-icon stat-icon-accent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" data-i18n="analytics.subtitle_ytd">Year-to-date USD volume</p>
+                </div>
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.total_transactions">Total Transactions</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="card-txns">0</p>
+                        </div>
+                        <div class="stat-icon stat-icon-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" data-i18n="analytics.subtitle_transfers">Total transfers processed</p>
+                </div>
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.total_fees">Total Fees</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="card-fees">$0.00</p>
+                        </div>
+                        <div class="stat-icon stat-icon-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" data-i18n="analytics.subtitle_fees">Fees collected this year</p>
+                </div>
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.report_commission">Report Commission</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="card-barri">$0.00</p>
+                        </div>
+                        <div class="stat-icon stat-icon-warning">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M2 20h20"/><rect x="4" y="8" width="4" height="12" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="16" y="10" width="4" height="10" rx="1"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" id="card-barri-sub" data-i18n="analytics.subtitle_commission">All company reports &amp; commission</p>
+                </div>
+            </section>
+
+            <!-- Row 2: Monthly Trend Chart -->
+            <section class="card">
+                <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-6" data-i18n="analytics.monthly_trend">Monthly Revenue Trend</h3>
+                <div class="relative h-64 flex items-end gap-2" id="monthly-chart">
+                    <p class="text-sm text-text-muted absolute inset-0 flex items-center justify-center" data-i18n="analytics.loading_chart">Loading chart data...</p>
+                </div>
+                <div class="flex justify-between mt-3 px-1" id="monthly-labels"></div>
+            </section>
+
+            <!-- Row 3: Company Breakdown + Store Comparison -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Company Breakdown Donut -->
+                <div class="card">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-6" data-i18n="analytics.company_breakdown">Company Breakdown</h3>
+                    <div class="flex flex-col items-center">
+                        <div class="relative w-52 h-52" id="donut-chart">
+                            <div class="w-52 h-52 rounded-full" id="donut-ring" style="background: oklch(0.94 0.01 55);"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-28 h-28 rounded-full bg-bg-surface flex items-center justify-center">
+                                    <div class="text-center">
+                                        <p class="text-lg font-bold font-mono tabular-nums" id="donut-total">0</p>
+                                        <p class="text-[10px] text-text-muted uppercase tracking-wider" data-i18n="analytics.transfers_label">Transfers</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-2 mt-6 w-full" id="donut-legend"></div>
+                    </div>
+                </div>
+
+                <!-- Store Comparison -->
+                <div class="card">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-6" data-i18n="analytics.store_comparison">Store Comparison</h3>
+                    <div class="space-y-4" id="store-chart">
+                        <p class="text-sm text-text-muted" data-i18n="analytics.loading_store">Loading store data...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 4: Top Senders Table -->
+            <section class="card p-0 overflow-hidden">
+                <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="analytics.top_senders">Top Senders</h3>
+                    <p class="text-xs text-text-muted" id="sender-count-label">0 senders</p>
+                </div>
+                <div class="table-container mobile-cards">
+                    <table class="w-full min-w-[900px]">
+                        <thead class="bg-[oklch(0.18_0.015_260)]">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider w-12">#</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.col.client_name">Client Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="common.phone">Phone</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.col.id">ID</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-accent transition-colors" data-sort="transfer_count"><span data-i18n="analytics.col.transfers">Transfers</span> <span class="sort-arrow"></span></th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-accent transition-colors" data-sort="total_sent"><span data-i18n="analytics.col.total_sent">Total Sent</span> <span class="sort-arrow"></span></th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-accent transition-colors" data-sort="current_month_total"><span data-i18n="analytics.col.current_month">Current Month</span> <span class="sort-arrow"></span></th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.col.flags">Flags</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="common.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="senders-tbody">
+                            <tr><td colspan="9" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Row 5: Transactional Analysis -->
+            <section class="card" id="txn-analysis-section">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="analytics.txn_heading">Transactional Analysis</h3>
+                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <label class="text-xs text-text-muted shrink-0" data-i18n="analytics.txn_date_from">From</label>
+                            <input type="date" id="txn-date-from" class="input py-1.5 px-2 text-sm w-full sm:w-36">
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <label class="text-xs text-text-muted shrink-0" data-i18n="analytics.txn_date_to">To</label>
+                            <input type="date" id="txn-date-to" class="input py-1.5 px-2 text-sm w-full sm:w-36">
+                        </div>
+                        <button id="txn-load-btn" class="btn-primary text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            <span data-i18n="analytics.txn_load">Load Analysis</span>
+                        </button>
+                        <button id="txn-export-btn" class="btn-secondary text-sm hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span data-i18n="analytics.txn_export_csv">Export CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="txn-results" class="hidden space-y-6">
+                    <!-- Summary cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="txn-summary-cards"></div>
+
+                    <!-- Patterns & Alerts -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="txn-pattern-cards"></div>
+
+                    <!-- Company Mix Table -->
+                    <div class="card p-0 overflow-hidden bg-bg-elevated">
+                        <div class="px-5 py-3 border-b border-border">
+                            <h4 class="text-xs font-semibold text-text-secondary uppercase tracking-wider" data-i18n="analytics.txn_company_mix">Company Mix</h4>
+                        </div>
+                        <div class="table-container mobile-cards">
+                            <table class="w-full min-w-[600px]">
+                                <thead>
+                                    <tr class="border-b border-border">
+                                        <th class="px-4 py-2.5 text-left text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_company">Company</th>
+                                        <th class="px-4 py-2.5 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_count">Transfers</th>
+                                        <th class="px-4 py-2.5 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_principal">Principal</th>
+                                        <th class="px-4 py-2.5 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_fees">Fees</th>
+                                        <th class="px-4 py-2.5 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_clients">Unique Clients</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="txn-company-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- High-Frequency Clients Table -->
+                    <div class="card p-0 overflow-hidden bg-bg-elevated">
+                        <div class="px-5 py-3 border-b border-border">
+                            <h4 class="text-xs font-semibold text-text-secondary uppercase tracking-wider" data-i18n="analytics.txn_high_freq">High-Frequency Clients</h4>
+                        </div>
+                        <div class="table-container mobile-cards">
+                            <table class="w-full min-w-[500px]">
+                                <thead>
+                                    <tr class="border-b border-border">
+                                        <th class="px-4 py-2.5 text-left text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_client">Client</th>
+                                        <th class="px-4 py-2.5 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_days">Active Days</th>
+                                        <th class="px-4 py-2.5 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="analytics.txn_col_last_txn">Last Transaction</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="txn-hf-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="txn-empty" class="text-center py-8">
+                    <p class="text-sm text-text-muted" data-i18n="analytics.txn_no_data">No transactional data for the selected period.</p>
+                </div>
+            </section>
+
+            <!-- Row 6: Export -->
+            <section class="card flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-text-primary" data-i18n="analytics.export_title">Export Full Dataset</h3>
+                    <p class="text-xs text-text-muted mt-1" data-i18n="analytics.export_desc">Download all analytics records for the selected year and store as CSV</p>
+                </div>
+                <button id="export-all-btn" class="btn-primary text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="analytics.export_all_btn">Download All Records (CSV)</span>
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+
+            App.initSidebar();
+            App.initUserMenu();
+
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) {
+                avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            }
+
+            const COMPANY_COLORS = {
+                'Barri':      'oklch(0.48 0.09 55)',
+                'Via':        'oklch(0.65 0.18 155)',
+                'Inter':      'oklch(0.7 0.15 60)',
+                'Dinex':      'oklch(0.6 0.18 310)',
+                'Lake June':  'oklch(0.42 0.08 50)',
+            };
+            const FALLBACK_COLOR = 'oklch(0.50 0.05 55)';
+            const MONTH_KEYS = ['month.jan','month.feb','month.mar','month.apr','month.may','month.jun','month.jul','month.aug','month.sep','month.oct','month.nov','month.dec'];
+
+            function monthLabels() {
+                return MONTH_KEYS.map((k) => App.t(k));
+            }
+
+            function refreshStoreFilter() {
+                const current = storeSel.value;
+                storeSel.innerHTML = `<option value="">${App.t('analytics.all_stores')}</option>` +
+                    App.stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                storeSel.value = current;
+            }
+
+            function companyColor(name) {
+                return COMPANY_COLORS[name] || FALLBACK_COLOR;
+            }
+
+            const storeSel = document.getElementById('store-filter');
+            const yearSel  = document.getElementById('year-selector');
+
+            refreshStoreFilter();
+
+            let analyticsData = null;
+            let sortField = 'total_sent';
+            let sortDir = -1;
+
+            async function loadData() {
+                try {
+                    const storeId = storeSel.value;
+                    const year = yearSel.value || new Date().getFullYear();
+                    const qs = `year=${year}` + (storeId ? `&store_id=${storeId}` : '');
+                    const data = await App.api('GET', `/api/analytics?${qs}`);
+                    analyticsData = data;
+
+                    if (!yearSel.options.length || yearSel.dataset.loaded !== 'true') {
+                        yearSel.innerHTML = (data.years || []).map(y =>
+                            `<option value="${y}" ${y == data.year ? 'selected' : ''}>${y}</option>`
+                        ).join('');
+                        yearSel.dataset.loaded = 'true';
+                    }
+
+                    renderCards(data);
+                    renderMonthlyChart(data.monthly_trend || []);
+                    renderDonut(data.company_breakdown || []);
+                    renderStoreChart(data.revenue_by_store || []);
+                    renderSenders(data.top_senders || []);
+                } catch (err) {
+                    App.toast(err.message, 'danger');
+                }
+            }
+
+            function renderCards(data) {
+                const stores = data.revenue_by_store || [];
+                const totalRev = stores.reduce((s, r) => s + (parseFloat(r.total_usd) || 0), 0);
+                const totalTxn = stores.reduce((s, r) => s + (parseInt(r.transfer_count) || 0), 0);
+                const totalFees = stores.reduce((s, r) => s + (parseFloat(r.total_fees) || 0), 0);
+                const barri = data.barri_summary || {};
+
+                document.getElementById('card-revenue').textContent = App.money(totalRev);
+                document.getElementById('card-txns').textContent = totalTxn.toLocaleString();
+                document.getElementById('card-fees').textContent = App.money(totalFees);
+                document.getElementById('card-barri').textContent = App.money(barri.barri_commission);
+                document.getElementById('card-barri-sub').textContent = App.t('analytics.barri_sub', {
+                    reports: barri.reports_count || 0,
+                    txns: (barri.barri_txn_count || 0).toLocaleString(),
+                });
+            }
+
+            function renderFromCache() {
+                if (!analyticsData) return;
+                renderCards(analyticsData);
+                renderMonthlyChart(analyticsData.monthly_trend || []);
+                renderDonut(analyticsData.company_breakdown || []);
+                renderStoreChart(analyticsData.revenue_by_store || []);
+                renderSenders(analyticsData.top_senders || []);
+            }
+
+            function renderMonthlyChart(trend) {
+                const chart = document.getElementById('monthly-chart');
+                const labels = document.getElementById('monthly-labels');
+                const monthMap = {};
+                trend.forEach(m => { monthMap[m.month] = parseFloat(m.total) || 0; });
+                const values = [];
+                for (let i = 1; i <= 12; i++) values.push(monthMap[i] || 0);
+                const max = Math.max(...values, 1);
+
+                labels.innerHTML = monthLabels().map(m =>
+                    `<span class="text-[10px] text-text-muted font-medium flex-1 text-center">${m}</span>`
+                ).join('');
+
+                if (!values.some(v => v > 0)) {
+                    chart.innerHTML = `<p class="text-sm text-text-muted absolute inset-0 flex items-center justify-center">${App.t('analytics.no_data')}</p>`;
+                    return;
+                }
+
+                chart.innerHTML = values.map((v, i) => {
+                    const pct = Math.max((v / max) * 100, 1);
+                    return `<div class="flex-1 flex flex-col items-center justify-end h-full group relative">
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded-lg bg-bg-elevated text-xs font-mono tabular-nums text-text-primary opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg border border-border z-10">${App.money(v)}</div>
+                        <div class="w-full rounded-t-md transition-all duration-300" style="height:${pct}%;background:linear-gradient(to top, oklch(0.48 0.09 55), oklch(0.55 0.10 45));min-height:3px;"></div>
+                    </div>`;
+                }).join('');
+            }
+
+            function renderDonut(companies) {
+                const ring = document.getElementById('donut-ring');
+                const legend = document.getElementById('donut-legend');
+                const totalEl = document.getElementById('donut-total');
+
+                if (!companies.length) {
+                    ring.style.background = 'oklch(0.94 0.01 55)';
+                    legend.innerHTML = `<p class="text-sm text-text-muted col-span-2">${App.t('analytics.no_data')}</p>`;
+                    totalEl.textContent = '0';
+                    return;
+                }
+
+                const total = companies.reduce((s, c) => s + (parseInt(c.count) || 0), 0);
+                totalEl.textContent = total.toLocaleString();
+
+                let cumPct = 0;
+                const segments = companies.map(c => {
+                    const pct = total > 0 ? ((parseInt(c.count) || 0) / total) * 100 : 0;
+                    const color = companyColor(c.company);
+                    const start = cumPct;
+                    cumPct += pct;
+                    return `${color} ${start}% ${cumPct}%`;
+                });
+
+                ring.style.background = `conic-gradient(${segments.join(', ')})`;
+
+                legend.innerHTML = companies.map(c => {
+                    const pct = total > 0 ? (((parseInt(c.count) || 0) / total) * 100).toFixed(1) : '0.0';
+                    const color = companyColor(c.company);
+                    return `<div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-sm shrink-0" style="background:${color}"></div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-text-primary truncate">${c.company}</p>
+                            <p class="text-[10px] text-text-muted">${(parseInt(c.count) || 0).toLocaleString()} · ${App.money(c.total)} · ${pct}%</p>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            function renderStoreChart(stores) {
+                const container = document.getElementById('store-chart');
+                if (!stores.length) {
+                    container.innerHTML = `<p class="text-sm text-text-muted">${App.t('analytics.no_store_data')}</p>`;
+                    return;
+                }
+                const max = Math.max(...stores.map(s => parseFloat(s.total_usd) || 0), 1);
+                container.innerHTML = stores.map(s => {
+                    const val = parseFloat(s.total_usd) || 0;
+                    const pct = (val / max) * 100;
+                    return `<div class="flex items-center gap-4">
+                        <span class="text-xs font-medium text-text-secondary w-24 shrink-0 truncate">${s.store_name}</span>
+                        <div class="flex-1 h-7 rounded-md bg-bg-elevated overflow-hidden">
+                            <div class="h-full rounded-md transition-all duration-500" style="width:${Math.max(pct, 2)}%;background:linear-gradient(to right, oklch(0.48 0.09 55), oklch(0.55 0.10 45));"></div>
+                        </div>
+                        <span class="text-xs font-mono tabular-nums text-text-secondary w-24 text-right shrink-0">${App.money(val)}</span>
+                    </div>`;
+                }).join('');
+            }
+
+            function renderSenders(senders) {
+                const tbody = document.getElementById('senders-tbody');
+                document.getElementById('sender-count-label').textContent = App.t('analytics.senders_count', { count: senders.length });
+
+                if (!senders.length) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-text-muted py-8">${App.t('analytics.no_senders')}</td></tr>`;
+                    return;
+                }
+
+                const empty = App.t('empty.none');
+                const sorted = [...senders].sort((a, b) => {
+                    const av = parseFloat(a[sortField]) || 0;
+                    const bv = parseFloat(b[sortField]) || 0;
+                    return (bv - av) * sortDir;
+                });
+
+                tbody.innerHTML = sorted.map((s, i) => {
+                    const totalSent = parseFloat(s.total_sent) || 0;
+                    const monthTotal = parseFloat(s.current_month_total) || 0;
+                    const hasId = !!s.sender_id_path;
+                    const flags = [];
+                    if (monthTotal >= 3000) flags.push(`<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-warning/15 text-warning">${App.t('analytics.flag.at_limit')}</span>`);
+                    if (totalSent >= 10000) flags.push(`<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-danger/15 text-danger">${App.t('analytics.flag.fincen')}</span>`);
+
+                    return `<tr class="border-b border-[oklch(0.25_0.015_260)] hover:bg-[oklch(0.24_0.02_260_/_0.5)] transition-colors">
+                        <td class="px-4 py-3 text-text-muted font-mono text-xs">${i + 1}</td>
+                        <td class="px-4 py-3 font-medium text-sm">${s.name || empty}</td>
+                        <td class="px-4 py-3 text-sm text-text-secondary font-mono">${s.phone || empty}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full ${hasId ? 'bg-success' : 'bg-danger'}" title="${hasId ? App.t('analytics.id_on_file') : App.t('analytics.no_id')}"></span>
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono tabular-nums text-sm">${(parseInt(s.transfer_count) || 0).toLocaleString()}</td>
+                        <td class="px-4 py-3 text-right font-mono tabular-nums text-sm font-semibold">${App.money(totalSent)}</td>
+                        <td class="px-4 py-3 text-right font-mono tabular-nums text-sm">${App.money(monthTotal)}</td>
+                        <td class="px-4 py-3 text-center"><div class="flex items-center justify-center gap-1">${flags.join('') || `<span class="text-text-muted text-xs">${empty}</span>`}</div></td>
+                        <td class="px-4 py-3 text-center"><a href="clients?id=${s.id}" class="text-xs font-semibold text-accent hover:text-accent-hover transition-colors">${App.t('analytics.view_client')}</a></td>
+                    </tr>`;
+                }).join('');
+            }
+
+            document.querySelectorAll('[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.sort;
+                    if (sortField === field) {
+                        sortDir *= -1;
+                    } else {
+                        sortField = field;
+                        sortDir = -1;
+                    }
+                    document.querySelectorAll('[data-sort] .sort-arrow').forEach(el => el.textContent = '');
+                    th.querySelector('.sort-arrow').textContent = sortDir === -1 ? ' ↓' : ' ↑';
+                    if (analyticsData) renderSenders(analyticsData.top_senders || []);
+                });
+            });
+
+            document.getElementById('csv-btn').addEventListener('click', () => exportCSV());
+            document.getElementById('export-all-btn').addEventListener('click', () => exportCSV());
+
+            async function exportCSV() {
+                try {
+                    const year = yearSel.value || new Date().getFullYear();
+                    const storeId = storeSel.value || '';
+                    const res = await fetch('/api/analytics', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': App.csrf,
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ action: 'export', year: parseInt(year), store_id: storeId ? parseInt(storeId) : null }),
+                    });
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+                        throw new Error(err.error || `HTTP ${res.status}`);
+                    }
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `analytics_${year}${storeId ? '_store' + storeId : ''}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                    App.toastKey('toast.csv_downloaded', 'success');
+                } catch (err) {
+                    App.toastKey('toast.error_generic', 'danger', err.message);
+                }
+            }
+
+            storeSel.addEventListener('change', loadData);
+            yearSel.addEventListener('change', loadData);
+            loadData();
+            window.addEventListener('store-changed', loadData);
+            document.addEventListener('language-changed', () => {
+                refreshStoreFilter();
+                if (analyticsData) renderFromCache();
+                else loadData();
+                if (txnData) renderTxnResults(txnData);
+            });
+
+            // ── Transactional Analysis ──────────────────────────
+            const txnDateFrom = document.getElementById('txn-date-from');
+            const txnDateTo   = document.getElementById('txn-date-to');
+            const txnLoadBtn  = document.getElementById('txn-load-btn');
+            const txnExportBtn = document.getElementById('txn-export-btn');
+            const txnResults  = document.getElementById('txn-results');
+            const txnEmpty    = document.getElementById('txn-empty');
+            let txnData = null;
+
+            {
+                const today = new Date();
+                const ago90 = new Date(today);
+                ago90.setDate(ago90.getDate() - 90);
+                txnDateTo.value = today.toISOString().slice(0, 10);
+                txnDateFrom.value = ago90.toISOString().slice(0, 10);
+            }
+
+            txnLoadBtn.addEventListener('click', loadTxnAnalysis);
+
+            async function loadTxnAnalysis() {
+                const btnLabel = txnLoadBtn.querySelector('span');
+                const origText = btnLabel.textContent;
+                btnLabel.textContent = App.t('analytics.txn_loading');
+                txnLoadBtn.disabled = true;
+                try {
+                    const params = new URLSearchParams({
+                        date_from: txnDateFrom.value,
+                        date_to: txnDateTo.value,
+                    });
+                    if (App.currentStore?.id) params.set('store_id', App.currentStore.id);
+                    const year = yearSel.value;
+                    if (year) params.set('year', year);
+
+                    txnData = await App.api('GET', `/api/transaction-analysis?${params}`);
+                    renderTxnResults(txnData);
+                } catch (err) {
+                    App.toast(err.message, 'danger');
+                } finally {
+                    btnLabel.textContent = origText;
+                    txnLoadBtn.disabled = false;
+                }
+            }
+
+            function renderTxnResults(data) {
+                const s = data.summary || {};
+                const hasData = (parseInt(s.count) || 0) > 0;
+
+                txnResults.classList.toggle('hidden', !hasData);
+                txnEmpty.classList.toggle('hidden', hasData);
+                txnExportBtn.classList.toggle('hidden', !hasData);
+
+                if (!hasData) return;
+
+                renderTxnSummary(s);
+                renderTxnPatterns(data.patterns || {}, data.open_alert_counts || {});
+                renderTxnCompanyTable(data.by_company || []);
+                renderTxnHighFreq((data.patterns || {}).high_frequency_clients || []);
+            }
+
+            function renderTxnSummary(s) {
+                const cards = document.getElementById('txn-summary-cards');
+                cards.innerHTML = [
+                    txnCard(App.t('analytics.txn_summary_count'), (parseInt(s.count) || 0).toLocaleString(), 'stat-icon-info'),
+                    txnCard(App.t('analytics.txn_summary_principal'), App.money(s.principal), 'stat-icon-accent'),
+                    txnCard(App.t('analytics.txn_summary_fees'), App.money(s.fees), 'stat-icon-success'),
+                    txnCard(App.t('analytics.txn_summary_clients'), (parseInt(s.unique_clients) || 0).toLocaleString(), 'stat-icon-warning'),
+                    txnCard(App.t('analytics.txn_summary_companies'), (parseInt(s.companies) || 0).toLocaleString(), 'stat-icon-info'),
+                ].join('');
+            }
+
+            function txnCard(label, value, iconClass) {
+                return `<div class="rounded-xl border border-border bg-bg-surface p-4">
+                    <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider">${label}</p>
+                    <p class="text-lg font-bold font-mono tabular-nums mt-1">${value}</p>
+                </div>`;
+            }
+
+            function renderTxnPatterns(p, alerts) {
+                const cards = document.getElementById('txn-pattern-cards');
+                const alertTotal = (parseInt(alerts.low) || 0) + (parseInt(alerts.medium) || 0) + (parseInt(alerts.high) || 0);
+                const alertBadges = alertTotal > 0
+                    ? `<div class="flex gap-1 mt-1.5 flex-wrap">
+                        ${(alerts.high || 0) > 0 ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-danger/15 text-danger">${App.t('analytics.txn_alert_high')}: ${alerts.high}</span>` : ''}
+                        ${(alerts.medium || 0) > 0 ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-warning/15 text-warning">${App.t('analytics.txn_alert_medium')}: ${alerts.medium}</span>` : ''}
+                        ${(alerts.low || 0) > 0 ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-info/15 text-info">${App.t('analytics.txn_alert_low')}: ${alerts.low}</span>` : ''}
+                    </div>`
+                    : '';
+
+                cards.innerHTML = [
+                    txnCard(App.t('analytics.txn_avg_amount'), App.money(p.avg_amount)),
+                    txnCard(App.t('analytics.txn_median'), App.money(p.median)),
+                    txnCard(App.t('analytics.txn_multi_store'), (parseInt(p.multi_store_clients_count) || 0).toLocaleString()),
+                    txnCard(App.t('analytics.txn_over_limit'), (parseInt(p.over_limit_clients_count) || 0).toLocaleString()),
+                    `<div class="rounded-xl border border-border bg-bg-surface p-4">
+                        <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider">${App.t('analytics.txn_open_alerts')}</p>
+                        <p class="text-lg font-bold font-mono tabular-nums mt-1">${alertTotal.toLocaleString()}</p>
+                        ${alertBadges}
+                        ${alertTotal > 0 ? `<a href="security" class="text-[10px] font-semibold text-accent hover:text-accent-hover mt-1.5 inline-block">${App.t('analytics.txn_view_security')} →</a>` : ''}
+                    </div>`,
+                ].join('');
+            }
+
+            function renderTxnCompanyTable(companies) {
+                const tbody = document.getElementById('txn-company-tbody');
+                if (!companies.length) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-text-muted py-6 text-sm">${App.t('analytics.txn_no_data')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = companies.map(c => `<tr class="border-b border-border/50 hover:bg-bg-elevated/50 transition-colors">
+                    <td class="px-4 py-2.5 text-sm font-medium">${c.company || '—'}</td>
+                    <td class="px-4 py-2.5 text-sm font-mono tabular-nums text-right">${(parseInt(c.count) || 0).toLocaleString()}</td>
+                    <td class="px-4 py-2.5 text-sm font-mono tabular-nums text-right">${App.money(c.principal)}</td>
+                    <td class="px-4 py-2.5 text-sm font-mono tabular-nums text-right">${App.money(c.fees)}</td>
+                    <td class="px-4 py-2.5 text-sm font-mono tabular-nums text-right">${(parseInt(c.unique_clients) || 0).toLocaleString()}</td>
+                </tr>`).join('');
+            }
+
+            function renderTxnHighFreq(clients) {
+                const tbody = document.getElementById('txn-hf-tbody');
+                if (!clients.length) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-text-muted py-6 text-sm">${App.t('analytics.txn_no_high_freq')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = clients.map(c => `<tr class="border-b border-border/50 hover:bg-bg-elevated/50 transition-colors">
+                    <td class="px-4 py-2.5 text-sm font-medium">
+                        <a href="clients?id=${c.client_id}" class="text-accent hover:text-accent-hover transition-colors">${c.client_name || '—'}</a>
+                    </td>
+                    <td class="px-4 py-2.5 text-sm font-mono tabular-nums text-right">${parseInt(c.day_count) || 0}</td>
+                    <td class="px-4 py-2.5 text-sm font-mono tabular-nums text-right">${App.formatDate(c.txn_date)}</td>
+                </tr>`).join('');
+            }
+
+            txnExportBtn.addEventListener('click', async () => {
+                try {
+                    const res = await App.api('POST', '/api/transaction-analysis', {
+                        action: 'export',
+                        date_from: txnDateFrom.value,
+                        date_to: txnDateTo.value,
+                    });
+                    if (res.csv) {
+                        const blob = new Blob([res.csv], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = res.filename || `transaction_analysis_${txnDateFrom.value}_to_${txnDateTo.value}.csv`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
+                        App.toastKey('toast.csv_downloaded', 'success');
+                    }
+                } catch (err) {
+                    App.toast(err.message, 'danger');
+                }
+            });
+
+        })();
+    </script>
+</body>
+</html>

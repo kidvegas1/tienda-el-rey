@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title">
+  <title id="title">Plaza ilustrada de México</title>
+  <rect width="640" height="480" fill="#dff3fa"/>
+  <circle cx="530" cy="95" r="54" fill="#efbe66"/>
+  <path d="M0 287 135 200l112 87 114-116 125 116 85-71 69 55v209H0Z" fill="#a8d9e7"/>
+  <path d="M0 344h640v136H0Z" fill="#e8c98f"/>
+  <path d="M83 245h157v151H83Z" fill="#d77952"/>
+  <path d="M109 276h42v49h-42Zm64 0h42v49h-42Zm-26 69h48v51h-48Z" fill="#fff2da"/>
+  <path d="M378 259h181v137H378Z" fill="#f4e2bd"/>
+  <path d="M404 287h43v42h-43Zm70 0h58v42h-58Zm-42 66h51v43h-51Z" fill="#6d9eb1"/>
+  <path d="M268 396c0-63 22-109 65-137v137Z" fill="#4f8f66"/>
+  <path d="M333 396c0-63-22-109-65-137v137Z" fill="#66a87a"/>
+  <path d="M300 214v182" stroke="#704633" stroke-width="10"/>
+  <path d="M0 396h640" stroke="#8d6044" stroke-width="6"/>
+</svg>

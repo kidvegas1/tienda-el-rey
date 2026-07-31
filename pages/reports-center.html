@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports Center — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css?v=20260723-metrics">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="reports_center.subtitle">Reports & analytics</p>
+                </div>
+            </div>
+        </div>
+
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted truncate" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated transition-colors text-text-muted hover:text-danger" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="lg:ml-[280px] min-h-dvh flex flex-col">
+        <!-- Mobile Header -->
+        <header class="lg:hidden sticky top-0 z-30 glass-strong border-b border-border px-4 py-3 flex items-center gap-3">
+            <button id="sidebar-toggle" type="button" class="p-2 rounded-lg hover:bg-bg-elevated transition-colors" aria-label="Open menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <h2 class="text-sm font-semibold" data-i18n="page.reports_center.heading">Reports Center</h2>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <!-- Page Header -->
+            <div class="flex items-start justify-between flex-wrap gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-text-primary lg:hidden" id="page-title-mobile" data-i18n="page.reports_center.heading">Reports Center</h2>
+                    <h2 class="text-2xl font-bold text-text-primary hidden lg:block" id="page-title" data-i18n="page.reports_center.heading">Reports Center</h2>
+                    <p class="text-sm text-text-secondary mt-1" data-i18n="reports_center.subtitle">Comprehensive transfer reports with deep filtering and export</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn-primary" id="btn-export-excel">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13l-2 2 2 2"/><path d="M14 17l2-2-2-2"/></svg>
+                        <span data-i18n="reports_center.download_template">Download Excel Template</span>
+                    </button>
+                    <button class="btn-secondary" id="btn-export">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span data-i18n="reports_center.export_csv">CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Period Tabs -->
+            <div class="card !p-2">
+                <div class="flex items-center gap-1 flex-wrap">
+                    <button class="period-tab" data-period="daily" data-i18n="reports_center.period.today">Today</button>
+                    <button class="period-tab" data-period="weekly" data-i18n="reports_center.period.week">This Week</button>
+                    <button class="period-tab active" data-period="monthly" data-i18n="reports_center.period.month">This Month</button>
+                    <button class="period-tab" data-period="annual" data-i18n="reports_center.period.year">This Year</button>
+                    <button class="period-tab" data-period="all" data-i18n="reports_center.period.all">All Time</button>
+                    <button class="period-tab" data-period="custom" data-i18n="reports_center.period.custom">Custom Range</button>
+                </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="card !py-3 !px-4">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="reports_center.filter.company">Company</label>
+                        <select id="filter-company" class="input !w-auto py-1.5 px-3 text-sm min-w-[140px]">
+                            <option value="" data-i18n="reports_center.filter.all_companies">All Companies</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="reports_center.filter.store">Store</label>
+                        <select id="filter-store" class="input !w-auto py-1.5 px-3 text-sm min-w-[140px]">
+                            <option value="" data-i18n="reports_center.filter.all_stores">All Stores</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="reports_center.filter.sender">Sender</label>
+                        <input type="text" id="filter-sender" class="input w-full py-1.5 px-3 text-sm sm:w-[180px]" data-i18n-placeholder="reports_center.filter.sender_placeholder" placeholder="Search sender...">
+                    </div>
+                    <div class="flex items-center gap-2 hidden" id="custom-date-wrap">
+                        <input type="date" id="filter-date-from" class="input !w-auto py-1.5 px-3 text-sm">
+                        <span class="text-text-muted text-sm" data-i18n="common.to">to</span>
+                        <input type="date" id="filter-date-to" class="input !w-auto py-1.5 px-3 text-sm">
+                    </div>
+                    <button class="btn-secondary !py-1.5 !px-3 !text-xs" id="btn-apply-filters">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        <span data-i18n="common.apply">Apply</span>
+                    </button>
+                    <button class="btn-secondary !py-1.5 !px-3 !text-xs text-text-muted" id="btn-clear-filters" data-i18n="common.clear">Clear</button>
+                    <div class="ml-auto text-xs text-text-muted" id="date-range-label"></div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4" id="summary-cards">
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.principal">Total Principal</p>
+                    <p class="metric-card-value text-accent" id="stat-principal">$0.00</p>
+                </div>
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.fees">Total Fees</p>
+                    <p class="metric-card-value text-warning" id="stat-fees">$0.00</p>
+                </div>
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.tax">Total Tax</p>
+                    <p class="metric-card-value text-info" id="stat-tax">$0.00</p>
+                </div>
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.grand_total">Grand Total</p>
+                    <p class="metric-card-value text-success" id="stat-total">$0.00</p>
+                </div>
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.transactions">Transactions</p>
+                    <p class="metric-card-value text-text-primary" id="stat-txns">0</p>
+                </div>
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.unique_senders">Unique Senders</p>
+                    <p class="metric-card-value text-text-primary" id="stat-senders">0</p>
+                </div>
+                <div class="card card-hover metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.stat.fincen_flagged">FinCEN Flagged</p>
+                    <p class="metric-card-value text-danger" id="stat-fincen">0</p>
+                </div>
+            </div>
+
+            <!-- KPI Analysis -->
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4" id="kpi-cards">
+                <div class="card metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.kpi.avg_ticket">Avg Ticket</p>
+                    <p class="metric-card-value text-text-primary" id="kpi-avg-ticket">$0.00</p>
+                </div>
+                <div class="card metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.kpi.fee_rate">Fee Rate</p>
+                    <p class="metric-card-value text-text-primary" id="kpi-fee-rate">0%</p>
+                </div>
+                <div class="card metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.kpi.txns_per_sender">Txns / Sender</p>
+                    <p class="metric-card-value text-text-primary" id="kpi-txns-sender">0</p>
+                </div>
+                <div class="card metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.kpi.over_limit">Over Limit</p>
+                    <p class="metric-card-value text-danger" id="kpi-over-limit">0</p>
+                </div>
+                <div class="card metric-card !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.kpi.high_freq">High-Frequency Days</p>
+                    <p class="metric-card-value text-warning" id="kpi-high-freq">0</p>
+                </div>
+                <div class="card metric-card finance-side-banner !p-4">
+                    <p class="metric-card-label" data-i18n="reports_center.kpi.other_services">Otros servicios (MO)</p>
+                    <p class="metric-card-value finance-side-text" id="kpi-other-services">$0.00</p>
+                    <p class="text-[10px] opacity-80 mt-0.5 truncate" id="kpi-other-services-meta"></p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Daily Activity Chart -->
+                <div class="card lg:col-span-1">
+                    <h3 class="text-sm font-semibold text-text-primary mb-4" data-i18n="reports_center.chart.activity">Activity Over Time</h3>
+                    <div class="h-48 flex items-end gap-1" id="chart-daily"></div>
+                </div>
+
+                <!-- Company Breakdown -->
+                <div class="card lg:col-span-1">
+                    <h3 class="text-sm font-semibold text-text-primary mb-4" data-i18n="reports_center.chart.company_breakdown">Company Breakdown</h3>
+                    <div id="company-breakdown" class="space-y-3"></div>
+                </div>
+
+                <!-- Type Breakdown -->
+                <div class="card lg:col-span-1">
+                    <h3 class="text-sm font-semibold text-text-primary mb-4" data-i18n="reports_center.chart.type_breakdown">By Transaction Type</h3>
+                    <div id="type-breakdown" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- High-frequency analysis -->
+            <div class="card" id="patterns-card">
+                <h3 class="text-sm font-semibold text-text-primary mb-3" data-i18n="reports_center.patterns.title">Transaction Pattern Alerts</h3>
+                <p class="text-xs text-text-muted mb-3" data-i18n="reports_center.patterns.hint">Clients with 4+ transfers on a single day in this period — useful for KPI review and compliance checks.</p>
+                <div id="high-freq-list" class="space-y-2"></div>
+            </div>
+
+            <!-- Tabs: Top Senders / Transactions / Barri Reports -->
+            <div class="card !p-0">
+                <div class="detail-tab-bar flex items-center border-b border-border overflow-x-auto">
+                    <button class="detail-tab active" data-tab="top-senders">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        <span data-i18n="reports_center.tab.top_senders">Top Senders</span>
+                    </button>
+                    <button class="detail-tab" data-tab="transactions">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        <span data-i18n="reports_center.tab.all_transactions">All Transactions</span>
+                    </button>
+                    <button class="detail-tab" data-tab="barri-reports">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+                        <span data-i18n="reports_center.tab.company_reports">Company Reports</span>
+                    </button>
+                </div>
+
+                <!-- Top Senders Panel -->
+                <div class="tab-panel" id="panel-top-senders">
+                    <div class="table-container mobile-cards">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="w-8" data-i18n="reports_center.table.rank">#</th>
+                                    <th data-i18n="reports_center.table.client">Client</th>
+                                    <th class="text-right" data-i18n="reports_center.table.transfers">Transfers</th>
+                                    <th class="text-right" data-i18n="reports_center.table.total_sent">Total Sent</th>
+                                    <th class="text-right" data-i18n="reports_center.table.fees">Fees</th>
+                                    <th data-i18n="reports_center.table.last_transfer">Last Transfer</th>
+                                    <th data-i18n="reports_center.table.status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-senders-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Transactions Panel -->
+                <div class="tab-panel hidden" id="panel-transactions">
+                    <div class="table-container mobile-cards">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="reports_center.table.date">Date</th>
+                                    <th data-i18n="reports_center.table.store">Store</th>
+                                    <th data-i18n="reports_center.table.client">Client</th>
+                                    <th data-i18n="reports_center.table.beneficiary">Beneficiary</th>
+                                    <th data-i18n="reports_center.table.company">Company</th>
+                                    <th data-i18n="reports_center.table.reference">Reference</th>
+                                    <th class="text-right" data-i18n="reports_center.table.principal">Principal</th>
+                                    <th class="text-right" data-i18n="reports_center.table.fee">Fee</th>
+                                    <th class="text-right" data-i18n="reports_center.table.tax">Tax</th>
+                                    <th class="text-right" data-i18n="reports_center.table.total">Total</th>
+                                    <th data-i18n="reports_center.table.source">Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="flex items-center justify-between px-4 py-3 border-t border-border" id="txn-pagination"></div>
+                </div>
+
+                <!-- Company Reports Panel -->
+                <div class="tab-panel hidden" id="panel-barri-reports">
+                    <div class="table-container mobile-cards">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="reports_center.table.date_range">Date Range</th>
+                                    <th data-i18n="reports_center.table.company">Company</th>
+                                    <th data-i18n="reports_center.table.agency">Agency</th>
+                                    <th class="text-right" data-i18n="reports_center.table.transactions">Transactions</th>
+                                    <th class="text-right" data-i18n="reports_center.table.principal">Principal</th>
+                                    <th class="text-right" data-i18n="reports_center.table.begin_bal">Begin Bal</th>
+                                    <th class="text-right" data-i18n="reports_center.table.end_bal">End Bal</th>
+                                    <th class="text-right" data-i18n="reports_center.table.commission">Commission</th>
+                                    <th data-i18n="reports_center.table.status">Status</th>
+                                    <th data-i18n="reports_center.table.pdf">PDF</th>
+                                </tr>
+                            </thead>
+                            <tbody id="barri-reports-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Breakdown -->
+            <div class="card" id="store-breakdown-card">
+                <h3 class="text-sm font-semibold text-text-primary mb-4" data-i18n="reports_center.section.store_breakdown">Store Breakdown</h3>
+                <div id="store-breakdown" class="space-y-3"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <style>
+        .period-tab {
+            padding: 0.5rem 1rem; border-radius: 0.625rem; font-size: 0.8125rem; font-weight: 500;
+            color: oklch(0.62 0.04 55); background: transparent; cursor: pointer; border: none;
+            transition: all 0.2s ease-out; white-space: nowrap;
+        }
+        .period-tab:hover { color: oklch(0.27 0.04 55); background: oklch(0.94 0.01 55 / 0.6); }
+        .period-tab.active {
+            color: white;
+            background: linear-gradient(135deg, oklch(0.48 0.09 55), oklch(0.60 0.12 45));
+            box-shadow: 0 2px 12px oklch(0.75 0.16 55 / 0.25);
+        }
+        .detail-tab {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.875rem 1.25rem; font-size: 0.8125rem; font-weight: 500;
+            color: oklch(0.54 0.025 55); background: transparent; cursor: pointer; border: none;
+            border-bottom: 2px solid transparent; transition: all 0.2s ease-out;
+        }
+        .detail-tab:hover { color: oklch(0.27 0.04 55); }
+        .detail-tab.active {
+            color: oklch(0.65 0.16 50); border-bottom-color: oklch(0.65 0.16 50);
+        }
+        .tab-panel table { width: 100%; border-collapse: collapse; }
+        .tab-panel th {
+            padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+            color: oklch(0.54 0.025 55); border-bottom: 1px solid oklch(0.92 0.01 70);
+            background: oklch(0.97 0.018 230);
+        }
+        .tab-panel td { padding: 0.75rem 1rem; font-size: 0.875rem; border-bottom: 1px solid oklch(0.95 0.005 70); color: oklch(0.30 0.03 45); }
+        .tab-panel tbody tr { transition: background 0.15s ease-out; }
+        .tab-panel tbody tr:hover { background: oklch(0.97 0.008 55 / 0.6); }
+        .tab-panel tbody tr:last-child td { border-bottom: none; }
+        .company-bar-bg { height: 0.5rem; border-radius: 9999px; background: oklch(0.94 0.01 55); overflow: hidden; }
+        .company-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+
+    <script src="assets/js/i18n.js?v=20260723-metrics"></script>
+    <script src="assets/js/app.js?v=20260723-metrics"></script>
+    <script type="module">
+
+    const RC = {
+        data: null,
+        currentPeriod: 'monthly',
+        currentPage: 1,
+        fincenLimit: 3000,
+
+        async init() {
+            const ok = await App.init();
+            if (!ok) return;
+            document.getElementById('user-avatar').textContent = (App.user.name || 'A')[0].toUpperCase();
+            App.initSidebar();
+            App.initUserMenu();
+            this.bindEvents();
+            this.loadData();
+        },
+
+        bindEvents() {
+            document.querySelectorAll('.period-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    this.currentPeriod = tab.dataset.period;
+                    this.currentPage = 1;
+                    document.getElementById('custom-date-wrap').classList.toggle('hidden', this.currentPeriod !== 'custom');
+                    if (this.currentPeriod !== 'custom') this.loadData();
+                });
+            });
+
+            document.querySelectorAll('.detail-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+                    document.getElementById('panel-' + tab.dataset.tab).classList.remove('hidden');
+                });
+            });
+
+            document.getElementById('btn-apply-filters').addEventListener('click', () => {
+                this.currentPage = 1;
+                this.loadData();
+            });
+            document.getElementById('btn-clear-filters').addEventListener('click', () => {
+                document.getElementById('filter-company').value = '';
+                document.getElementById('filter-store').value = '';
+                document.getElementById('filter-sender').value = '';
+                document.getElementById('filter-date-from').value = '';
+                document.getElementById('filter-date-to').value = '';
+                this.currentPage = 1;
+                this.loadData();
+            });
+            document.getElementById('btn-export').addEventListener('click', () => this.exportCSV());
+            document.getElementById('btn-export-excel').addEventListener('click', () => this.exportExcel());
+
+            let senderTimeout;
+            document.getElementById('filter-sender').addEventListener('input', () => {
+                clearTimeout(senderTimeout);
+                senderTimeout = setTimeout(() => { this.currentPage = 1; this.loadData(); }, 500);
+            });
+        },
+
+        buildQuery() {
+            const params = new URLSearchParams();
+            params.set('period', this.currentPeriod);
+            params.set('page', this.currentPage);
+
+            const company = document.getElementById('filter-company').value;
+            const store = document.getElementById('filter-store').value;
+            const sender = document.getElementById('filter-sender').value;
+            if (company) params.set('company', company);
+            if (store) params.set('store_id', store);
+            if (sender) params.set('sender', sender);
+
+            if (this.currentPeriod === 'custom') {
+                const from = document.getElementById('filter-date-from').value;
+                const to = document.getElementById('filter-date-to').value;
+                if (from) params.set('date_from', from);
+                if (to) params.set('date_to', to);
+            }
+            return params.toString();
+        },
+
+        async loadData() {
+            try {
+                const data = await App.api('GET', '/api/reports-center?' + this.buildQuery());
+                this.data = data;
+                this.fincenLimit = parseFloat(data.fincen_limit) || 3000;
+                this.populateFilters(data);
+                this.renderSummary(data.summary, data.fincen_flagged);
+                this.renderKpis(data.kpis || {}, data.patterns || {});
+                this.renderDailyChart(data.daily_breakdown);
+                this.renderCompanyBreakdown(data.companies);
+                this.renderTypeBreakdown(data.type_breakdown || []);
+                this.renderHighFrequency(data.patterns?.high_frequency_clients || []);
+                this.renderTopSenders(data.top_senders);
+                this.renderTransactions(data.transactions, data.total_rows, data.page, data.pages);
+                this.renderBarriReports(data.barri_reports);
+                this.renderStoreBreakdown(data.store_breakdown);
+
+                const f = data.filters;
+                document.getElementById('date-range-label').textContent = `${f.date_from} — ${f.date_to}`;
+            } catch (err) {
+                App.toastKey('toast.report_load_failed', 'danger', err.message);
+            }
+        },
+
+        populateFilters(data) {
+            const compSel = document.getElementById('filter-company');
+            const storeSel = document.getElementById('filter-store');
+            const curComp = compSel.value;
+            const curStore = storeSel.value;
+
+            if (compSel.options.length <= 1) {
+                (data.available_companies || []).forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c; opt.textContent = c;
+                    compSel.appendChild(opt);
+                });
+            }
+            if (storeSel.options.length <= 1) {
+                (data.available_stores || []).forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id; opt.textContent = s.name;
+                    storeSel.appendChild(opt);
+                });
+            }
+            compSel.value = curComp;
+            storeSel.value = curStore;
+        },
+
+        esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; },
+        t(key, params) { return App.t(key, params); },
+
+        renderSummary(s, fincen) {
+            App.setMoneyMetric(document.getElementById('stat-principal'), s.total_principal);
+            App.setMoneyMetric(document.getElementById('stat-fees'), s.total_fees);
+            App.setMoneyMetric(document.getElementById('stat-tax'), s.total_tax);
+            App.setMoneyMetric(document.getElementById('stat-total'), s.total_amount);
+            App.setCountMetric(document.getElementById('stat-txns'), s.total_transactions);
+            App.setCountMetric(document.getElementById('stat-senders'), s.unique_senders);
+            App.applyMetric(document.getElementById('stat-fincen'), String(parseInt(fincen, 10) || 0));
+        },
+
+        renderKpis(kpis, patterns) {
+            App.setMoneyMetric(document.getElementById('kpi-avg-ticket'), kpis.avg_ticket || 0, { compact: false });
+            App.applyMetric(document.getElementById('kpi-fee-rate'), (kpis.fee_rate_pct || 0) + '%');
+            App.applyMetric(document.getElementById('kpi-txns-sender'), String(kpis.txns_per_sender || 0));
+            App.applyMetric(document.getElementById('kpi-over-limit'), String(kpis.over_limit_clients || 0));
+            App.applyMetric(document.getElementById('kpi-high-freq'), String(kpis.high_frequency_days || 0));
+            App.setMoneyMetric(document.getElementById('kpi-other-services'), kpis.other_services_principal || 0);
+            const feesFull = App.moneyFull(kpis.other_services_fees || 0);
+            const feesDisplay = App.moneyMetric(kpis.other_services_fees || 0, { compact: 'auto' });
+            document.getElementById('kpi-other-services-meta').textContent = this.t('reports_center.kpi.other_services_meta', {
+                count: kpis.other_services_count || 0,
+                fees: feesDisplay,
+            });
+            document.getElementById('kpi-other-services-meta').title = feesFull !== feesDisplay ? feesFull : '';
+        },
+
+        formatBarMoney(val) {
+            const display = App.moneyMetric(val, { compact: 'auto' });
+            const full = App.moneyFull(val);
+            const cls = Number(val) < 0 ? 'metric-bar-value text-danger' : 'metric-bar-value text-text-primary';
+            const title = full !== display ? ` title="${this.esc(full)}"` : '';
+            return `<span class="${cls}"${title}>${this.esc(display)}</span>`;
+        },
+
+        renderTypeBreakdown(types) {
+            const el = document.getElementById('type-breakdown');
+            if (!types || types.length === 0) {
+                el.innerHTML = '<p class="text-sm text-text-muted text-center py-4">' + this.esc(this.t('reports_center.empty.no_company_data')) + '</p>';
+                return;
+            }
+            const maxTotal = Math.max(...types.map(t => parseFloat(t.total_principal) || 0), 1);
+            el.innerHTML = types.map((t) => {
+                const pct = (parseFloat(t.total_principal) / maxTotal) * 100;
+                const label = String(t.txn_type || 'unknown').replace(/_/g, ' ');
+                return `<div>
+                    <div class="metric-bar-row">
+                        <span class="metric-bar-label text-sm font-medium capitalize">${this.esc(label)}</span>
+                        <span class="flex items-center gap-1 shrink-0">${this.formatBarMoney(t.total_principal)}<span class="text-xs text-text-muted">· ${t.count}</span></span>
+                    </div>
+                    <div class="company-bar-bg"><div class="company-bar-fill" style="width:${pct}%;background:oklch(0.55 0.12 50)"></div></div>
+                </div>`;
+            }).join('');
+        },
+
+        renderHighFrequency(rows) {
+            const el = document.getElementById('high-freq-list');
+            if (!rows || rows.length === 0) {
+                el.innerHTML = '<p class="text-sm text-text-muted">' + this.esc(this.t('reports_center.patterns.empty')) + '</p>';
+                return;
+            }
+            el.innerHTML = rows.map((r) => `
+                <div class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-bg-elevated border border-border">
+                    <div class="min-w-0">
+                        <a href="clients?client_id=${encodeURIComponent(r.client_id)}" class="text-sm font-medium text-accent hover:underline">${this.esc(r.client_name || '')}</a>
+                        <p class="text-xs text-text-muted">${this.esc(r.txn_date || '')}</p>
+                    </div>
+                    <span class="badge badge-warning text-xs shrink-0">${this.esc(this.t('reports_center.patterns.day_count', { count: r.day_count }))}</span>
+                </div>`).join('');
+        },
+
+        renderDailyChart(days) {
+            const el = document.getElementById('chart-daily');
+            if (!days || days.length === 0) {
+                el.innerHTML = '<p class="text-sm text-text-muted w-full text-center py-8">' + this.esc(this.t('reports_center.empty.no_chart_data')) + '</p>';
+                return;
+            }
+            const maxVal = Math.max(...days.map(d => parseFloat(d.total) || 1));
+            const colors = ['oklch(0.48 0.09 55)', 'oklch(0.55 0.10 45)', 'oklch(0.75 0.18 155)', 'oklch(0.8 0.15 85)'];
+
+            el.innerHTML = days.map((d, i) => {
+                const pct = Math.max(4, (parseFloat(d.total) / maxVal) * 100);
+                const color = colors[i % colors.length];
+                const label = d.day ? d.day.slice(5) : '';
+                const tip = this.t('reports_center.chart.tooltip', { day: d.day, amount: App.money(d.total), count: d.count });
+                return `<div class="flex-1 flex flex-col items-center gap-1 min-w-0" title="${this.esc(tip)}">
+                    <div class="w-full rounded-t-md transition-all duration-500" style="height:${pct}%;background:${color};min-height:4px;max-width:32px;margin:0 auto"></div>
+                    <span class="text-[9px] text-text-muted font-mono truncate w-full text-center">${label}</span>
+                </div>`;
+            }).join('');
+        },
+
+        renderCompanyBreakdown(companies) {
+            const el = document.getElementById('company-breakdown');
+            if (!companies || companies.length === 0) {
+                el.innerHTML = '<p class="text-sm text-text-muted text-center py-4">' + this.esc(this.t('reports_center.empty.no_company_data')) + '</p>';
+                return;
+            }
+            const maxTotal = Math.max(...companies.map(c => parseFloat(c.total_principal)));
+            const colors = ['oklch(0.48 0.09 55)', 'oklch(0.75 0.18 155)', 'oklch(0.8 0.15 85)', 'oklch(0.65 0.2 25)', 'oklch(0.42 0.08 50)', 'oklch(0.55 0.10 45)'];
+
+            el.innerHTML = companies.map((c, i) => {
+                const pct = maxTotal > 0 ? (parseFloat(c.total_principal) / maxTotal) * 100 : 0;
+                const color = colors[i % colors.length];
+                return `<div>
+                    <div class="metric-bar-row">
+                        <div class="metric-bar-label flex items-center gap-2 min-w-0">
+                            <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></div>
+                            <span class="text-sm font-medium text-text-primary truncate">${this.esc(c.company)}</span>
+                            <span class="text-xs text-text-muted shrink-0">${this.esc(this.t('reports_center.company_txns', { count: c.count }))}</span>
+                        </div>
+                        ${this.formatBarMoney(c.total_principal)}
+                    </div>
+                    <div class="company-bar-bg"><div class="company-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                </div>`;
+            }).join('');
+        },
+
+        renderTopSenders(senders) {
+            const tbody = document.getElementById('top-senders-tbody');
+            if (!senders || senders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-text-muted">' + this.esc(this.t('reports_center.empty.no_senders')) + '</td></tr>';
+                return;
+            }
+            tbody.innerHTML = senders.map((s, i) => {
+                const totalSent = parseFloat(s.total_sent) || 0;
+                const isFincen = totalSent >= this.fincenLimit;
+                const hasId = !!s.sender_id_path;
+                return `<tr>
+                    <td class="text-text-muted font-mono text-sm">${i + 1}</td>
+                    <td>
+                        <div>
+                            <p class="font-medium text-text-primary"><a href="clients?client_id=${encodeURIComponent(s.id)}" class="text-accent hover:underline">${this.esc(s.name)}</a></p>
+                            <p class="text-xs text-text-muted">${this.esc(s.phone || '')}</p>
+                        </div>
+                    </td>
+                    <td class="text-right font-mono tabular-nums text-sm">${s.transfer_count}</td>
+                    <td class="text-right font-mono tabular-nums font-semibold ${isFincen ? 'text-danger' : 'text-text-primary'}">${App.money(totalSent)}</td>
+                    <td class="text-right font-mono tabular-nums text-sm text-text-secondary">${App.money(s.total_fees)}</td>
+                    <td class="text-sm text-text-secondary">${s.last_transfer ? s.last_transfer.slice(0, 10) : '—'}</td>
+                    <td>
+                        ${isFincen ? '<span class="badge badge-danger">' + this.esc(this.t('reports_center.badge.fincen')) + '</span>' : ''}
+                        ${s.income_verified ? '<span class="badge badge-success ml-1">' + this.esc(this.t('reports_center.badge.verified')) + '</span>' : ''}
+                        ${hasId ? '<span class="badge badge-info ml-1">' + this.esc(this.t('reports_center.badge.id')) + '</span>' : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+        },
+
+        renderTransactions(txns, total, page, pages) {
+            const tbody = document.getElementById('transactions-tbody');
+            if (!txns || txns.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-text-muted">' + this.esc(this.t('reports_center.empty.no_transactions')) + '</td></tr>';
+                document.getElementById('txn-pagination').innerHTML = '';
+                return;
+            }
+            const srcReport = this.esc(this.t('reports_center.badge.report'));
+            const srcManual = this.esc(this.t('reports_center.badge.manual'));
+            tbody.innerHTML = txns.map(txn => {
+                const srcBadge = txn.source === 'report_import' || txn.source === 'barri_report'
+                    ? `<span class="badge badge-info">${srcReport}</span>`
+                    : `<span class="badge badge-warning">${srcManual}</span>`;
+                return `<tr>
+                    <td class="font-mono text-sm text-text-secondary whitespace-nowrap">${(txn.date_sent || '').slice(0, 10)}</td>
+                    <td class="text-sm">${this.esc(txn.store_name)}</td>
+                    <td class="text-sm font-medium text-text-primary">${this.esc(txn.client_name)}</td>
+                    <td class="text-sm text-text-secondary">${this.esc(txn.beneficiary)}</td>
+                    <td class="text-sm">${this.esc(txn.company)}</td>
+                    <td class="font-mono text-xs text-text-muted">${this.esc(txn.transaction_code)}</td>
+                    <td class="text-right font-mono tabular-nums">${App.money(txn.amount_usd)}</td>
+                    <td class="text-right font-mono tabular-nums text-text-secondary">${App.money(txn.fee)}</td>
+                    <td class="text-right font-mono tabular-nums text-text-secondary">${App.money(txn.tax)}</td>
+                    <td class="text-right font-mono tabular-nums font-semibold">${App.money(txn.total)}</td>
+                    <td>${srcBadge}</td>
+                </tr>`;
+            }).join('');
+
+            const pag = document.getElementById('txn-pagination');
+            pag.innerHTML = `
+                <span class="text-xs text-text-muted">${this.esc(this.t('reports_center.records_count', { count: total.toLocaleString(), page, pages }))}</span>
+                <div class="flex items-center gap-2">
+                    <button class="btn-secondary !py-1 !px-3 !text-xs" ${page <= 1 ? 'disabled' : ''} id="btn-prev-page">${this.esc(this.t('reports_center.pagination.prev'))}</button>
+                    <button class="btn-secondary !py-1 !px-3 !text-xs" ${page >= pages ? 'disabled' : ''} id="btn-next-page">${this.esc(this.t('reports_center.pagination.next'))}</button>
+                </div>`;
+            document.getElementById('btn-prev-page')?.addEventListener('click', () => { this.currentPage--; this.loadData(); });
+            document.getElementById('btn-next-page')?.addEventListener('click', () => { this.currentPage++; this.loadData(); });
+        },
+
+        renderBarriReports(reports) {
+            const tbody = document.getElementById('barri-reports-tbody');
+            if (!reports || reports.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-text-muted">' + this.esc(this.t('reports_center.empty.no_uploaded_reports')) + '</td></tr>';
+                return;
+            }
+            const companyColors = { 'Barri': 'info', 'Viamericas': 'success', 'Intercambio': 'warning', 'Intermex': 'danger', 'Ria': 'danger' };
+            const statusLabels = {
+                processed: this.t('reports_center.status.processed'),
+                error: this.t('reports_center.status.error'),
+                pending: this.t('reports_center.status.pending'),
+            };
+            const pdfLabel = this.esc(this.t('reports_center.pdf_link'));
+            tbody.innerHTML = reports.map(r => {
+                const pdfLink = r.filename
+                    ? `<a href="/api/barri-reports?download=${r.id}" target="_blank" class="btn-secondary !py-1 !px-2 !text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        ${pdfLabel}</a>`
+                    : '<span class="text-xs text-text-muted">—</span>';
+                const statusClass = r.status === 'processed' ? 'success' : r.status === 'error' ? 'danger' : 'warning';
+                const statusLabel = this.esc(statusLabels[r.status] || r.status);
+                const companyName = r.company || 'Barri';
+                const companyBadge = companyColors[companyName] || 'info';
+                const beginBal = parseFloat(r.beginning_balance) || 0;
+                const endBal = parseFloat(r.ending_balance) || 0;
+                const endBalClass = endBal < 0 ? 'text-danger' : 'text-success';
+                return `<tr>
+                    <td class="font-mono text-sm whitespace-nowrap">${this.esc(r.date_from)} — ${this.esc(r.date_to)}</td>
+                    <td><span class="badge badge-${companyBadge}">${this.esc(companyName)}</span></td>
+                    <td class="text-sm">${this.esc(r.agency_name)}</td>
+                    <td class="text-right font-mono tabular-nums text-sm">${r.total_transactions}</td>
+                    <td class="text-right font-mono tabular-nums">${App.money(r.total_principal)}</td>
+                    <td class="text-right font-mono tabular-nums text-text-secondary">${App.money(beginBal)}</td>
+                    <td class="text-right font-mono tabular-nums font-semibold ${endBalClass}">${App.money(endBal)}</td>
+                    <td class="text-right font-mono tabular-nums text-success">${App.money(r.total_commission)}</td>
+                    <td><span class="badge badge-${statusClass}">${statusLabel}</span></td>
+                    <td>${pdfLink}</td>
+                </tr>`;
+            }).join('');
+        },
+
+        renderStoreBreakdown(stores) {
+            const el = document.getElementById('store-breakdown');
+            if (!stores || stores.length === 0) {
+                el.innerHTML = '<p class="text-sm text-text-muted text-center py-4">' + this.esc(this.t('reports_center.empty.no_store_data')) + '</p>';
+                return;
+            }
+            const maxTotal = Math.max(...stores.map(s => parseFloat(s.total)));
+            const colors = ['oklch(0.48 0.09 55)', 'oklch(0.75 0.18 155)', 'oklch(0.8 0.15 85)', 'oklch(0.65 0.2 25)'];
+
+            el.innerHTML = stores.map((s, i) => {
+                const pct = maxTotal > 0 ? (parseFloat(s.total) / maxTotal) * 100 : 0;
+                const color = colors[i % colors.length];
+                return `<div>
+                    <div class="metric-bar-row">
+                        <div class="metric-bar-label flex items-center gap-2 min-w-0">
+                            <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></div>
+                            <span class="text-sm font-medium text-text-primary truncate">${this.esc(s.store_name)}</span>
+                            <span class="text-xs text-text-muted shrink-0">${this.esc(this.t('reports_center.company_txns', { count: s.count }))}</span>
+                        </div>
+                        ${this.formatBarMoney(s.total)}
+                    </div>
+                    <div class="company-bar-bg"><div class="company-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                </div>`;
+            }).join('');
+        },
+
+        async exportCSV() {
+            const btn = document.getElementById('btn-export');
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ${this.esc(this.t('common.exporting'))}`;
+
+            try {
+                const f = this.data?.filters || {};
+                const res = await fetch('/api/reports-center', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': App.csrf },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        action: 'export',
+                        date_from: f.date_from,
+                        date_to: f.date_to,
+                        company: f.company || '',
+                        store_id: f.store_id || '',
+                        sender: f.sender || '',
+                    })
+                });
+                if (!res.ok) throw new Error('Export failed');
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tienda-el-rey-reporte-${f.date_from}-a-${f.date_to}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                App.toastKey('toast.report_downloaded', 'success');
+            } catch (err) {
+                App.toastKey('toast.export_failed', 'danger', err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ${this.esc(this.t('reports_center.export_csv'))}`;
+            }
+        },
+
+        async exportExcel() {
+            const btn = document.getElementById('btn-export-excel');
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ${this.esc(this.t('common.generating_pdf'))}`;
+
+            try {
+                const f = this.data?.filters || {};
+                const storeId = document.getElementById('filter-store').value || '';
+                const params = new URLSearchParams({
+                    date_from: f.date_from || '',
+                    date_to: f.date_to || '',
+                });
+                if (storeId) params.set('store_id', storeId);
+
+                const data = await App.api('GET', '/api/export-workbook?' + params.toString());
+                this.buildExcelWorkbook(data);
+                App.toastKey('toast.template_downloaded', 'success');
+            } catch (err) {
+                App.toastKey('toast.excel_export_failed', 'danger', err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13l-2 2 2 2"/><path d="M14 17l2-2-2-2"/></svg> ${this.esc(this.t('reports_center.download_template'))}`;
+            }
+        },
+
+        buildExcelWorkbook(data) {
+            const wb = XLSX.utils.book_new();
+            const m = (v) => parseFloat(v) || 0;
+            const storeName = data.store_name || 'Store';
+            const range = `${data.date_from} to ${data.date_to}`;
+
+            // ── Sheet 1: CAJA ──
+            {
+                const rows = [
+                    [`CAJA — ${storeName}`, '', '', '', `Period: ${range}`],
+                    [],
+                    ['COMPANIA', 'ENTRADA', 'CHEQUES Y DEBITOS', 'TOTAL', 'FECHA', 'CAJERA'],
+                ];
+                let totalIn = 0, totalChecks = 0, totalAll = 0;
+                for (const r of (data.caja || [])) {
+                    const cashIn = m(r.cash_in);
+                    const checks = m(r.checks_debits);
+                    const tot = m(r.total) || (cashIn + checks);
+                    rows.push([r.company, cashIn, checks, tot, r.session_date || '', r.cashier_name || '']);
+                    totalIn += cashIn; totalChecks += checks; totalAll += tot;
+                }
+                rows.push([]);
+                rows.push(['TOTAL', totalIn, totalChecks, totalAll]);
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:20},{wch:14},{wch:18},{wch:14},{wch:14},{wch:16}];
+                XLSX.utils.book_append_sheet(wb, ws, 'CAJA');
+            }
+
+            // ── Sheet 2: ESTADISTICAS GIROS ──
+            {
+                const rows = [
+                    [`ESTADISTICAS GIROS — ${storeName}`, '', '', `Period: ${range}`],
+                    [],
+                    ['COMPANY', 'MONTH', 'YEAR', 'TRANSFERS', 'TOTAL USD'],
+                ];
+                for (const r of (data.statistics || [])) {
+                    rows.push([r.company, r.month, r.year, parseInt(r.transfer_count) || 0, m(r.total_usd)]);
+                }
+                if (rows.length === 3) rows.push(['(No statistics data for this period)']);
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:16},{wch:8},{wch:8},{wch:12},{wch:14}];
+                XLSX.utils.book_append_sheet(wb, ws, 'ESTADISTICAS GIROS');
+            }
+
+            // ── Sheet 3: Libro interno ──
+            {
+                const rows = [
+                    [`LIBRO INTERNO — ${storeName}`, '', '', '', `Periodo: ${range}`],
+                    [],
+                    ['EMPLEADO', 'DESCRIPCIÓN', 'POR PAGAR A EL REY', 'EL REY DEBE', 'FECHA', 'ESTADO', 'NOTAS'],
+                ];
+                let totalOwed = 0, totalStoreOwes = 0;
+                for (const r of (data.internal_ledger || [])) {
+                    const owed = m(r.owed_to_store);
+                    const storeOwes = m(r.store_owes);
+                    const isOpen = !r.status || r.status === 'open';
+                    const statusLabel = r.status === 'paid' ? this.t('ledger.status_paid') : this.t('ledger.status_open');
+                    rows.push([r.employee_name || '', r.description, owed, storeOwes, r.entry_date || '', statusLabel, r.notes || '']);
+                    if (isOpen) {
+                        totalOwed += owed;
+                        totalStoreOwes += storeOwes;
+                    }
+                }
+                rows.push([]);
+                rows.push(['TOTAL (abierto)', '', totalOwed, totalStoreOwes, '', '', `DIFERENCIA: ${(totalOwed - totalStoreOwes).toFixed(2)}`]);
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:16},{wch:30},{wch:14},{wch:14},{wch:12},{wch:10},{wch:20}];
+                XLSX.utils.book_append_sheet(wb, ws, 'LIBRO INTERNO');
+            }
+
+            // ── Sheet 4: CONTABILIDAD ──
+            {
+                const rows = [
+                    [`CONTABILIDAD — ${storeName}`, '', '', `Period: ${range}`],
+                    [],
+                    ['CATEGORIA', 'DESCRIPCION', 'MONTO', 'TIPO', 'FECHA', 'NOTAS'],
+                ];
+                let totalIncome = 0, totalExpense = 0;
+                for (const r of (data.accounting || [])) {
+                    const amt = m(r.amount);
+                    rows.push([r.category || '', r.description, amt, r.entry_type, r.entry_date || '', r.notes || '']);
+                    if (amt >= 0) totalIncome += amt; else totalExpense += Math.abs(amt);
+                }
+                rows.push([]);
+                rows.push(['', 'TOTAL INGRESOS', totalIncome]);
+                rows.push(['', 'TOTAL GASTOS', totalExpense]);
+                rows.push(['', 'BALANCE', totalIncome - totalExpense]);
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:16},{wch:30},{wch:14},{wch:12},{wch:12},{wch:20}];
+                XLSX.utils.book_append_sheet(wb, ws, 'CONTABILIDAD');
+            }
+
+            // ── Sheet 5: BASE DE DATOS CLIENTES ──
+            {
+                const rows = [
+                    [`BASE DE DATOS CLIENTES`, '', '', '', '', `Period: ${range}`],
+                    [],
+                    ['CLIENTE', 'TELEFONO', 'CODIGO', 'LIMITE MENSUAL', 'INGRESO VERIFICADO', 'ENVIADO (PERIODO)', 'TRANSFERENCIAS', 'TOTAL ENVIADO'],
+                ];
+                for (const r of (data.clients || [])) {
+                    rows.push([
+                        r.name, r.phone || '', r.client_code || '',
+                        m(r.monthly_limit), r.income_verified ? 'SI' : 'NO',
+                        m(r.period_sent), parseInt(r.period_transfers) || 0, m(r.total_sent)
+                    ]);
+                }
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:24},{wch:14},{wch:12},{wch:16},{wch:18},{wch:16},{wch:14},{wch:14}];
+                XLSX.utils.book_append_sheet(wb, ws, 'BASE DE DATOS CLIENTES');
+            }
+
+            // ── Sheet 6: TRANSFERENCIAS ──
+            {
+                const rows = [
+                    [`TRANSFERENCIAS — ${storeName}`, '', '', '', '', '', `Period: ${range}`],
+                    [],
+                    ['FECHA', 'TIENDA', 'CLIENTE', 'BENEFICIARIO', 'COMPANIA', 'REFERENCIA', 'TIPO', 'PRINCIPAL (USD)', 'FEE', 'TAX', 'TOTAL', 'FUENTE'],
+                ];
+                let totalP = 0, totalF = 0, totalT = 0, totalA = 0;
+                for (const r of (data.transfers || [])) {
+                    const p = m(r.amount_usd), f = m(r.fee), t = m(r.tax), tot = m(r.total);
+                    rows.push([
+                        r.date_sent, r.store_name || '', r.client_name || '', r.beneficiary || '',
+                        r.company || '', r.transaction_code || '', r.transaction_type || '',
+                        p, f, t, tot, r.source || 'manual'
+                    ]);
+                    totalP += p; totalF += f; totalT += t; totalA += tot;
+                }
+                rows.push([]);
+                rows.push(['TOTALES', '', '', '', '', '', '', totalP, totalF, totalT, totalA, `${data.transfers?.length || 0} registros`]);
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:20},{wch:14},{wch:20},{wch:20},{wch:12},{wch:14},{wch:14},{wch:14},{wch:10},{wch:10},{wch:12},{wch:12}];
+                XLSX.utils.book_append_sheet(wb, ws, 'TRANSFERENCIAS');
+            }
+
+            // ── Sheet 7: INVENTARIO MEDICINA ──
+            {
+                const rows = [
+                    [`INVENTARIO MEDICINA — ${storeName}`],
+                    [],
+                    ['PRODUCTO', 'QTY', 'PARA QUE SIRVE', 'PRECIO', 'PRECIO PUBLICO', 'STOCK MINIMO'],
+                ];
+                for (const r of (data.inventory || [])) {
+                    rows.push([
+                        r.product_name, parseInt(r.quantity) || 0, r.description || '',
+                        m(r.cost_price), m(r.retail_price), parseInt(r.low_stock_threshold) || 0
+                    ]);
+                }
+                if (rows.length === 3) rows.push(['(No inventory data)']);
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{wch:24},{wch:8},{wch:30},{wch:12},{wch:14},{wch:14}];
+                XLSX.utils.book_append_sheet(wb, ws, 'INVENTARIO MEDICINA');
+            }
+
+            // Generate and download
+            const dateLabel = `${data.date_from} to ${data.date_to}`;
+            const filename = `CAJA ${storeName} ${dateLabel}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+    };
+
+    window.RC = RC;
+    RC.init();
+
+    document.addEventListener('language-changed', () => {
+        RC.loadData();
+    });
+
+    </script>
+</body>
+</html>

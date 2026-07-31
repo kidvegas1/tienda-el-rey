@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees & Payroll — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css?v=20260716e">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.employees">Employees</p>
+                </div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.employees.heading">Employees & Payroll</h2>
+                    <p class="text-xs text-text-muted" data-i18n="employees.subtitle">Track staff, rates, and estimated pay from clock-ins</p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="store-filter" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
+                <label class="flex items-center gap-2 text-xs text-text-secondary px-2">
+                    <input type="checkbox" id="include-inactive" class="rounded border-border">
+                    <span data-i18n="employees.show_inactive">Show inactive</span>
+                </label>
+                <button id="btn-add-employee" class="btn-primary flex items-center gap-2 px-4 py-2.5 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="employees.add">Add Employee</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <section class="card">
+                <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+                    <div>
+                        <h3 class="text-lg font-bold" data-i18n="employees.roster_title">Staff Roster</h3>
+                        <p class="text-xs text-text-muted" data-i18n="employees.roster_subtitle">Hourly rates used for payroll estimates</p>
+                    </div>
+                    <a href="stores" class="btn-secondary text-xs py-1.5 px-3" data-i18n="employees.manage_logins">Manage logins on Stores</a>
+                </div>
+                <div class="table-container mobile-cards">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs uppercase tracking-wider text-text-muted border-b border-border">
+                                <th class="pb-2 pr-4" data-i18n="common.name">Name</th>
+                                <th class="pb-2 pr-4" data-i18n="stores.col.store">Store</th>
+                                <th class="pb-2 pr-4" data-i18n="common.phone">Phone</th>
+                                <th class="pb-2 pr-4" data-i18n="employees.col.hourly_rate">Hourly Rate</th>
+                                <th class="pb-2 pr-4" data-i18n="employees.col.login">Login</th>
+                                <th class="pb-2 pr-4" data-i18n="common.status">Status</th>
+                                <th class="pb-2" data-i18n="stores.col.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-tbody">
+                            <tr><td colspan="7" class="py-8 text-center text-text-muted" data-i18n="common.loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+                    <div>
+                        <h3 class="text-lg font-bold" data-i18n="employees.payroll_title">Payroll Estimate</h3>
+                        <p class="text-xs text-text-muted" data-i18n="employees.payroll_subtitle">Hours from completed clock-outs × hourly rate</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <input type="date" id="payroll-from" class="input py-1.5 px-3 text-xs w-full sm:w-36">
+                        <input type="date" id="payroll-to" class="input py-1.5 px-3 text-xs w-full sm:w-36">
+                        <button id="btn-load-payroll" class="btn-secondary text-xs py-1.5 px-3" data-i18n="action.load">Load</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4" id="payroll-summary">
+                    <div class="rounded-xl bg-bg-elevated/60 border border-border p-4">
+                        <p class="text-[11px] uppercase tracking-wider text-text-muted" data-i18n="employees.stat.hours">Total Hours</p>
+                        <p class="text-xl font-bold font-mono mt-1" id="stat-hours">—</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated/60 border border-border p-4">
+                        <p class="text-[11px] uppercase tracking-wider text-text-muted" data-i18n="employees.stat.pay">Estimated Pay</p>
+                        <p class="text-xl font-bold font-mono mt-1" id="stat-pay">—</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated/60 border border-border p-4">
+                        <p class="text-[11px] uppercase tracking-wider text-text-muted" data-i18n="employees.stat.staff">Staff Count</p>
+                        <p class="text-xl font-bold font-mono mt-1" id="stat-staff">—</p>
+                    </div>
+                </div>
+                <div class="table-container mobile-cards">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs uppercase tracking-wider text-text-muted border-b border-border">
+                                <th class="pb-2 pr-4" data-i18n="common.name">Name</th>
+                                <th class="pb-2 pr-4" data-i18n="stores.col.store">Store</th>
+                                <th class="pb-2 pr-4" data-i18n="col.hours">Hours</th>
+                                <th class="pb-2 pr-4" data-i18n="employees.col.shifts">Shifts</th>
+                                <th class="pb-2 pr-4" data-i18n="employees.col.hourly_rate">Hourly Rate</th>
+                                <th class="pb-2" data-i18n="employees.col.estimated_pay">Estimated Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payroll-tbody">
+                            <tr><td colspan="6" class="py-8 text-center text-text-muted" data-i18n="employees.payroll_empty">Select a date range and load payroll</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="employee-modal-backdrop"></div>
+    <div class="modal-content w-full max-w-lg" id="employee-modal">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold" id="employee-modal-title" data-i18n="employees.add">Add Employee</h3>
+            <button type="button" onclick="closeEmployeeModal()" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <form id="employee-form" class="space-y-4">
+            <input type="hidden" id="employee-id" value="">
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.full_name">Full Name *</label>
+                <input type="text" id="employee-name" class="input w-full" required placeholder="e.g. Maria Lopez">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.col.store">Store *</label>
+                    <select id="employee-store" class="input w-full" required></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="common.phone">Phone</label>
+                    <input type="text" id="employee-phone" class="input w-full" placeholder="(214) 555-0100">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="employees.col.hourly_rate">Hourly Rate ($)</label>
+                    <input type="number" id="employee-rate" class="input w-full font-mono" min="0" step="0.25" placeholder="15.00">
+                </div>
+                <div id="employee-status-wrap" class="hidden">
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="common.status">Status</label>
+                    <select id="employee-status" class="input w-full">
+                        <option value="active" data-i18n="stores.user.role_active">Active</option>
+                        <option value="inactive" data-i18n="stores.user.role_inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" onclick="closeEmployeeModal()" class="btn-secondary px-4 py-2.5 text-sm" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" id="btn-save-employee" class="btn-primary px-6 py-2.5 text-sm" data-i18n="action.save">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js?v=20260716e"></script>
+    <script src="assets/js/app.js?v=20260716e"></script>
+    <script>
+        let employeesList = [];
+        let storesList = [];
+
+        function t(key, params) { return App.t(key, params); }
+        function localeTag() { return (App.lang || 'en') === 'es' ? 'es-US' : 'en-US'; }
+        function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        function money(v) {
+            if (v == null || v === '') return '—';
+            return App.money(v);
+        }
+        function isoDate(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+        function mondayOfWeek(d = new Date()) {
+            const x = new Date(d);
+            const day = x.getDay();
+            const diff = day === 0 ? -6 : 1 - day;
+            x.setDate(x.getDate() + diff);
+            return x;
+        }
+
+        function fillStoreSelects() {
+            const filter = document.getElementById('store-filter');
+            const modal = document.getElementById('employee-store');
+            const opts = storesList.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+            filter.innerHTML = `<option value="">${esc(t('employees.all_stores'))}</option>` + opts;
+            modal.innerHTML = opts;
+        }
+
+        function openEmployeeModal(emp = null) {
+            document.getElementById('employee-form').reset();
+            fillStoreSelects();
+            const statusWrap = document.getElementById('employee-status-wrap');
+            if (emp) {
+                document.getElementById('employee-id').value = emp.id;
+                document.getElementById('employee-name').value = emp.name || '';
+                document.getElementById('employee-phone').value = emp.phone || '';
+                document.getElementById('employee-rate').value = emp.hourly_rate != null ? emp.hourly_rate : '';
+                document.getElementById('employee-store').value = String(emp.store_id);
+                document.getElementById('employee-status').value = emp.status || 'active';
+                statusWrap.classList.remove('hidden');
+                document.getElementById('employee-modal-title').textContent = t('employees.edit');
+            } else {
+                document.getElementById('employee-id').value = '';
+                statusWrap.classList.add('hidden');
+                document.getElementById('employee-modal-title').textContent = t('employees.add');
+                const filterStore = document.getElementById('store-filter').value;
+                if (filterStore) document.getElementById('employee-store').value = filterStore;
+            }
+            App.openModal('employee-modal');
+        }
+        function closeEmployeeModal() { App.closeModal('employee-modal'); }
+
+        function wireEmployeeActions() {
+            const tbody = document.getElementById('employees-tbody');
+            tbody.querySelectorAll('.edit-emp-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const emp = employeesList.find(e => String(e.id) === String(btn.dataset.id));
+                    if (emp) openEmployeeModal(emp);
+                });
+            });
+            tbody.querySelectorAll('.remove-emp-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const emp = employeesList.find(e => String(e.id) === String(btn.dataset.id));
+                    if (!emp || !App.confirmKey('confirm.remove_employee', { name: emp.name })) return;
+                    try {
+                        await App.api('POST', '/api/employees', { action: 'deactivate', id: emp.id });
+                        App.toastKey('toast.employee_removed', 'success', { name: emp.name });
+                        await loadEmployees();
+                        await loadPayroll();
+                    } catch (err) {
+                        App.toast(err.message || t('toast.error_generic'), 'danger');
+                    }
+                });
+            });
+            tbody.querySelectorAll('.reactivate-emp-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const emp = employeesList.find(e => String(e.id) === String(btn.dataset.id));
+                    if (!emp) return;
+                    try {
+                        await App.api('POST', '/api/employees', { action: 'reactivate', id: emp.id });
+                        App.toastKey('toast.employee_reactivated', 'success', { name: emp.name });
+                        await loadEmployees();
+                        await loadPayroll();
+                    } catch (err) {
+                        App.toast(err.message || t('toast.error_generic'), 'danger');
+                    }
+                });
+            });
+        }
+
+        async function loadEmployees() {
+            const tbody = document.getElementById('employees-tbody');
+            tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-text-muted">${esc(t('common.loading'))}</td></tr>`;
+            const storeId = document.getElementById('store-filter').value;
+            const includeInactive = document.getElementById('include-inactive').checked;
+            const qs = new URLSearchParams();
+            if (storeId) qs.set('store_id', storeId);
+            if (includeInactive) qs.set('include_inactive', '1');
+            try {
+                const res = await App.api('GET', '/api/employees?' + qs.toString());
+                employeesList = res.employees || [];
+                if (!employeesList.length) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-text-muted">${esc(t('employees.empty'))}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = employeesList.map(e => {
+                    const active = e.status === 'active';
+                    const login = e.user_email
+                        ? `${esc(e.user_email)} <span class="text-[10px] text-text-muted">(${esc(e.user_role || '')})</span>`
+                        : `<span class="text-text-muted">${esc(t('employees.no_login'))}</span>`;
+                    let actions = `<button type="button" class="btn-secondary px-2 py-1 text-xs edit-emp-btn" data-id="${e.id}">${esc(t('action.edit'))}</button>`;
+                    if (active) {
+                        actions += ` <button type="button" class="btn-secondary px-2 py-1 text-xs text-danger border-danger/30 remove-emp-btn" data-id="${e.id}">${esc(t('action.remove'))}</button>`;
+                    } else {
+                        actions += ` <button type="button" class="btn-secondary px-2 py-1 text-xs reactivate-emp-btn" data-id="${e.id}">${esc(t('action.reactivate'))}</button>`;
+                    }
+                    return `<tr class="border-b border-border/50 ${active ? '' : 'opacity-70'}">
+                        <td class="py-3 pr-4 font-medium">${esc(e.name)}</td>
+                        <td class="py-3 pr-4">${esc(e.store_name || '—')}</td>
+                        <td class="py-3 pr-4 text-text-secondary">${esc(e.phone || '—')}</td>
+                        <td class="py-3 pr-4 font-mono">${e.hourly_rate != null ? money(e.hourly_rate) : '—'}</td>
+                        <td class="py-3 pr-4 text-xs">${login}</td>
+                        <td class="py-3 pr-4">${active
+                            ? `<span class="text-success text-xs font-semibold">${esc(t('stores.user.role_active'))}</span>`
+                            : `<span class="text-danger text-xs font-semibold">${esc(t('stores.user.role_inactive'))}</span>`}</td>
+                        <td class="py-3"><div class="flex flex-wrap gap-2">${actions}</div></td>
+                    </tr>`;
+                }).join('');
+                wireEmployeeActions();
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+
+        async function loadPayroll() {
+            const from = document.getElementById('payroll-from').value;
+            const to = document.getElementById('payroll-to').value;
+            const storeId = document.getElementById('store-filter').value;
+            const tbody = document.getElementById('payroll-tbody');
+            if (!from || !to) return;
+            tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-text-muted">${esc(t('common.loading'))}</td></tr>`;
+            const qs = new URLSearchParams({ action: 'payroll', from, to });
+            if (storeId) qs.set('store_id', storeId);
+            try {
+                const res = await App.api('GET', '/api/employees?' + qs.toString());
+                const rows = res.rows || [];
+                document.getElementById('stat-hours').textContent = Number(res.totals?.hours_worked || 0).toLocaleString(localeTag(), { maximumFractionDigits: 2 });
+                document.getElementById('stat-pay').textContent = money(res.totals?.estimated_pay || 0);
+                document.getElementById('stat-staff').textContent = String(res.totals?.employee_count || 0);
+                if (!rows.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-text-muted">${esc(t('employees.payroll_no_rows'))}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = rows.map(r => `<tr class="border-b border-border/50">
+                    <td class="py-3 pr-4 font-medium">${esc(r.name)}</td>
+                    <td class="py-3 pr-4">${esc(r.store_name || '—')}</td>
+                    <td class="py-3 pr-4 font-mono">${Number(r.hours_worked || 0).toLocaleString(localeTag(), { maximumFractionDigits: 2 })}</td>
+                    <td class="py-3 pr-4 font-mono">${esc(String(r.shift_count || 0))}</td>
+                    <td class="py-3 pr-4 font-mono">${r.hourly_rate != null ? money(r.hourly_rate) : '—'}</td>
+                    <td class="py-3 font-mono font-semibold">${r.estimated_pay != null ? money(r.estimated_pay) : '—'}</td>
+                </tr>`).join('');
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            if (App.user?.role !== 'admin') {
+                App.toastKey('toast.admin_required', 'danger');
+                location.href = 'dashboard';
+                return;
+            }
+            App.initSidebar();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) {
+                avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            }
+            storesList = App.stores || [];
+            fillStoreSelects();
+
+            const from = mondayOfWeek();
+            const to = new Date();
+            document.getElementById('payroll-from').value = isoDate(from);
+            document.getElementById('payroll-to').value = isoDate(to);
+
+            document.getElementById('btn-add-employee').addEventListener('click', () => openEmployeeModal(null));
+            document.getElementById('store-filter').addEventListener('change', async () => {
+                await loadEmployees();
+                await loadPayroll();
+            });
+            document.getElementById('include-inactive').addEventListener('change', loadEmployees);
+            document.getElementById('btn-load-payroll').addEventListener('click', loadPayroll);
+            document.getElementById('employee-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('employee-id').value;
+                const btn = document.getElementById('btn-save-employee');
+                const payload = {
+                    action: id ? 'update' : 'create',
+                    name: document.getElementById('employee-name').value.trim(),
+                    phone: document.getElementById('employee-phone').value.trim(),
+                    store_id: parseInt(document.getElementById('employee-store').value, 10),
+                    hourly_rate: document.getElementById('employee-rate').value,
+                };
+                if (id) {
+                    payload.id = parseInt(id, 10);
+                    payload.status = document.getElementById('employee-status').value;
+                }
+                btn.disabled = true;
+                try {
+                    await App.api('POST', '/api/employees', payload);
+                    App.toastKey(id ? 'toast.employee_updated' : 'toast.employee_created', 'success');
+                    closeEmployeeModal();
+                    await loadEmployees();
+                    await loadPayroll();
+                } catch (err) {
+                    App.toast(err.message || t('toast.error_generic'), 'danger');
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+
+            document.addEventListener('language-changed', () => {
+                loadEmployees();
+                loadPayroll();
+            });
+
+            await loadEmployees();
+            await loadPayroll();
+        })();
+    </script>
+</body>
+</html>

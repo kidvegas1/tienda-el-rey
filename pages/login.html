@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans flex items-center justify-center min-h-dvh p-4 overflow-hidden">
+
+    <!-- Ambient glow orbs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-accent/[0.10] blur-[120px]"></div>
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-[oklch(0.82_0.12_55_/_0.12)] blur-[100px]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-accent/[0.06] blur-[80px]"></div>
+    </div>
+
+    <main class="relative w-full max-w-md z-10">
+        <a href="/" class="inline-flex items-center gap-2 mb-4 text-sm font-semibold text-text-secondary hover:text-accent transition-colors">
+            <span aria-hidden="true">←</span> Volver al inicio
+        </a>
+        <!-- Login Card -->
+        <div class="glass-strong rounded-3xl p-8 md:p-10 shadow-xl shadow-black/[0.06] border border-border">
+
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-18 h-18 rounded-2xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] mb-5 shadow-lg shadow-accent/20 ring-1 ring-white/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1>
+                <p class="text-sm text-text-secondary mt-2" data-i18n="app.subtitle">Business Management System</p>
+            </div>
+
+            <!-- Form -->
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-[11px] font-semibold text-text-muted uppercase tracking-[0.1em] mb-2.5" data-i18n="login.email_label">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        </div>
+                        <input type="email" id="email" class="input input-with-leading-icon" data-i18n-placeholder="login.email_placeholder" placeholder="correo@ejemplo.com" required autocomplete="email">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-text-muted uppercase tracking-[0.1em] mb-2.5" data-i18n="login.password_label">Password</label>
+                    <div class="relative">
+                        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <input type="password" id="password" class="input input-with-leading-icon" data-i18n-placeholder="login.password_placeholder" placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-sm text-danger bg-danger/10 border border-danger/20 rounded-xl px-4 py-3 font-medium"></div>
+
+                <button type="submit" id="login-btn" class="btn-primary w-full justify-center py-3.5 text-base rounded-xl mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    <span data-i18n="action.sign_in">Sign In</span>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-6">
+                <div class="flex-1 h-px bg-border"></div>
+                <span class="text-[11px] text-text-muted uppercase tracking-wider" data-i18n="login.secure_access">Secure Access</span>
+                <div class="flex-1 h-px bg-border"></div>
+            </div>
+
+            <!-- Info -->
+            <div class="flex items-center gap-3 p-3.5 rounded-xl bg-bg-elevated/50 border border-border">
+                <div class="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center text-accent flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <p class="text-xs text-text-secondary leading-relaxed" data-i18n="login.secure_note">Protected with session-based authentication and CSRF tokens.</p>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-text-muted mt-6" data-i18n="login.footer">Tienda Hispana El Rey © 2026 — All rights reserved</p>
+    </main>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        const LOGIN_SIGN_IN_BTN = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> <span data-i18n="action.sign_in">Sign In</span>';
+
+        function loginErrorMessage(raw) {
+            if (!raw) return App.t('login.error.generic');
+            if (raw === 'Invalid email or password.') return App.t('login.error.invalid_credentials');
+            const match = raw.match(/^Field '(\w+)' is required\.$/);
+            if (match) {
+                const fieldKey = match[1] === 'email' ? 'login.email' : match[1] === 'password' ? 'login.password' : 'common.name';
+                return App.t('login.error.field_required', { field: App.t(fieldKey) });
+            }
+            return raw;
+        }
+
+        function showLoginError(raw) {
+            const errEl = document.getElementById('login-error');
+            errEl.dataset.errorRaw = raw || '';
+            errEl.textContent = loginErrorMessage(raw);
+            errEl.classList.remove('hidden');
+        }
+
+        function resetLoginButton() {
+            const btn = document.getElementById('login-btn');
+            btn.disabled = false;
+            btn.innerHTML = LOGIN_SIGN_IN_BTN;
+            App.applyI18n();
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (ok) { location.href = 'dashboard'; return; }
+
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const errEl = document.getElementById('login-error');
+                errEl.classList.add('hidden');
+                errEl.dataset.errorRaw = '';
+                const btn = document.getElementById('login-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ' + App.t('action.signing_in');
+                try {
+                    await App.api('POST', '/api/auth', {
+                        action: 'login',
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value,
+                    });
+                    location.href = '/dashboard';
+                } catch (err) {
+                    showLoginError(err.message);
+                    resetLoginButton();
+                }
+            });
+
+            document.addEventListener('language-changed', () => {
+                const errEl = document.getElementById('login-error');
+                if (!errEl.classList.contains('hidden')) {
+                    errEl.textContent = loginErrorMessage(errEl.dataset.errorRaw);
+                }
+                const btn = document.getElementById('login-btn');
+                if (btn.disabled) {
+                    btn.innerHTML = '<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ' + App.t('action.signing_in');
+                } else {
+                    resetLoginButton();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

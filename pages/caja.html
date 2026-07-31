@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Register — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar (same as dashboard) -->
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.caja">Cash Register</p>
+                </div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.caja.heading">Cash Register</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-44" title="Store"></select>
+                <input type="date" id="filter-date" class="input py-2 px-3 text-sm w-full sm:w-44">
+                <button id="new-session-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="caja.new_session">New Session</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <!-- Negative balance calculator (always visible on list) -->
+            <section class="card p-5 space-y-4" id="balance-calculator-panel">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold text-accent uppercase tracking-[0.14em]" data-i18n="caja.balance.eyebrow">Store balances</p>
+                        <h3 class="text-lg font-bold mt-1" data-i18n="caja.balance.title">Negative balance calculator</h3>
+                        <p class="text-sm text-text-muted mt-1" data-i18n="caja.balance.help">When another store’s Barri/Viamericas balance is negative, send checks cashed here to that store to clear it.</p>
+                    </div>
+                    <button type="button" id="refresh-balance-btn" class="btn-secondary text-xs py-1.5 px-3 whitespace-nowrap" data-i18n="caja.balance.refresh">Refresh</button>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-[11px] text-text-muted uppercase tracking-wider" data-i18n="caja.balance.negative_accounts">Negative accounts</p>
+                        <p class="text-xl font-bold font-mono mt-1" id="bal-neg-count">0</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-[11px] text-text-muted uppercase tracking-wider" data-i18n="caja.balance.total_negative">Total negative</p>
+                        <p class="text-xl font-bold font-mono text-danger mt-1" id="bal-neg-total">$0.00</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-[11px] text-text-muted uppercase tracking-wider" data-i18n="caja.balance.checks_shipped">Checks shipped</p>
+                        <p class="text-xl font-bold font-mono mt-1" id="bal-shipped">$0.00</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-3">
+                        <p class="text-[11px] text-text-muted uppercase tracking-wider" data-i18n="caja.balance.remaining">Still to clear</p>
+                        <p class="text-xl font-bold font-mono text-warning mt-1" id="bal-remaining">$0.00</p>
+                    </div>
+                </div>
+                <div id="balance-negatives" class="space-y-2"></div>
+            </section>
+
+            <!-- Sessions List -->
+            <div id="sessions-view">
+                <div class="table-container mobile-cards">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="common.date">Date</th>
+                                <th data-i18n="caja.col.cashier">Cashier</th>
+                                <th data-i18n="caja.col.opening">Opening</th>
+                                <th data-i18n="caja.col.entries_total">Entries Total</th>
+                                <th data-i18n="common.status">Status</th>
+                                <th data-i18n="common.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-tbody">
+                            <tr><td colspan="6" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Session Detail (hidden by default) -->
+            <div id="session-detail" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <button id="back-to-list" class="btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        <span data-i18n="caja.back_to_sessions">Back to Sessions</span>
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <span class="badge" id="session-status-badge"></span>
+                        <button id="close-session-btn" class="btn-danger hidden" data-i18n="caja.close_session">Close Session</button>
+                    </div>
+                </div>
+
+                <!-- Session Info -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="card">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="common.date">Date</p>
+                        <p class="text-lg font-semibold mt-1" id="detail-date"></p>
+                    </div>
+                    <div class="card">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="caja.col.cashier">Cashier</p>
+                        <p class="text-lg font-semibold mt-1" id="detail-cashier"></p>
+                    </div>
+                    <div class="card">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="caja.opening_balance">Opening Balance</p>
+                        <p class="text-lg font-semibold font-mono tabular-nums mt-1 text-accent" id="detail-opening"></p>
+                    </div>
+                    <div class="card">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="caja.cash_received">Cash received</p>
+                        <div class="mt-1 flex items-center gap-2">
+                            <input type="number" id="detail-cash-received" class="input py-1.5 font-mono text-sm" step="0.01" min="0" value="0">
+                            <button type="button" id="save-cash-received-btn" class="btn-secondary text-xs py-1.5 px-2.5 whitespace-nowrap" data-i18n="action.save">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entries Table -->
+                <div class="card p-0 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="caja.company_entries">Company Entries</h3>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <button id="company-flags-btn" class="btn-secondary text-xs py-1.5 px-3 hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                                <span data-i18n="caja.company_flags">Company Flags</span>
+                            </button>
+                            <button id="add-entry-btn" class="btn-secondary text-xs py-1.5 px-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            <span data-i18n="caja.add_row">Add Row</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container mobile-cards border-0 rounded-none bg-transparent">
+                    <table class="w-full">
+                        <thead class="bg-[oklch(0.18_0.015_260)]">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="caja.col.company">Company</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="caja.col.cash_in">Cash In</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="caja.col.checks_debits">Checks/Debits</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="caja.col.total">Total</th>
+                                <th class="px-4 py-3 w-12"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="entries-tbody"></tbody>
+                        <tfoot class="border-t-2 border-accent/30">
+                            <tr class="bg-[oklch(0.72_0.15_195_/_0.05)]">
+                                <td class="px-4 py-3 font-bold text-sm text-accent" data-i18n="caja.grand_total">GRAND TOTAL</td>
+                                <td class="px-4 py-3 text-right font-bold font-mono tabular-nums" id="total-cash-in"></td>
+                                <td class="px-4 py-3 text-right font-bold font-mono tabular-nums" id="total-checks"></td>
+                                <td class="px-4 py-3 text-right font-bold font-mono tabular-nums text-accent text-lg" id="grand-total"></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- Denomination Counter -->
+                <div class="card">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4" data-i18n="caja.bill_count">Bill Count</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="denoms-grid"></div>
+                    <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                        <span class="text-sm text-text-secondary" data-i18n="caja.cash_total">Cash Total</span>
+                        <span class="text-xl font-bold font-mono tabular-nums text-accent" id="denom-total">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Checks sent to other stores -->
+                <div class="card p-5 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="caja.ship.title">Checks sent to other stores</h3>
+                            <p class="text-xs text-text-muted mt-1" data-i18n="caja.ship.help">Upload check images when shipping paper to clear another store’s negative company balance.</p>
+                        </div>
+                        <button type="button" id="new-shipment-btn" class="btn-primary text-xs py-1.5 px-3 whitespace-nowrap" data-i18n="caja.ship.add">Send checks</button>
+                    </div>
+                    <div id="shipments-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Session Modal -->
+    <div class="modal-backdrop" id="new-session-modal-backdrop"></div>
+    <div class="modal-content" id="new-session-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="caja.open_session">Open New Caja Session</h3>
+        <form id="new-session-form" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.date">Date</label>
+                <input type="date" name="session_date" class="input" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.cashier_name">Cashier Name</label>
+                <input type="text" name="cashier_name" class="input" data-i18n-placeholder="caja.cashier_name_placeholder" placeholder="Cashier name">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.store">Store</label>
+                <select name="store_id" id="new-session-store" class="input"></select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.opening_balance">Opening Balance ($)</label>
+                <input type="number" name="opening_balance" class="input font-mono" step="0.01" value="0" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.cash_received">Cash received ($)</label>
+                <input type="number" name="cash_received" class="input font-mono" step="0.01" value="0" min="0">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label>
+                <textarea name="notes" class="input" rows="2"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('new-session-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="caja.open_session_btn">Open Session</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Check shipment modal -->
+    <div class="modal-backdrop" id="shipment-modal-backdrop"></div>
+    <div class="modal-content max-w-lg" id="shipment-modal">
+        <h3 class="text-lg font-bold mb-2" data-i18n="caja.ship.add">Send checks</h3>
+        <p class="text-sm text-text-muted mb-4" data-i18n="caja.ship.modal_help">Record checks from this store being sent to another store to clear a negative company balance.</p>
+        <form id="shipment-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.ship.to_store">To store</label>
+                    <select name="to_store_id" id="shipment-to-store" class="input" required></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.col.company">Company</label>
+                    <select name="company" id="shipment-company" class="input" required>
+                        <option value="BARRI">BARRI</option>
+                        <option value="VIAMERICAS">VIAMERICAS</option>
+                        <option value="INTERCAMBIO">INTERCAMBIO</option>
+                        <option value="INTERMEX">INTERMEX</option>
+                        <option value="RIA">RIA</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.ship.check_amount">Check amount ($)</label>
+                    <input type="number" name="check_amount" class="input font-mono" step="0.01" min="0.01" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.cash_received">Cash received ($)</label>
+                    <input type="number" name="cash_received" class="input font-mono" step="0.01" min="0" value="0">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.date">Date</label>
+                    <input type="date" name="shipment_date" class="input" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.ship.check_number">Check #</label>
+                    <input type="text" name="check_number" class="input font-mono" placeholder="Optional">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.ship.images">Check images</label>
+                <input type="file" name="images" id="shipment-images" class="input py-2" accept="image/*,.pdf" multiple capture="environment">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label>
+                <textarea name="notes" class="input" rows="2" placeholder="e.g. clearing Barri negative at Store B"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('shipment-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="caja.ship.save">Save shipment</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Company Flags Modal -->
+    <div class="modal-backdrop" id="company-flags-modal-backdrop"></div>
+    <div class="modal-content max-w-2xl" id="company-flags-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="caja.company_flags">Company Flags</h3>
+        <p class="text-sm text-text-secondary mb-4" data-i18n="caja.company_flags_help">Flagged companies show a warning badge in every Caja session. Only admins can change flags.</p>
+        <div id="company-flags-list" class="space-y-2 max-h-80 overflow-y-auto mb-4"></div>
+        <div class="flex gap-3 pt-2">
+            <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('company-flags-modal')" data-i18n="action.close">Close</button>
+            <button type="button" id="new-company-flag-btn" class="btn-primary flex-1 justify-center" data-i18n="caja.flag_company">Flag Company</button>
+        </div>
+    </div>
+
+    <!-- Flag Company Modal -->
+    <div class="modal-backdrop" id="flag-company-modal-backdrop"></div>
+    <div class="modal-content" id="flag-company-modal">
+        <h3 class="text-lg font-bold mb-4" data-i18n="caja.flag_company">Flag Company</h3>
+        <form id="flag-company-form" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.col.company">Company</label>
+                <input type="text" name="company" class="input" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="caja.flag_reason">Reason</label>
+                <textarea name="reason" class="input" rows="3" required data-i18n-placeholder="caja.flag_reason_placeholder" placeholder="Why is this company flagged?"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('flag-company-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-danger flex-1 justify-center" data-i18n="caja.flag_save">Save Flag</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        let currentSessionId = null;
+        let canManageFlags = false;
+        let companyFlags = {};
+        let refreshTimer = null;
+        const editingFields = new Map();
+        const REFRESH_MS = 30000;
+
+        const debouncedUpdate = App.debounce(async (entryId, field, value, el) => {
+            try {
+                setSaving(el, true);
+                const getVal = (f) => editingFields.get(fieldKey('entry', entryId, f))
+                    ?? document.querySelector(`[data-entry-id="${entryId}"][data-field="${f}"]`)?.value
+                    ?? '';
+                const payload = cajaStorePayload({
+                    action: 'update_entry',
+                    entry_id: entryId,
+                    company: field === 'company' ? value : getVal('company'),
+                    cash_in: field === 'cash_in' ? (parseFloat(value) || 0) : (parseFloat(getVal('cash_in')) || 0),
+                    checks_debits: field === 'checks_debits' ? (parseFloat(value) || 0) : (parseFloat(getVal('checks_debits')) || 0),
+                });
+                await App.api('POST', '/api/caja', payload);
+                editingFields.delete(fieldKey('entry', entryId, field));
+                if (el) {
+                    el.dataset.pending = '0';
+                    el.classList.remove('ring-2', 'ring-warning/40');
+                }
+                await loadSession(currentSessionId, { silent: true });
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            } finally {
+                setSaving(el, false);
+            }
+        }, 600);
+
+        const debouncedDenomUpdate = App.debounce(async (denomId, count, el) => {
+            try {
+                setSaving(el, true);
+                await App.api('POST', '/api/caja', cajaStorePayload({
+                    action: 'update_denomination',
+                    denom_id: denomId,
+                    count: parseInt(count, 10) || 0,
+                }));
+                editingFields.delete(fieldKey('denom', denomId, 'count'));
+                if (el) {
+                    el.dataset.pending = '0';
+                    el.classList.remove('ring-2', 'ring-warning/40');
+                }
+                await loadSession(currentSessionId, { silent: true });
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            } finally {
+                setSaving(el, false);
+            }
+        }, 600);
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            const dateInput = document.getElementById('filter-date');
+            dateInput.value = new Date().toISOString().split('T')[0];
+
+            loadSessions();
+            dateInput.addEventListener('change', loadSessions);
+
+            document.getElementById('new-session-btn').addEventListener('click', () => {
+                document.querySelector('#new-session-form [name=session_date]').value = dateInput.value;
+                document.querySelector('#new-session-form [name=cashier_name]').value = App.user?.name || '';
+                fillStoreSelect(document.getElementById('new-session-store'), App.currentStore?.id);
+                App.openModal('new-session-modal');
+            });
+
+            document.getElementById('new-session-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                try {
+                    const res = await App.api('POST', '/api/caja', cajaStorePayload({
+                        action: 'open_session',
+                        store_id: parseInt(fd.get('store_id'), 10) || App.currentStore?.id,
+                        session_date: fd.get('session_date'),
+                        cashier_name: fd.get('cashier_name'),
+                        opening_balance: parseFloat(fd.get('opening_balance')) || 0,
+                        cash_received: parseFloat(fd.get('cash_received')) || 0,
+                        notes: fd.get('notes'),
+                    }));
+                    App.closeModal('new-session-modal');
+                    App.toastKey('caja.toast.session_opened', 'success');
+                    openSession(res.session_id);
+                } catch (err) {
+                    App.toast(err.message, 'danger');
+                }
+            });
+
+            document.getElementById('refresh-balance-btn')?.addEventListener('click', loadBalanceCalculator);
+            document.getElementById('save-cash-received-btn')?.addEventListener('click', saveCashReceived);
+            document.getElementById('new-shipment-btn')?.addEventListener('click', openShipmentModal);
+            document.getElementById('shipment-form')?.addEventListener('submit', submitShipment);
+            loadBalanceCalculator();
+
+            document.getElementById('back-to-list').addEventListener('click', () => {
+                stopSessionRefresh();
+                currentSessionId = null;
+                editingFields.clear();
+                document.getElementById('session-detail').classList.add('hidden');
+                document.getElementById('sessions-view').classList.remove('hidden');
+                loadSessions();
+            });
+
+            document.getElementById('add-entry-btn').addEventListener('click', async () => {
+                const name = prompt(App.t('caja.prompt_entry_name'));
+                if (!name) return;
+                try {
+                    await App.api('POST', '/api/caja', cajaStorePayload({
+                        action: 'add_entry',
+                        session_id: currentSessionId,
+                        company: name,
+                    }));
+                    await loadSession(currentSessionId);
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+
+            document.getElementById('close-session-btn').addEventListener('click', async () => {
+                if (!App.confirmKey('caja.confirm_close')) return;
+                try {
+                    const res = await App.api('POST', '/api/caja', cajaStorePayload({
+                        action: 'close_session',
+                        session_id: currentSessionId,
+                    }));
+                    App.toastKey('caja.toast.session_closed', 'success', { balance: App.money(res.closing_balance) });
+                    stopSessionRefresh();
+                    await loadSession(currentSessionId);
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+
+            document.getElementById('company-flags-btn')?.addEventListener('click', openCompanyFlagsModal);
+            document.getElementById('new-company-flag-btn')?.addEventListener('click', () => openFlagCompanyModal(''));
+            document.getElementById('flag-company-form')?.addEventListener('submit', submitCompanyFlag);
+
+            window.addEventListener('store-changed', () => {
+                if (currentSessionId) {
+                    stopSessionRefresh();
+                    currentSessionId = null;
+                    editingFields.clear();
+                    document.getElementById('session-detail').classList.add('hidden');
+                    document.getElementById('sessions-view').classList.remove('hidden');
+                }
+                loadSessions();
+                loadBalanceCalculator();
+            });
+            document.addEventListener('language-changed', () => {
+                loadSessions();
+                loadBalanceCalculator();
+                if (currentSessionId) loadSession(currentSessionId);
+            });
+        })();
+
+        function fillStoreSelect(sel, selectedId) {
+            if (!sel) return;
+            const stores = App.stores || [];
+            sel.innerHTML = stores.map(s =>
+                `<option value="${s.id}" ${String(s.id) === String(selectedId) ? 'selected' : ''}>${escapeHtml(s.name)}</option>`
+            ).join('');
+            if (!App.user || App.user.role !== 'admin') {
+                sel.disabled = true;
+            }
+        }
+
+        function renderBalanceCalculator(calc) {
+            if (!calc) return;
+            const sum = calc.summary || {};
+            document.getElementById('bal-neg-count').textContent = sum.negative_accounts ?? 0;
+            document.getElementById('bal-neg-total').textContent = App.money(sum.total_negative || 0);
+            document.getElementById('bal-shipped').textContent = App.money(sum.total_checks_shipped || 0);
+            document.getElementById('bal-remaining').textContent = App.money(sum.total_remaining_to_clear || 0);
+            const host = document.getElementById('balance-negatives');
+            const rows = calc.negatives || [];
+            if (!rows.length) {
+                host.innerHTML = `<p class="text-sm text-text-muted">${App.t('caja.balance.none')}</p>`;
+                return;
+            }
+            host.innerHTML = rows.map(r => {
+                const cleared = r.cleared
+                    ? `<span class="badge badge-success">${App.t('caja.balance.cleared')}</span>`
+                    : `<span class="badge badge-warning">${App.t('caja.balance.needs')} ${App.money(r.remaining_to_clear)}</span>`;
+                return `<div class="rounded-xl border border-border bg-bg-base p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="font-semibold text-sm">${escapeHtml(r.store_name)} · ${escapeHtml(r.company)}</p>
+                        <p class="text-xs text-text-muted mt-0.5">${App.formatDate(r.report_date_from)} – ${App.formatDate(r.report_date_to)}</p>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <p class="font-mono text-sm text-danger font-bold">${App.money(r.ending_balance)}</p>
+                        <p class="text-xs text-text-muted">${App.t('caja.balance.shipped_in')}: ${App.money(r.checks_shipped_in)} → ${App.money(r.projected_balance)}</p>
+                        ${cleared}
+                    </div>
+                    <button type="button" class="btn-secondary text-xs py-1.5 px-2.5 whitespace-nowrap ship-to-neg"
+                        data-to-store="${r.store_id}" data-company="${escapeHtml(r.company)}">${App.t('caja.ship.send_here')}</button>
+                </div>`;
+            }).join('');
+            host.querySelectorAll('.ship-to-neg').forEach(btn => {
+                btn.addEventListener('click', () => openShipmentModal({
+                    to_store_id: parseInt(btn.dataset.toStore, 10),
+                    company: btn.dataset.company,
+                }));
+            });
+        }
+
+        async function loadBalanceCalculator() {
+            try {
+                const res = await App.api('GET', `/api/caja?action=balance_calculator${cajaStoreQuery()}`);
+                renderBalanceCalculator(res.calculator);
+                window._cajaAllStores = res.stores || App.stores || [];
+            } catch (err) {
+                console.warn('balance calculator', err);
+            }
+        }
+
+        function renderShipments(list) {
+            const host = document.getElementById('shipments-list');
+            if (!host) return;
+            if (!list?.length) {
+                host.innerHTML = `<p class="text-sm text-text-muted">${App.t('caja.ship.empty')}</p>`;
+                return;
+            }
+            host.innerHTML = list.map(s => {
+                const img = s.image_url
+                    ? `<a href="${escapeHtml(s.image_url)}" target="_blank" rel="noopener" class="text-xs text-accent font-semibold">${App.t('caja.ship.view_image')}</a>`
+                    : '';
+                return `<div class="rounded-xl border border-border p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <p class="text-sm font-semibold">${escapeHtml(s.from_store_name || '')} → ${escapeHtml(s.to_store_name || '')}</p>
+                        <p class="text-xs text-text-muted mt-0.5">${escapeHtml(s.company)} · ${App.formatDate(s.shipment_date)} · ${escapeHtml(s.status)}</p>
+                        ${s.notes ? `<p class="text-xs text-text-secondary mt-1">${escapeHtml(s.notes)}</p>` : ''}
+                        ${img}
+                    </div>
+                    <div class="text-right">
+                        <p class="font-mono font-bold">${App.money(s.check_amount)}</p>
+                        <p class="text-xs text-text-muted">${App.t('caja.cash_received')}: ${App.money(s.cash_received)}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openShipmentModal(prefill = {}) {
+            const form = document.getElementById('shipment-form');
+            form.reset();
+            const stores = window._cajaAllStores?.length ? window._cajaAllStores : (App.stores || []);
+            const toSel = document.getElementById('shipment-to-store');
+            const currentId = App.currentStore?.id;
+            toSel.innerHTML = stores
+                .filter(s => String(s.id) !== String(currentId))
+                .map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`)
+                .join('');
+            form.elements.shipment_date.value = new Date().toISOString().split('T')[0];
+            if (prefill.to_store_id) toSel.value = String(prefill.to_store_id);
+            if (prefill.company) {
+                const c = String(prefill.company).toUpperCase();
+                const companySel = document.getElementById('shipment-company');
+                if (![...companySel.options].some(o => o.value === c)) {
+                    companySel.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`);
+                }
+                companySel.value = c;
+            }
+            if (prefill.check_amount) form.elements.check_amount.value = prefill.check_amount;
+            App.openModal('shipment-modal');
+        }
+        window.openShipmentModal = openShipmentModal;
+
+        async function submitShipment(e) {
+            e.preventDefault();
+            const form = e.target;
+            const fd = new FormData(form);
+            fd.append('action', 'create_check_shipment');
+            if (App.currentStore?.id) fd.append('from_store_id', App.currentStore.id);
+            if (App.currentStore?.id) fd.append('store_id', App.currentStore.id);
+            if (currentSessionId) fd.append('session_id', currentSessionId);
+            const files = document.getElementById('shipment-images')?.files;
+            if (files?.length) {
+                // FormData already has images from the input name="images"
+            }
+            try {
+                await App.apiForm('/api/caja', fd);
+                App.closeModal('shipment-modal');
+                App.toast(App.t('caja.ship.saved'), 'success');
+                loadBalanceCalculator();
+                if (currentSessionId) loadSession(currentSessionId, { silent: true });
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function saveCashReceived() {
+            if (!currentSessionId) return;
+            const val = parseFloat(document.getElementById('detail-cash-received').value) || 0;
+            try {
+                await App.api('POST', '/api/caja', cajaStorePayload({
+                    action: 'update_cash_received',
+                    session_id: currentSessionId,
+                    cash_received: val,
+                }));
+                App.toast(App.t('caja.cash_received_saved'), 'success');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function cajaStorePayload(extra = {}) {
+            const payload = { ...extra };
+            if (App.currentStore?.id) payload.store_id = App.currentStore.id;
+            return payload;
+        }
+
+        function cajaStoreQuery() {
+            return App.currentStore?.id ? `&store_id=${encodeURIComponent(App.currentStore.id)}` : '';
+        }
+
+        function fieldKey(type, id, field) {
+            return `${type}-${id}-${field}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function companyFlagKey(label) {
+            return (label || '').trim().replace(/\s+/g, ' ').toUpperCase();
+        }
+
+        function setSaving(el, saving) {
+            if (!el) return;
+            el.classList.toggle('opacity-70', saving);
+            el.disabled = saving && el.tagName === 'BUTTON';
+        }
+
+        function shouldPauseRefresh() {
+            return document.querySelectorAll('#session-detail [data-pending="1"]').length > 0;
+        }
+
+        function startSessionRefresh() {
+            stopSessionRefresh();
+            refreshTimer = setInterval(() => {
+                if (currentSessionId && !document.getElementById('session-detail').classList.contains('hidden')) {
+                    refreshSessionIfIdle();
+                }
+            }, REFRESH_MS);
+            window.addEventListener('focus', onSessionRefreshTrigger);
+            document.addEventListener('visibilitychange', onVisibilityRefresh);
+        }
+
+        function stopSessionRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+            window.removeEventListener('focus', onSessionRefreshTrigger);
+            document.removeEventListener('visibilitychange', onVisibilityRefresh);
+        }
+
+        function onVisibilityRefresh() {
+            if (document.visibilityState === 'visible') onSessionRefreshTrigger();
+        }
+
+        async function onSessionRefreshTrigger() {
+            if (currentSessionId) await refreshSessionIfIdle();
+        }
+
+        async function refreshSessionIfIdle() {
+            if (shouldPauseRefresh()) return;
+            await loadSession(currentSessionId, { silent: true });
+        }
+
+        function onFieldInput(type, id, field, el) {
+            editingFields.set(fieldKey(type, id, field), el.value);
+            el.dataset.pending = '1';
+            el.classList.add('ring-2', 'ring-warning/40');
+            if (type === 'entry') debouncedUpdate(id, field, el.value, el);
+            else debouncedDenomUpdate(id, el.value, el);
+        }
+
+        function renderFlagBadge(flag) {
+            if (!flag) return '';
+            const reason = escapeHtml(flag.reason || '');
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-warning/15 text-warning border border-warning/30" title="${reason}">⚠ ${App.t('caja.flag.warn')}</span>`;
+        }
+
+        async function loadSessions() {
+            const t = (k, v) => App.t(k, v);
+            const statusLabel = (status) => {
+                const key = 'status.' + status;
+                const translated = t(key);
+                return translated !== key ? translated : status;
+            };
+            const date = document.getElementById('filter-date').value;
+            try {
+                const res = await App.api('GET', `/api/caja?date=${encodeURIComponent(date)}${cajaStoreQuery()}`);
+                if (res.calculator) renderBalanceCalculator(res.calculator);
+                const tbody = document.getElementById('sessions-tbody');
+                if (!res.sessions.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-text-muted py-8">${t('caja.empty_sessions')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = res.sessions.map(s => `
+                    <tr class="cursor-pointer" onclick="openSession(${s.id})">
+                        <td class="font-medium">${App.formatDate(s.session_date)}</td>
+                        <td>${escapeHtml(s.cashier_name || s.user_name || t('empty.none'))}</td>
+                        <td class="font-mono tabular-nums">${App.money(s.opening_balance)}</td>
+                        <td class="font-mono tabular-nums font-semibold">${App.money(s.entries_total)}</td>
+                        <td><span class="badge ${s.status === 'open' ? 'badge-success' : 'badge-info'}">${statusLabel(s.status)}</span></td>
+                        <td>
+                            <button class="btn-secondary text-xs py-1 px-2.5">${t('caja.view')}</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function openSession(id) {
+            currentSessionId = id;
+            document.getElementById('sessions-view').classList.add('hidden');
+            document.getElementById('session-detail').classList.remove('hidden');
+            await loadSession(id);
+            startSessionRefresh();
+        }
+
+        async function loadSession(id, opts = {}) {
+            const silent = opts.silent === true;
+            const t = (k, v) => App.t(k, v);
+            const statusLabel = (status) => {
+                const key = 'status.' + status;
+                const translated = t(key);
+                return translated !== key ? translated : status;
+            };
+            try {
+                const res = await App.api('GET', `/api/caja?action=session&id=${id}${cajaStoreQuery()}`);
+                const s = res.session;
+                const isOpen = s.status === 'open';
+                canManageFlags = !!res.can_manage_flags;
+                companyFlags = res.company_flags || {};
+
+                document.getElementById('company-flags-btn')?.classList.toggle('hidden', !canManageFlags);
+
+                document.getElementById('detail-date').textContent = App.formatDate(s.session_date);
+                document.getElementById('detail-cashier').textContent = s.cashier_name || t('empty.none');
+                document.getElementById('detail-opening').textContent = App.money(s.opening_balance);
+                const cashRecv = document.getElementById('detail-cash-received');
+                if (cashRecv && !silent) cashRecv.value = s.cash_received ?? 0;
+                cashRecv && (cashRecv.disabled = !isOpen);
+                document.getElementById('save-cash-received-btn')?.classList.toggle('hidden', !isOpen);
+
+                const badge = document.getElementById('session-status-badge');
+                badge.textContent = statusLabel(s.status);
+                badge.className = `badge ${isOpen ? 'badge-success' : 'badge-info'}`;
+
+                document.getElementById('close-session-btn').classList.toggle('hidden', !isOpen);
+                document.getElementById('add-entry-btn').classList.toggle('hidden', !isOpen);
+                if (res.calculator) renderBalanceCalculator(res.calculator);
+                if (res.shipments) renderShipments(res.shipments);
+
+                let totalCash = 0, totalChecks = 0, grandTotal = 0;
+                const tbody = document.getElementById('entries-tbody');
+                tbody.innerHTML = res.entries.map(e => {
+                    totalCash += parseFloat(e.cash_in);
+                    totalChecks += parseFloat(e.checks_debits);
+                    grandTotal += parseFloat(e.total);
+                    const flag = companyFlags[companyFlagKey(e.company)];
+                    const companyVal = editingFields.get(fieldKey('entry', e.id, 'company')) ?? e.company;
+                    const cashVal = editingFields.get(fieldKey('entry', e.id, 'cash_in')) ?? e.cash_in;
+                    const checksVal = editingFields.get(fieldKey('entry', e.id, 'checks_debits')) ?? e.checks_debits;
+                    const companyPending = editingFields.has(fieldKey('entry', e.id, 'company')) ? '1' : '0';
+                    const cashPending = editingFields.has(fieldKey('entry', e.id, 'cash_in')) ? '1' : '0';
+                    const checksPending = editingFields.has(fieldKey('entry', e.id, 'checks_debits')) ? '1' : '0';
+                    const pendingClass = 'ring-2 ring-warning/40';
+                    return `
+                    <tr class="border-b border-[oklch(0.25_0.015_260)]">
+                        <td class="px-4 py-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${renderFlagBadge(flag)}
+                                ${isOpen ? `<input type="text" value="${escapeHtml(companyVal)}" data-entry-id="${e.id}" data-field="company" data-pending="${companyPending}" class="input py-1.5 text-sm flex-1 min-w-[8rem] ${companyPending === '1' ? pendingClass : ''}" oninput="onFieldInput('entry', ${e.id}, 'company', this)">` : `<span class="font-medium">${escapeHtml(e.company)}</span>`}
+                                ${canManageFlags ? `<button type="button" class="btn-secondary text-[10px] py-1 px-2" onclick="openFlagCompanyModal('${escapeHtml(e.company).replace(/'/g, "\\'")}')">${flag ? App.t('caja.flag_edit') : App.t('caja.flag_company')}</button>` : ''}
+                            </div>
+                        </td>
+                        <td class="px-4 py-2 text-right">
+                            ${isOpen ? `<input type="number" value="${cashVal}" step="0.01" data-entry-id="${e.id}" data-field="cash_in" data-pending="${cashPending}" class="input py-1.5 text-sm text-right font-mono w-28 ml-auto ${cashPending === '1' ? pendingClass : ''}" oninput="onFieldInput('entry', ${e.id}, 'cash_in', this)">` : `<span class="font-mono tabular-nums">${App.money(e.cash_in)}</span>`}
+                        </td>
+                        <td class="px-4 py-2 text-right">
+                            ${isOpen ? `<input type="number" value="${checksVal}" step="0.01" data-entry-id="${e.id}" data-field="checks_debits" data-pending="${checksPending}" class="input py-1.5 text-sm text-right font-mono w-28 ml-auto ${checksPending === '1' ? pendingClass : ''}" oninput="onFieldInput('entry', ${e.id}, 'checks_debits', this)">` : `<span class="font-mono tabular-nums">${App.money(e.checks_debits)}</span>`}
+                        </td>
+                        <td class="px-4 py-2 text-right font-mono tabular-nums font-semibold">${App.money(e.total)}</td>
+                        <td class="px-4 py-2">
+                            ${isOpen ? `<button onclick="deleteEntry(${e.id})" class="p-1 rounded hover:bg-[oklch(0.65_0.2_25_/_0.15)] text-text-muted hover:text-danger transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>` : ''}
+                        </td>
+                    </tr>`;
+                }).join('');
+
+                document.getElementById('total-cash-in').textContent = App.money(totalCash);
+                document.getElementById('total-checks').textContent = App.money(totalChecks);
+                document.getElementById('grand-total').textContent = App.money(grandTotal);
+
+                const denomGrid = document.getElementById('denoms-grid');
+                let denomTotal = 0;
+                denomGrid.innerHTML = (res.denominations || []).map(d => {
+                    denomTotal += parseFloat(d.subtotal);
+                    const label = parseFloat(d.denomination) >= 1 ? `$${parseInt(d.denomination)}` : `${parseInt(d.denomination * 100)}¢`;
+                    const countVal = editingFields.get(fieldKey('denom', d.id, 'count')) ?? d.count;
+                    const countPending = editingFields.has(fieldKey('denom', d.id, 'count')) ? '1' : '0';
+                    return `
+                    <div class="p-3 rounded-xl bg-bg-elevated border border-border">
+                        <p class="text-xs text-text-muted mb-1">${t('caja.denom_bills', { label })}</p>
+                        ${isOpen ? `<input type="number" value="${countVal}" min="0" data-pending="${countPending}" class="input py-1.5 text-sm font-mono text-center ${countPending === '1' ? 'ring-2 ring-warning/40' : ''}" oninput="onFieldInput('denom', ${d.id}, 'count', this)">` : `<p class="text-lg font-bold font-mono tabular-nums">${d.count}</p>`}
+                        <p class="text-xs text-text-muted mt-1 font-mono">${App.money(d.subtotal)}</p>
+                    </div>`;
+                }).join('');
+                document.getElementById('denom-total').textContent = App.money(denomTotal);
+
+                if (!silent) {
+                    const savingEl = document.getElementById('session-saving-indicator');
+                    savingEl?.remove();
+                }
+            } catch (err) {
+                if (!silent) App.toast(err.message, 'danger');
+            }
+        }
+
+        function updateEntry(id, field, value) {
+            const el = document.querySelector(`[data-entry-id="${id}"][data-field="${field}"]`);
+            onFieldInput('entry', id, field, el || { value, dataset: {}, classList: { add() {}, remove() {} } });
+        }
+
+        async function deleteEntry(id) {
+            if (!App.confirmKey('caja.confirm_delete_entry')) return;
+            try {
+                await App.api('POST', '/api/caja', cajaStorePayload({ action: 'delete_entry', entry_id: id }));
+                editingFields.forEach((_, key) => {
+                    if (key.startsWith(`entry-${id}-`)) editingFields.delete(key);
+                });
+                await loadSession(currentSessionId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function updateDenom(id, count) {
+            const el = document.querySelector(`#denoms-grid input[oninput*="onFieldInput('denom', ${id}"]`);
+            onFieldInput('denom', id, 'count', el || { value: count, dataset: {}, classList: { add() {}, remove() {} } });
+        }
+
+        async function openCompanyFlagsModal() {
+            try {
+                const res = await App.api('GET', `/api/caja?action=list_company_flags${cajaStoreQuery()}`);
+                const list = document.getElementById('company-flags-list');
+                if (!res.flags.length) {
+                    list.innerHTML = `<p class="text-sm text-text-muted py-4 text-center">${App.t('caja.flags_empty')}</p>`;
+                } else {
+                    list.innerHTML = res.flags.map(flag => `
+                        <div class="p-3 rounded-xl border border-border bg-bg-elevated flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-semibold text-sm">${escapeHtml(flag.company_label)}</p>
+                                <p class="text-xs text-text-secondary mt-1">${escapeHtml(flag.reason || '')}</p>
+                                <p class="text-[10px] text-text-muted mt-2">${escapeHtml(flag.flagged_by_name || App.t('empty.none'))}</p>
+                            </div>
+                            ${canManageFlags ? `<button type="button" class="btn-secondary text-xs py-1 px-2" onclick="clearCompanyFlag('${escapeHtml(flag.company_key).replace(/'/g, "\\'")}')">${App.t('caja.flag_clear')}</button>` : ''}
+                        </div>
+                    `).join('');
+                }
+                App.openModal('company-flags-modal');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function openFlagCompanyModal(company) {
+            const form = document.getElementById('flag-company-form');
+            form.company.value = company || '';
+            const existing = companyFlags[companyFlagKey(company)];
+            form.reason.value = existing?.reason || '';
+            App.openModal('flag-company-modal');
+        }
+
+        async function submitCompanyFlag(e) {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            try {
+                await App.api('POST', '/api/caja', cajaStorePayload({
+                    action: 'set_company_flag',
+                    company: fd.get('company'),
+                    reason: fd.get('reason'),
+                }));
+                App.closeModal('flag-company-modal');
+                App.toastKey('caja.toast.flag_saved', 'success');
+                if (currentSessionId) await loadSession(currentSessionId);
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function clearCompanyFlag(companyKey) {
+            if (!App.confirmKey('caja.confirm_clear_flag')) return;
+            try {
+                await App.api('POST', '/api/caja', cajaStorePayload({
+                    action: 'clear_company_flag',
+                    company: companyKey,
+                }));
+                App.toastKey('caja.toast.flag_cleared', 'success');
+                await openCompanyFlagsModal();
+                if (currentSessionId) await loadSession(currentSessionId);
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibos — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+        .period-tab {
+            padding: 0.45rem 0.85rem; border-radius: 0.65rem; font-size: 0.8125rem;
+            font-weight: 600; color: oklch(0.54 0.025 55); transition: all 0.15s ease-out;
+        }
+        .period-tab:hover { background: oklch(0.95 0.02 225); color: oklch(0.27 0.04 55); }
+        .period-tab.active { background: oklch(0.48 0.09 55 / 0.14); color: oklch(0.42 0.08 50); }
+        .receipt-card { background: oklch(1 0 0); border: 1px solid oklch(0.87 0.025 225); border-radius: 1rem; overflow: hidden; }
+        .receipt-card.collapsed .receipt-body { display: none; }
+        .receipt-card .receipt-thumb { width: 100%; max-height: 16rem; object-fit: contain; background: oklch(0.96 0.01 225); }
+        .receipt-card .receipt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; padding: 0.9rem 1rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .receipt-card .receipt-body { padding: 0 1rem 1rem; border-top: 1px solid oklch(0.92 0.015 225); }
+        @media (max-width: 767px) {
+            #drop-zone { padding: 1.5rem 1rem !important; border-radius: 1rem; }
+            .receipt-card .receipt-thumb { max-height: 12rem; }
+            .modal-content .input, .modal-content .btn-primary, .modal-content .btn-secondary { min-height: 2.75rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.receipts">Recibos</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M2 7h20"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    
+    <div class="lg:ml-[280px] min-h-dvh min-w-0 overflow-x-hidden">
+        <header class="sticky top-0 z-30 glass-strong px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <div class="min-w-0">
+                    <h2 class="text-xl font-bold tracking-tight flex items-center gap-2" id="page-title">
+                        <span data-i18n="page.receipts.heading">Recibos</span>
+                        <button type="button" class="info-tip" data-info-tip data-tip-key="receipts.help.page" aria-label="Info"></button>
+                    </h2>
+                    <p class="text-xs text-text-muted" data-i18n="receipts.subtitle">Sube recibos — la IA los convierte en gastos editables</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-xs w-full sm:w-auto">
+                <span class="text-text-muted" data-i18n="receipts.approved_total">Gastos aprobados</span>
+                <span class="font-mono font-bold" id="stat-expenses">$0.00</span>
+                <button type="button" id="btn-collapse-all" class="btn-secondary !py-2 !px-3 !text-xs ml-auto sm:ml-2" data-i18n="receipts.collapse_all">Collapse all</button>
+                <button type="button" id="btn-expand-all" class="btn-secondary !py-2 !px-3 !text-xs hidden" data-i18n="receipts.expand_all">Expand all</button>
+            </div>
+        </header>
+
+        <main class="p-3 sm:p-6 lg:p-8 space-y-4 max-w-full pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+            <section id="drop-zone" class="border-2 border-dashed border-border rounded-2xl p-8 sm:p-12 text-center cursor-pointer hover:border-accent/50 transition-colors bg-bg-surface active:bg-bg-elevated">
+                <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,application/pdf" capture="environment">
+                <p class="text-base sm:text-lg font-semibold" data-i18n="receipts.drop_title">Suelta un recibo o haz clic</p>
+                <p class="text-sm text-text-muted mt-1" data-i18n="receipts.drop_hint">JPG, PNG, WEBP o PDF — la IA lee proveedor, impuestos y líneas</p>
+                <p id="upload-status" class="text-sm text-accent mt-3 hidden"></p>
+            </section>
+
+            <section id="receipts-list" class="space-y-3">
+                <p class="text-center text-text-muted py-8" data-i18n="common.loading">Cargando...</p>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="receipt-modal-backdrop"></div>
+    <div class="modal-content max-w-2xl" id="receipt-modal">
+        <div class="flex items-start justify-between mb-4 gap-3">
+            <h3 class="text-lg font-bold" data-i18n="receipts.edit_title">Editar gasto</h3>
+            <button type="button" class="shrink-0 w-10 h-10 rounded-full bg-bg-elevated text-text-muted text-xl leading-none" data-close-modal="receipt-modal" aria-label="Close">×</button>
+        </div>
+        <form id="receipt-form" class="space-y-4">
+            <input type="hidden" name="id">
+            <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="common.date">Fecha</label>
+                    <input type="date" name="receipt_date" class="input" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="receipts.col.vendor">Proveedor</label>
+                    <input type="text" name="vendor" class="input" required>
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="receipts.col.subtotal">Subtotal</label>
+                    <input type="number" name="subtotal" class="input font-mono" step="0.01" min="0">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="receipts.col.tax">Impuesto</label>
+                    <input type="number" name="tax" class="input font-mono" step="0.01" min="0">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="common.amount">Total</label>
+                    <input type="number" name="total" class="input font-mono" step="0.01" min="0" required>
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="common.category">Categoría</label>
+                    <input type="text" name="category" class="input" list="receipt-categories">
+                    <datalist id="receipt-categories">
+                        <option value="Supplies"><option value="Inventory"><option value="Utilities"><option value="Fuel"><option value="Rent"><option value="Food"><option value="Maintenance"><option value="Other">
+                    </datalist>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="common.status">Estado</label>
+                    <select name="status" class="input">
+                        <option value="pending">pending</option>
+                        <option value="approved">approved</option>
+                        <option value="rejected">rejected</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary mb-1" data-i18n="common.notes">Notas</label>
+                <textarea name="notes" class="input" rows="2"></textarea>
+            </div>
+            <div id="receipt-image-wrap" class="hidden">
+                <img id="receipt-image" alt="Receipt" class="max-h-48 rounded-xl border border-border object-contain bg-bg-elevated w-full">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="receipts.line_items">Líneas (editables)</label>
+                <div id="items-editor" class="space-y-2"></div>
+                <button type="button" id="add-item-btn" class="btn-secondary !text-xs mt-2" data-i18n="receipts.add_line">+ Línea</button>
+            </div>
+            <div class="flex flex-wrap gap-2 pt-2">
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Guardar</button>
+                <button type="button" id="approve-btn" class="btn-secondary flex-1 justify-center" data-i18n="receipts.approve">Aprobar como gasto</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+    (async () => {
+        if (!(await App.init())) return;
+        App.initSidebar();
+        App.initUserMenu();
+        App.bindInfoTips();
+
+        const listEl = document.getElementById('receipts-list');
+        const form = document.getElementById('receipt-form');
+        const itemsEditor = document.getElementById('items-editor');
+        const btnCollapse = document.getElementById('btn-collapse-all');
+        const btnExpand = document.getElementById('btn-expand-all');
+        let currentItems = [];
+        let allCollapsed = false;
+
+        if (!App.escapeHtml) {
+            App.escapeHtml = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        }
+        const esc = (s) => App.escapeHtml(s);
+
+        const drop = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        drop.addEventListener('click', () => fileInput.click());
+        drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('border-accent'); });
+        drop.addEventListener('dragleave', () => drop.classList.remove('border-accent'));
+        drop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            drop.classList.remove('border-accent');
+            if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => { if (fileInput.files[0]) upload(fileInput.files[0]); });
+
+        function setCollapsed(collapsed) {
+            allCollapsed = collapsed;
+            listEl.querySelectorAll('.receipt-card').forEach((c) => c.classList.toggle('collapsed', collapsed));
+            btnCollapse.classList.toggle('hidden', collapsed);
+            btnExpand.classList.toggle('hidden', !collapsed);
+        }
+        btnCollapse.addEventListener('click', () => setCollapsed(true));
+        btnExpand.addEventListener('click', () => setCollapsed(false));
+
+        /** Re-encode phone photos to JPEG so uploads always reach the server. */
+        async function prepareReceiptFile(file) {
+            if (!file) throw new Error('No file');
+            const name = (file.name || '').toLowerCase();
+            const type = (file.type || '').toLowerCase();
+            if (type === 'application/pdf' || name.endsWith('.pdf')) return file;
+
+            const url = URL.createObjectURL(file);
+            try {
+                let bitmap = null;
+                if (typeof createImageBitmap === 'function') {
+                    try { bitmap = await createImageBitmap(file); } catch (_) {}
+                }
+                const toJpeg = (w, h, paint) => {
+                    const max = 1800;
+                    const scale = Math.min(1, max / Math.max(w, h, 1));
+                    const cw = Math.max(1, Math.round(w * scale));
+                    const ch = Math.max(1, Math.round(h * scale));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cw; canvas.height = ch;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, cw, ch);
+                    paint(ctx, cw, ch);
+                    return new Promise((resolve, reject) => {
+                        canvas.toBlob((blob) => {
+                            if (!blob) return reject(new Error('Could not process image'));
+                            resolve(new File([blob], (file.name || 'receipt').replace(/\.[^.]+$/, '') + '.jpg', {
+                                type: 'image/jpeg', lastModified: Date.now(),
+                            }));
+                        }, 'image/jpeg', 0.85);
+                    });
+                };
+                if (bitmap) {
+                    const out = await toJpeg(bitmap.width, bitmap.height, (ctx, cw, ch) => {
+                        ctx.drawImage(bitmap, 0, 0, cw, ch);
+                        bitmap.close?.();
+                    });
+                    return out;
+                }
+                const img = await new Promise((resolve, reject) => {
+                    const el = new Image();
+                    el.onload = () => resolve(el);
+                    el.onerror = () => reject(new Error('Could not read that photo. Use JPG/PNG or the in-app camera.'));
+                    el.src = url;
+                });
+                return await toJpeg(img.naturalWidth || img.width, img.naturalHeight || img.height, (ctx, cw, ch) => {
+                    ctx.drawImage(img, 0, 0, cw, ch);
+                });
+            } finally {
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        async function upload(rawFile) {
+            const status = document.getElementById('upload-status');
+            status.classList.remove('hidden');
+            status.textContent = App.t('receipts.preparing') || 'Preparando…';
+            try {
+                let file = rawFile;
+                try {
+                    file = await prepareReceiptFile(rawFile);
+                } catch (prepErr) {
+                    // Keep original if already jpeg/png/webp/pdf
+                    const ok = /image\/(jpeg|png|webp)|application\/pdf/i.test(rawFile.type || '')
+                        || /\.(jpe?g|png|webp|pdf)$/i.test(rawFile.name || '');
+                    if (!ok) throw prepErr;
+                    file = rawFile;
+                }
+                status.textContent = App.t('receipts.parsing');
+                const fd = new FormData();
+                fd.append('action', 'upload_parse');
+                const fname = file.name || 'receipt.jpg';
+                fd.append('file', file, fname);
+                fd.append('image', file, fname); // ponytail: some proxies only keep one name
+                if (App.currentStore?.id) fd.append('store_id', App.currentStore.id);
+                const res = await App.apiForm('/api/receipts', fd);
+                App.toast(App.t('receipts.parsed_ok'), 'success');
+                status.textContent = '';
+                status.classList.add('hidden');
+                await load();
+                if (res.id) {
+                    document.getElementById('receipt-' + res.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } catch (e) {
+                status.textContent = e.message || App.t('receipts.parse_failed');
+                App.toast(e.message || App.t('receipts.parse_failed'), 'danger');
+            } finally {
+                fileInput.value = '';
+            }
+        }
+
+        function renderItems() {
+            itemsEditor.innerHTML = currentItems.map((it, i) => `
+                <div class="grid grid-cols-12 gap-2 items-center" data-idx="${i}">
+                    <input class="input col-span-6 text-sm" data-f="description" value="${App.escapeHtml?.(it.description) ?? String(it.description||'').replace(/"/g,'&quot;')}" placeholder="Desc">
+                    <input class="input col-span-2 text-sm font-mono" data-f="qty" type="number" step="0.001" value="${it.qty ?? 1}">
+                    <input class="input col-span-3 text-sm font-mono" data-f="amount" type="number" step="0.01" value="${it.amount ?? 0}">
+                    <button type="button" class="col-span-1 text-danger text-sm" data-remove="${i}">×</button>
+                </div>
+            `).join('') || `<p class="text-xs text-text-muted">${App.t('receipts.no_lines')}</p>`;
+            itemsEditor.querySelectorAll('[data-remove]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    currentItems.splice(Number(btn.dataset.remove), 1);
+                    renderItems();
+                });
+            });
+        }
+
+        function readItemsFromDom() {
+            const rows = [];
+            itemsEditor.querySelectorAll('[data-idx]').forEach((row) => {
+                rows.push({
+                    description: row.querySelector('[data-f=description]').value.trim(),
+                    qty: parseFloat(row.querySelector('[data-f=qty]').value) || 1,
+                    amount: parseFloat(row.querySelector('[data-f=amount]').value) || 0,
+                });
+            });
+            return rows;
+        }
+
+        document.getElementById('add-item-btn').addEventListener('click', () => {
+            currentItems = readItemsFromDom();
+            currentItems.push({ description: '', qty: 1, amount: 0 });
+            renderItems();
+        });
+
+        function lineItemsHtml(items) {
+            if (!items || !items.length) {
+                return `<p class="text-xs text-text-muted">${App.t('receipts.no_lines')}</p>`;
+            }
+            return `<ul class="space-y-1.5 text-sm">${items.map((it) => `
+                <li class="flex justify-between gap-2 border-b border-border/50 py-1">
+                    <span class="min-w-0"><span class="text-text-muted font-mono text-xs">${Number(it.quantity ?? it.qty ?? 1)}</span> × ${esc(it.description || '—')}</span>
+                    <span class="font-mono shrink-0">${App.money(it.amount)}</span>
+                </li>`).join('')}</ul>`;
+        }
+
+        async function load() {
+            try {
+                const res = await App.api('GET', '/api/receipts');
+                App.setMoneyMetric(document.getElementById('stat-expenses'), res.expenses || 0);
+                const rows = res.receipts || [];
+                if (!rows.length) {
+                    listEl.innerHTML = `<p class="text-center text-text-muted py-8">${App.t('receipts.empty')}</p>`;
+                    return;
+                }
+                listEl.innerHTML = rows.map((r) => {
+                    const badge = r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'info';
+                    const img = r.image_url
+                        ? `<a href="${esc(r.image_url)}" target="_blank" rel="noopener" class="block mt-3 rounded-xl overflow-hidden border border-border">
+                             <img src="${esc(r.image_url)}" alt="${esc(r.vendor || 'Receipt')}" class="receipt-thumb" loading="lazy">
+                           </a>`
+                        : `<p class="text-xs text-text-muted mt-3">${App.t('receipts.no_image') || 'No image'}</p>`;
+                    return `
+                    <article class="receipt-card${allCollapsed ? ' collapsed' : ''}" id="receipt-${r.id}" data-id="${r.id}">
+                        <div class="receipt-head" data-toggle>
+                            <div class="min-w-0">
+                                <p class="font-semibold text-base truncate">${esc(r.vendor || '—')}</p>
+                                <p class="text-xs text-text-muted mt-0.5">${esc(r.receipt_date || '—')} · ${esc(r.category || '—')} · <span class="badge badge-${badge}">${esc(r.status)}</span></p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="font-mono font-bold text-lg">${App.money(r.total)}</p>
+                                <p class="text-[10px] text-text-muted">${App.t('receipts.col.tax')}: ${App.money(r.tax)}</p>
+                            </div>
+                        </div>
+                        <div class="receipt-body space-y-3 pt-3">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+                                <div><p class="text-[10px] uppercase text-text-muted font-semibold">${App.t('receipts.col.subtotal')}</p><p class="font-mono">${App.money(r.subtotal)}</p></div>
+                                <div><p class="text-[10px] uppercase text-text-muted font-semibold">${App.t('receipts.col.tax')}</p><p class="font-mono">${App.money(r.tax)}</p></div>
+                                <div><p class="text-[10px] uppercase text-text-muted font-semibold">${App.t('common.amount')}</p><p class="font-mono font-semibold">${App.money(r.total)}</p></div>
+                                <div><p class="text-[10px] uppercase text-text-muted font-semibold">${App.t('common.status')}</p><p>${esc(r.status)}</p></div>
+                            </div>
+                            ${r.notes ? `<p class="text-sm text-text-secondary"><span class="font-semibold">${App.t('common.notes')}:</span> ${esc(r.notes)}</p>` : ''}
+                            <div>
+                                <p class="text-xs font-semibold text-text-muted uppercase mb-1">${App.t('receipts.line_items')}</p>
+                                ${lineItemsHtml(r.items)}
+                            </div>
+                            ${img}
+                            <div class="flex flex-wrap gap-2 pt-1">
+                                <button type="button" class="btn-primary flex-1 justify-center !text-sm" data-edit="${r.id}">${App.t('action.edit')}</button>
+                                <button type="button" class="btn-secondary flex-1 justify-center !text-sm text-danger" data-del="${r.id}">${App.t('action.delete')}</button>
+                            </div>
+                        </div>
+                    </article>`;
+                }).join('');
+
+                listEl.querySelectorAll('[data-toggle]').forEach((head) => {
+                    head.addEventListener('click', () => {
+                        head.closest('.receipt-card')?.classList.toggle('collapsed');
+                    });
+                });
+                listEl.querySelectorAll('[data-edit]').forEach((b) => {
+                    b.addEventListener('click', (e) => { e.stopPropagation(); openEdit(Number(b.dataset.edit)); });
+                });
+                listEl.querySelectorAll('[data-del]').forEach((b) => {
+                    b.addEventListener('click', (e) => { e.stopPropagation(); del(Number(b.dataset.del)); });
+                });
+                setCollapsed(allCollapsed);
+            } catch (e) {
+                listEl.innerHTML = `<p class="text-center text-danger py-8">${esc(e.message)}</p>`;
+            }
+        }
+
+        async function openEdit(id) {
+            const res = await App.api('GET', `/api/receipts?id=${id}`);
+            const r = res.receipt;
+            form.id.value = r.id;
+            form.receipt_date.value = r.receipt_date || '';
+            form.vendor.value = r.vendor || '';
+            form.subtotal.value = r.subtotal || 0;
+            form.tax.value = r.tax || 0;
+            form.total.value = r.total || 0;
+            form.category.value = r.category || '';
+            form.status.value = r.status || 'pending';
+            form.notes.value = r.notes || '';
+            currentItems = (r.items || []).map((it) => ({ description: it.description, qty: Number(it.quantity), amount: Number(it.amount) }));
+            renderItems();
+            const wrap = document.getElementById('receipt-image-wrap');
+            const img = document.getElementById('receipt-image');
+            if (r.image_url) { wrap.classList.remove('hidden'); img.src = r.image_url; }
+            else { wrap.classList.add('hidden'); img.removeAttribute('src'); }
+            App.openModal('receipt-modal');
+            App.bindInfoTips();
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await App.api('POST', '/api/receipts', {
+                    action: 'update',
+                    id: Number(form.id.value),
+                    vendor: form.vendor.value,
+                    receipt_date: form.receipt_date.value,
+                    subtotal: parseFloat(form.subtotal.value) || 0,
+                    tax: parseFloat(form.tax.value) || 0,
+                    total: parseFloat(form.total.value) || 0,
+                    category: form.category.value,
+                    status: form.status.value,
+                    notes: form.notes.value,
+                    items: readItemsFromDom(),
+                });
+                App.toast(App.t('receipts.saved'), 'success');
+                App.closeModal('receipt-modal');
+                await load();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        });
+
+        document.getElementById('approve-btn').addEventListener('click', async () => {
+            try {
+                // save first
+                await App.api('POST', '/api/receipts', {
+                    action: 'update',
+                    id: Number(form.id.value),
+                    vendor: form.vendor.value,
+                    receipt_date: form.receipt_date.value,
+                    subtotal: parseFloat(form.subtotal.value) || 0,
+                    tax: parseFloat(form.tax.value) || 0,
+                    total: parseFloat(form.total.value) || 0,
+                    category: form.category.value,
+                    status: 'pending',
+                    notes: form.notes.value,
+                    items: readItemsFromDom(),
+                });
+                await App.api('POST', '/api/receipts', { action: 'approve', id: Number(form.id.value) });
+                App.toast(App.t('receipts.approved'), 'success');
+                App.closeModal('receipt-modal');
+                await load();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        });
+
+        async function del(id) {
+            if (!confirm(App.t('receipts.confirm_delete'))) return;
+            try {
+                await App.api('POST', '/api/receipts', { action: 'delete', id });
+                App.toast(App.t('receipts.deleted'), 'success');
+                await load();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        document.querySelectorAll('[data-close-modal]').forEach((btn) => {
+            btn.addEventListener('click', () => App.closeModal(btn.dataset.closeModal));
+        });
+        document.getElementById('receipt-modal-backdrop')?.addEventListener('click', () => App.closeModal('receipt-modal'));
+
+        await load();
+    })();
+    </script>
+</body>
+</html>

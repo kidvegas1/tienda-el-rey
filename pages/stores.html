@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Management — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css?v=20260714-tip2">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.stores">Stores</p>
+                </div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.stores.heading">Store Management</h2>
+                    <p class="text-xs text-text-muted" id="page-date"></p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <button type="button" id="btn-toggle-inactive" class="btn-secondary px-4 py-2.5 text-sm w-full sm:w-auto justify-center" data-i18n="stores.show_inactive">Show archived stores</button>
+                <button id="btn-add-store" class="btn-primary flex items-center gap-2 px-4 py-2.5 text-sm w-full sm:w-auto justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="stores.add_store">Add Store</span>
+                </button>
+            </div>
+        </header>
+        <main class="p-6 lg:p-8 space-y-6">
+            <div id="balance-overview" class="hidden space-y-3 mb-6">
+                <div class="flex items-center gap-1.5">
+                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="stores.balance.overview_title">Company report totals</h3>
+                    <span id="balance-overview-help"></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="balance-summary-cards"></div>
+            </div>
+            <section id="account-section" class="card hidden">
+                <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+                    <div>
+                        <h3 class="text-lg font-bold" data-i18n="stores.account_title">Admin Account</h3>
+                        <p class="text-xs text-text-muted" data-i18n="stores.account_subtitle">Change the password for your signed-in admin account</p>
+                    </div>
+                    <p class="text-xs text-text-secondary font-mono" id="account-email"></p>
+                </div>
+                <form id="change-password-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end max-w-4xl">
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.current_password">Current Password *</label>
+                        <input type="password" id="current-password-input" class="input w-full" required autocomplete="current-password" minlength="1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.new_password">New Password *</label>
+                        <input type="password" id="new-password-input" class="input w-full" required autocomplete="new-password" minlength="8" data-i18n-placeholder="stores.form.password_ph" placeholder="Min. 8 characters">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.confirm_password">Confirm New Password *</label>
+                        <input type="password" id="confirm-password-input" class="input w-full" required autocomplete="new-password" minlength="8">
+                    </div>
+                    <div class="md:col-span-3 flex justify-end">
+                        <button type="submit" id="btn-change-password" class="btn-primary px-5 py-2.5 text-sm" data-i18n="stores.change_password">Change Password</button>
+                    </div>
+                </form>
+            </section>
+            <section id="team-section" class="card hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold" data-i18n="stores.team_title">Team &amp; Managers</h3>
+                        <p class="text-xs text-text-muted" data-i18n="stores.team_subtitle">Create store managers and assign them to a location</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-add-user" class="btn-primary flex items-center gap-2 px-4 py-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                            <span data-i18n="stores.add_user">Add User</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container mobile-cards">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs uppercase tracking-wider text-text-muted border-b border-border">
+                                <th class="pb-2 pr-4" data-i18n="common.name">Name</th>
+                                <th class="pb-2 pr-4" data-i18n="stores.col.email">Email</th>
+                                <th class="pb-2 pr-4" data-i18n="stores.col.role">Role</th>
+                                <th class="pb-2 pr-4" data-i18n="stores.col.store">Store</th>
+                                <th class="pb-2 pr-4" data-i18n="common.status">Status</th>
+                                <th class="pb-2" data-i18n="stores.col.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr><td colspan="6" class="py-6 text-center text-text-muted" data-i18n="stores.loading_users">Loading users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="stores-grid">
+                <div class="card flex items-center justify-center py-12 text-text-muted" data-i18n="stores.loading_stores">Loading stores...</div>
+            </div>
+        </main>
+    </div>
+    <div class="modal-backdrop" id="store-modal-backdrop"></div>
+    <div class="modal-content w-full max-w-lg" id="store-modal">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold" id="modal-title" data-i18n="stores.add_store">Add Store</h3>
+            <button onclick="closeModal()" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <form id="store-form" class="space-y-4">
+            <input type="hidden" id="store-id" value="">
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.store_name">Store Name *</label>
+                <input type="text" id="store-name" class="input w-full" required data-i18n-placeholder="stores.form.store_name_ph" placeholder="e.g. Bruton">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.address">Address</label>
+                <input type="text" id="store-address" class="input w-full" data-i18n-placeholder="stores.form.address_ph" placeholder="e.g. 123 Main St, Dallas TX">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.phone">Phone</label>
+                <input type="text" id="store-phone" class="input w-full" data-i18n-placeholder="stores.form.phone_ph" placeholder="e.g. (214) 555-0100">
+            </div>
+            <div class="border-t border-border pt-4 mt-4">
+                <p class="text-sm font-semibold text-accent mb-3" data-i18n="stores.public_catalog">Public Catalog</p>
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="store-publish-inventory" class="mt-1 rounded border-border" checked>
+                    <span>
+                        <span class="block text-sm font-medium text-text-primary" data-i18n="stores.publish_inventory">Publish inventory</span>
+                        <span class="block text-xs text-text-muted mt-0.5" data-i18n="stores.publish_inventory_hint">Show this store's in-stock products on the public website.</span>
+                    </span>
+                </label>
+                <label class="flex items-start gap-3 cursor-pointer mt-3">
+                    <input type="checkbox" id="store-publish-prices" class="mt-1 rounded border-border">
+                    <span>
+                        <span class="block text-sm font-medium text-text-primary" data-i18n="stores.publish_prices">Publish prices</span>
+                        <span class="block text-xs text-text-muted mt-0.5" data-i18n="stores.publish_prices_hint">Show retail prices on the public website (requires publish inventory).</span>
+                    </span>
+                </label>
+            </div>
+            <div class="border-t border-border pt-4 mt-4">
+                <p class="text-sm font-semibold text-accent mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
+                    <span data-i18n="stores.report_integration">Report Integration</span>
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.barri_agency">Barri Agency #</label>
+                        <input type="text" id="store-agency" class="input w-full font-mono" data-i18n-placeholder="stores.form.agency_ph" placeholder="e.g. 240247">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.barri_operator">Barri Operator</label>
+                        <input type="text" id="store-operator" class="input w-full font-mono" data-i18n-placeholder="stores.form.operator_ph" placeholder="e.g. a2402472">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.viamericas_agency">Viamericas Agency #</label>
+                        <input type="text" id="store-viamericas" class="input w-full font-mono" data-i18n-placeholder="stores.form.viamericas_ph" placeholder="e.g. A30097">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.intercambio_agency">Intercambio Agency #</label>
+                        <input type="text" id="store-intercambio" class="input w-full font-mono" data-i18n-placeholder="stores.form.intercambio_ph" placeholder="e.g. TX8113">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.intermex_agency">Intermex/Ria Agency #</label>
+                        <input type="text" id="store-intermex" class="input w-full font-mono" data-i18n-placeholder="stores.form.intermex_ph" placeholder="e.g. TX3499">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" onclick="closeModal()" class="btn-secondary px-4 py-2.5 text-sm" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" id="btn-save" class="btn-primary px-6 py-2.5 text-sm" data-i18n="stores.save_store">Save Store</button>
+            </div>
+        </form>
+    </div>
+    <div class="modal-backdrop" id="user-modal-backdrop"></div>
+    <div class="modal-content w-full max-w-lg" id="user-modal">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold" id="user-modal-title" data-i18n="stores.add_team_member">Add Team Member</h3>
+            <button onclick="closeUserModal()" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <form id="user-form" class="space-y-4">
+            <input type="hidden" id="user-id-input" value="">
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.full_name">Full Name *</label>
+                <input type="text" id="user-name-input" class="input w-full" required data-i18n-placeholder="stores.form.full_name_ph" placeholder="e.g. Maria Lopez">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.email">Email *</label>
+                <input type="email" id="user-email-input" class="input w-full" required data-i18n-placeholder="stores.form.email_ph" placeholder="manager@store.com">
+            </div>
+            <div id="user-current-password-wrap" class="hidden">
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.current_password">Current Password *</label>
+                <input type="password" id="user-current-password-input" class="input w-full" autocomplete="current-password" data-i18n-placeholder="stores.form.current_password_ph" placeholder="Required only when setting a new password">
+            </div>
+            <div id="user-password-create-wrap">
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" id="user-password-label" data-i18n="stores.form.temp_password">Temporary Password *</label>
+                <div class="flex gap-2">
+                    <input type="text" id="user-password-input" class="input w-full font-mono" minlength="8" autocomplete="new-password" data-i18n-placeholder="stores.form.password_ph" placeholder="Min. 8 characters">
+                    <button type="button" id="btn-generate-create-password" class="btn-secondary px-3 py-2 text-xs shrink-0" data-i18n="stores.generate_password">Generate</button>
+                </div>
+                <p id="user-password-edit-hint" class="hidden text-[11px] text-text-muted mt-1" data-i18n="stores.form.password_optional_edit">Leave blank to keep the current password. Use Set Password to rotate it.</p>
+                <p id="user-password-self-hint" class="hidden text-[11px] text-text-muted mt-1" data-i18n="stores.form.password_self_edit">To change your password, enter your current password above and a new password here (or use Admin Account at the top of this page).</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.col.role">Role *</label>
+                    <select id="user-role-input" class="input w-full">
+                        <option value="manager" data-i18n="role.manager">Manager</option>
+                        <option value="employee" data-i18n="role.employee">Employee</option>
+                        <option value="cashier" data-i18n="role.cashier">Cashier</option>
+                        <option value="admin" data-i18n="role.admin">Admin</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.col.store">Store *</label>
+                    <select id="user-store-input" class="input w-full"></select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" onclick="closeUserModal()" class="btn-secondary px-4 py-2.5 text-sm" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" id="btn-save-user" class="btn-primary px-6 py-2.5 text-sm" data-i18n="stores.create_user">Create User</button>
+            </div>
+        </form>
+    </div>
+    <div class="modal-backdrop" id="set-password-modal-backdrop"></div>
+    <div class="modal-content w-full max-w-lg" id="set-password-modal">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold" id="set-password-modal-title">Set Password</h3>
+            <button type="button" onclick="closeSetPasswordModal()" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <form id="set-password-form" class="space-y-4">
+            <input type="hidden" id="set-password-user-id" value="">
+            <p class="text-sm text-text-secondary" id="set-password-user-meta"></p>
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.form.temp_password">Temporary Password *</label>
+                <div class="flex gap-2">
+                    <input type="text" id="set-password-input" class="input w-full font-mono" required minlength="8" autocomplete="new-password" data-i18n-placeholder="stores.form.password_ph" placeholder="Min. 8 characters">
+                    <button type="button" id="btn-generate-set-password" class="btn-secondary px-3 py-2 text-xs shrink-0" data-i18n="stores.generate_password">Generate</button>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" onclick="closeSetPasswordModal()" class="btn-secondary px-4 py-2.5 text-sm" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" id="btn-save-set-password" class="btn-primary px-6 py-2.5 text-sm" data-i18n="stores.set_password_apply">Set Password</button>
+            </div>
+        </form>
+    </div>
+    <div class="modal-backdrop" id="show-password-modal-backdrop"></div>
+    <div class="modal-content w-full max-w-lg" id="show-password-modal">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold" data-i18n="stores.password_show_title">Password Set</h3>
+            <button type="button" onclick="closeShowPasswordModal()" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <p class="text-sm text-text-secondary" id="show-password-user-meta"></p>
+            <p class="text-sm text-text-muted" data-i18n="stores.password_show_hint">Save this password now. You can view it again during this session from the team table after setting it.</p>
+            <div>
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5" data-i18n="stores.password_show_label">New Password</label>
+                <div class="flex gap-2">
+                    <input type="text" id="show-password-value" class="input w-full font-mono" readonly>
+                    <button type="button" id="btn-copy-password" class="btn-secondary px-3 py-2 text-xs shrink-0" data-i18n="stores.copy_password">Copy</button>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button type="button" onclick="closeShowPasswordModal()" class="btn-primary px-6 py-2.5 text-sm" data-i18n="action.close">Close</button>
+            </div>
+        </div>
+    </div>
+    <script src="assets/js/i18n.js?v=20260730-stores1"></script>
+    <script src="assets/js/app.js?v=20260730-stores1"></script>
+    <script>
+        let storesList = [];
+        let storeBalances = {};
+        let usersList = [];
+        let showInactiveStores = true;
+        const passwordCache = {};
+        const companyColors = {
+            'Barri': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500' },
+            'Viamericas': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', dot: 'bg-purple-500' },
+            'Intercambio': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-500' },
+            'Intermex': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', dot: 'bg-emerald-500' },
+            'Ria': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', dot: 'bg-rose-500' },
+        };
+        function getCC(company) {
+            return companyColors[company] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200', dot: 'bg-gray-500' };
+        }
+
+        function t(key, params) { return App.t(key, params); }
+        function localeTag() { return (App.lang || 'en') === 'es' ? 'es-US' : 'en-US'; }
+        function roleLabel(role) {
+            const key = 'role.' + role;
+            const translated = t(key);
+            return translated !== key ? translated : role;
+        }
+
+        let lastCompanySummary = [];
+
+        function storePublishInventory(store) {
+            return store && (store.publish_inventory === true || store.publish_inventory === 1 || store.publish_inventory === '1' || store.publish_inventory === 't');
+        }
+        function storePublishPrices(store) {
+            return store && (store.publish_prices === true || store.publish_prices === 1 || store.publish_prices === '1' || store.publish_prices === 't');
+        }
+
+        function openStoreModal(store) {
+            document.getElementById('modal-title').textContent = store ? t('stores.edit_store') : t('stores.add_store');
+            document.getElementById('store-id').value = store ? store.id : '';
+            document.getElementById('store-name').value = store ? store.name : '';
+            document.getElementById('store-address').value = store ? (store.address || '') : '';
+            document.getElementById('store-phone').value = store ? (store.phone || '') : '';
+            document.getElementById('store-agency').value = store ? (store.barri_agency_number || '') : '';
+            document.getElementById('store-operator').value = store ? (store.barri_operator_number || '') : '';
+            document.getElementById('store-viamericas').value = store ? (store.viamericas_agency_number || '') : '';
+            document.getElementById('store-intercambio').value = store ? (store.intercambio_agency_number || '') : '';
+            document.getElementById('store-intermex').value = store ? (store.intermex_agency_number || '') : '';
+            document.getElementById('store-publish-inventory').checked = store ? storePublishInventory(store) : true;
+            document.getElementById('store-publish-prices').checked = store ? storePublishPrices(store) : false;
+            App.openModal('store-modal');
+        }
+        function closeModal() { App.closeModal('store-modal'); }
+        function isUserActive(u) {
+            return u.active === true || u.active === 1 || u.active === '1' || u.active === 't';
+        }
+
+        function openUserModal(user = null) {
+            const sel = document.getElementById('user-store-input');
+            sel.innerHTML = storesList.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+            const form = document.getElementById('user-form');
+            form.reset();
+            const idInput = document.getElementById('user-id-input');
+            const passInput = document.getElementById('user-password-input');
+            const passHint = document.getElementById('user-password-edit-hint');
+            const selfHint = document.getElementById('user-password-self-hint');
+            const currentWrap = document.getElementById('user-current-password-wrap');
+            const currentInput = document.getElementById('user-current-password-input');
+            const title = document.getElementById('user-modal-title');
+            const saveBtn = document.getElementById('btn-save-user');
+            const selfId = App.user ? String(App.user.id) : '';
+            if (user) {
+                const isSelf = String(user.id) === selfId;
+                idInput.value = user.id;
+                document.getElementById('user-name-input').value = user.name || '';
+                document.getElementById('user-email-input').value = user.email || '';
+                document.getElementById('user-role-input').value = user.role || 'manager';
+                if (user.store_id) sel.value = String(user.store_id);
+                passInput.value = '';
+                passInput.required = false;
+                if (currentInput) currentInput.value = '';
+                if (isSelf) {
+                    currentWrap?.classList.remove('hidden');
+                    passHint?.classList.add('hidden');
+                    selfHint?.classList.remove('hidden');
+                } else {
+                    currentWrap?.classList.add('hidden');
+                    passHint?.classList.remove('hidden');
+                    selfHint?.classList.add('hidden');
+                }
+                title.textContent = t('stores.edit_team_member');
+                saveBtn.textContent = t('stores.save_user');
+            } else {
+                idInput.value = '';
+                passInput.value = generateTempPassword();
+                passInput.required = true;
+                currentWrap?.classList.add('hidden');
+                passHint?.classList.add('hidden');
+                selfHint?.classList.add('hidden');
+                title.textContent = t('stores.add_team_member');
+                saveBtn.textContent = t('stores.create_user');
+            }
+            App.openModal('user-modal');
+        }
+        function closeUserModal() { App.closeModal('user-modal'); }
+
+        async function removeUser(userId) {
+            const u = usersList.find(x => String(x.id) === String(userId));
+            if (!u) return;
+            if (!App.confirmKey('confirm.remove_user', { name: u.name })) return;
+            try {
+                await App.api('POST', '/api/users', { action: 'deactivate', id: parseInt(userId, 10) });
+                App.toastKey('toast.user_removed', 'success', { name: u.name });
+                await loadUsers();
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+
+        async function reactivateUser(userId) {
+            const u = usersList.find(x => String(x.id) === String(userId));
+            if (!u) return;
+            try {
+                await App.api('POST', '/api/users', { action: 'reactivate', id: parseInt(userId, 10) });
+                App.toastKey('toast.user_reactivated', 'success', { name: u.name });
+                await loadUsers();
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+
+        async function deleteUserPermanently(userId) {
+            const u = usersList.find(x => String(x.id) === String(userId));
+            if (!u) return;
+            if (!App.confirmKey('confirm.delete_user_permanent', { name: u.name })) return;
+            try {
+                await App.api('POST', '/api/users', { action: 'delete', id: parseInt(userId, 10) });
+                App.toastKey('toast.user_deleted', 'success', { name: u.name });
+                await loadUsers();
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+        function generateTempPassword() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+            let p = '';
+            for (let i = 0; i < 12; i++) p += chars[Math.floor(Math.random() * chars.length)];
+            return p;
+        }
+
+        function cacheUserPassword(userId, name, email, password) {
+            passwordCache[userId] = { name, email, password };
+        }
+
+        function openShowPasswordModal(userId) {
+            const cached = passwordCache[userId];
+            if (!cached) return;
+            document.getElementById('show-password-user-meta').textContent = cached.name + ' · ' + cached.email;
+            document.getElementById('show-password-value').value = cached.password;
+            App.openModal('show-password-modal');
+        }
+        function closeShowPasswordModal() { App.closeModal('show-password-modal'); }
+
+        function openSetPasswordModal(userId) {
+            const u = usersList.find(x => String(x.id) === String(userId));
+            if (!u) return;
+            document.getElementById('set-password-user-id').value = u.id;
+            document.getElementById('set-password-modal-title').textContent = t('stores.set_password_title', { name: u.name });
+            document.getElementById('set-password-user-meta').textContent = u.email + ' · ' + roleLabel(u.role);
+            document.getElementById('set-password-input').value = generateTempPassword();
+            App.openModal('set-password-modal');
+        }
+        function closeSetPasswordModal() { App.closeModal('set-password-modal'); }
+
+        function showPasswordReveal(userId, name, email, password) {
+            cacheUserPassword(userId, name, email, password);
+            document.getElementById('show-password-user-meta').textContent = name + ' · ' + email;
+            document.getElementById('show-password-value').value = password;
+            App.openModal('show-password-modal');
+        }
+
+        async function copyPasswordToClipboard() {
+            const value = document.getElementById('show-password-value').value;
+            try {
+                await navigator.clipboard.writeText(value);
+                App.toastKey('stores.password_copied', 'success');
+            } catch (err) {
+                document.getElementById('show-password-value').select();
+                document.execCommand('copy');
+                App.toastKey('stores.password_copied', 'success');
+            }
+        }
+
+        function wireUserTableActions() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.querySelectorAll('.edit-user-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const u = usersList.find(x => String(x.id) === String(btn.dataset.id));
+                    if (u) openUserModal(u);
+                });
+            });
+            tbody.querySelectorAll('.set-password-btn').forEach(btn => {
+                btn.addEventListener('click', () => openSetPasswordModal(btn.dataset.id));
+            });
+            tbody.querySelectorAll('.view-password-btn').forEach(btn => {
+                btn.addEventListener('click', () => openShowPasswordModal(btn.dataset.id));
+            });
+            tbody.querySelectorAll('.remove-user-btn').forEach(btn => {
+                btn.addEventListener('click', () => removeUser(btn.dataset.id));
+            });
+            tbody.querySelectorAll('.reactivate-user-btn').forEach(btn => {
+                btn.addEventListener('click', () => reactivateUser(btn.dataset.id));
+            });
+            tbody.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteUserPermanently(btn.dataset.id));
+            });
+        }
+        async function loadUsers() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-text-muted">' + esc(t('stores.loading_users')) + '</td></tr>';
+            try {
+                const res = await App.api('GET', '/api/users');
+                usersList = res.users || [];
+                if (!usersList.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-text-muted">' + esc(t('stores.users_empty')) + '</td></tr>';
+                    return;
+                }
+                const selfId = App.user ? String(App.user.id) : '';
+                tbody.innerHTML = usersList.map(u => {
+                    const isSelf = String(u.id) === selfId;
+                    const active = isUserActive(u);
+                    const hasCached = passwordCache[u.id];
+                    let actions = '';
+                    actions += '<button type="button" class="btn-secondary px-2 py-1 text-xs edit-user-btn" data-id="' + esc(String(u.id)) + '">' + esc(t('action.edit')) + '</button>';
+                    if (!isSelf) {
+                        actions += ' <button type="button" class="btn-secondary px-2 py-1 text-xs set-password-btn" data-id="' + esc(String(u.id)) + '">' + esc(t('stores.set_password')) + '</button>';
+                    }
+                    if (hasCached) {
+                        actions += ' <button type="button" class="btn-secondary px-2 py-1 text-xs view-password-btn" data-id="' + esc(String(u.id)) + '">' + esc(t('stores.view_password')) + '</button>';
+                    }
+                    if (!isSelf && active) {
+                        actions += ' <button type="button" class="btn-secondary px-2 py-1 text-xs text-danger border-danger/30 remove-user-btn" data-id="' + esc(String(u.id)) + '">' + esc(t('action.remove')) + '</button>';
+                    }
+                    if (!isSelf && !active) {
+                        actions += ' <button type="button" class="btn-secondary px-2 py-1 text-xs reactivate-user-btn" data-id="' + esc(String(u.id)) + '">' + esc(t('action.reactivate')) + '</button>';
+                        if (u.role !== 'admin') {
+                            actions += ' <button type="button" class="btn-secondary px-2 py-1 text-xs text-danger border-danger/40 delete-user-btn" data-id="' + esc(String(u.id)) + '">' + esc(t('action.delete')) + '</button>';
+                        }
+                    }
+                    return '<tr class="border-b border-border/50' + (active ? '' : ' opacity-70') + '">'
+                        + '<td class="py-3 pr-4 font-medium">' + esc(u.name) + '</td>'
+                        + '<td class="py-3 pr-4 text-text-secondary">' + esc(u.email) + '</td>'
+                        + '<td class="py-3 pr-4">' + esc(roleLabel(u.role)) + '</td>'
+                        + '<td class="py-3 pr-4">' + esc(u.store_name || t('empty.none')) + '</td>'
+                        + '<td class="py-3 pr-4">' + (active
+                            ? '<span class="text-success text-xs font-semibold">' + esc(t('stores.user.role_active')) + '</span>'
+                            : '<span class="text-danger text-xs font-semibold">' + esc(t('stores.user.role_inactive')) + '</span>')
+                        + '</td>'
+                        + '<td class="py-3"><div class="flex flex-wrap gap-2">' + actions + '</div></td>'
+                        + '</tr>';
+                }).join('');
+                wireUserTableActions();
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function loadStores() {
+            try {
+                const res = await App.api('GET', '/api/stores?include_inactive=1');
+                storesList = res.stores || [];
+                renderStores();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        function storeIsActive(store) {
+            return !(store.active === 0 || store.active === false || store.active === '0' || store.active === 'f' || store.active === 'false');
+        }
+
+        async function deleteStore(storeId) {
+            const store = storesList.find(st => String(st.id) === String(storeId));
+            if (!store) return;
+            if (!App.confirmKey('confirm.delete_store', { name: store.name })) return;
+            try {
+                const res = await App.api('POST', '/api/stores', { action: 'delete', id: parseInt(storeId, 10) });
+                if (res.mode === 'deleted') {
+                    App.toastKey('toast.store_deleted', 'success');
+                } else {
+                    App.toastKey('toast.store_deactivated', 'success');
+                }
+                await loadStores();
+                await loadBalances();
+                const authRes = await App.api('GET', '/api/auth');
+                App.stores = authRes.stores;
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+
+        async function reactivateStore(storeId) {
+            const store = storesList.find(st => String(st.id) === String(storeId));
+            if (!store) return;
+            if (!App.confirmKey('confirm.reactivate_store', { name: store.name })) return;
+            try {
+                await App.api('POST', '/api/stores', { action: 'reactivate', id: parseInt(storeId, 10) });
+                App.toastKey('toast.store_reactivated', 'success');
+                await loadStores();
+                await loadBalances();
+                const authRes = await App.api('GET', '/api/auth');
+                App.stores = authRes.stores;
+            } catch (err) {
+                App.toast(err.message || t('toast.error_generic'), 'danger');
+            }
+        }
+
+        async function loadBalances() {
+            try {
+                const res = await App.api('GET', '/api/store-balances');
+                storeBalances = {};
+                (res.stores || []).forEach(s => { storeBalances[s.store_id] = s; });
+                renderBalanceSummary(res.company_summary || []);
+                renderStores();
+            } catch (err) { console.warn('Balance load failed:', err); }
+        }
+
+        function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+        function fmtMoney(v) {
+            const n = parseFloat(v) || 0;
+            const prefix = n < 0 ? '-' : '';
+            return prefix + '$' + Math.abs(n).toLocaleString(localeTag(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        const HELP_FALLBACKS = {
+            en: {
+                'stores.balance.help.overview': 'Totals from all imported remittance reports for this company across your stores (not cash-drawer balances).',
+                'stores.balance.help.account_balances': 'What you are seeing:\n\nThese are remittance company account balances for this store — not cash in the drawer.\n\nEach company row shows the ending balance from the most recent imported report (Barri, Viamericas, Intermex, etc.). The large total adds those latest company balances together.\n\nGreen = positive balance. Red = negative / amount owed. Dates under each amount are the report period.',
+                'stores.balance.help.principal': 'Total principal (money sent) across imported reports for this company.',
+                'stores.balance.help.fees': 'Total customer fees collected across imported reports for this company.',
+                'stores.balance.help.comm': 'Total agency commission earned across imported reports for this company.',
+                'stores.balance.help.report_integration': 'Agency / operator numbers used to match imported company reports to this store.',
+                'stores.balance.help.what_is_this': 'What is this?',
+            },
+            es: {
+                'stores.balance.help.overview': 'Totales de todos los reportes de remesas importados para esta compañía en sus tiendas (no son saldos de caja).',
+                'stores.balance.help.account_balances': 'Qué está viendo:\n\nEstos son saldos de cuenta con las compañías de remesas de esta tienda — no es el efectivo de la caja.\n\nCada fila de compañía muestra el saldo final del reporte importado más reciente (Barri, Viamericas, Intermex, etc.). El total grande suma esos saldos más recientes.\n\nVerde = saldo positivo. Rojo = negativo / adeudo. Las fechas bajo cada monto son el período del reporte.',
+                'stores.balance.help.principal': 'Principal total (dinero enviado) en los reportes importados de esta compañía.',
+                'stores.balance.help.fees': 'Comisiones cobradas al cliente en los reportes importados de esta compañía.',
+                'stores.balance.help.comm': 'Comisión de agencia ganada en los reportes importados de esta compañía.',
+                'stores.balance.help.report_integration': 'Números de agencia/operador usados para vincular los reportes importados a esta tienda.',
+                'stores.balance.help.what_is_this': '¿Qué es esto?',
+            },
+        };
+
+        function helpText(key) {
+            const translated = t(key);
+            if (translated && translated !== key) return translated;
+            const lang = (App.lang === 'es') ? 'es' : 'en';
+            return HELP_FALLBACKS[lang][key] || HELP_FALLBACKS.en[key] || key;
+        }
+
+        let floatingTip = null;
+
+        function hideFloatingTip() {
+            if (floatingTip) {
+                floatingTip.remove();
+                floatingTip = null;
+            }
+        }
+
+        function showFloatingTip(btn) {
+            hideFloatingTip();
+            const key = btn.getAttribute('data-tip-key') || '';
+            const text = key ? helpText(key) : '';
+            if (!text || text === key) return;
+            const tip = document.createElement('div');
+            tip.className = 'info-tip-float';
+            tip.setAttribute('role', 'tooltip');
+            tip.textContent = text;
+            document.body.appendChild(tip);
+
+            const rect = btn.getBoundingClientRect();
+            const tipRect = tip.getBoundingClientRect();
+            let left = rect.right - tipRect.width;
+            let top = rect.bottom + 8;
+            if (left < 8) left = 8;
+            if (left + tipRect.width > window.innerWidth - 8) {
+                left = Math.max(8, window.innerWidth - tipRect.width - 8);
+            }
+            if (top + tipRect.height > window.innerHeight - 8) {
+                top = Math.max(8, rect.top - tipRect.height - 8);
+            }
+            tip.style.left = left + 'px';
+            tip.style.top = top + 'px';
+            floatingTip = tip;
+        }
+
+        function infoTip(helpKey, opts = {}) {
+            const label = opts.label ? helpText(opts.label) : helpText('stores.balance.help.what_is_this');
+            const classes = ['info-tip'];
+            if (opts.lg) classes.push('info-tip-lg');
+            return `<button type="button" class="${classes.join(' ')}" aria-label="${esc(label)}" data-info-tip data-tip-key="${esc(helpKey)}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="${opts.lg ? 15 : 14}" height="${opts.lg ? 15 : 14}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </button>`;
+        }
+
+        function bindInfoTips(root) {
+            (root || document).querySelectorAll('[data-info-tip]').forEach((btn) => {
+                if (btn.dataset.tipBound) return;
+                btn.dataset.tipBound = '1';
+                btn.addEventListener('mouseenter', () => showFloatingTip(btn));
+                btn.addEventListener('mouseleave', hideFloatingTip);
+                btn.addEventListener('focus', () => showFloatingTip(btn));
+                btn.addEventListener('blur', hideFloatingTip);
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+        }
+
+        function renderBalanceSummary(companySummary) {
+            lastCompanySummary = companySummary;
+            const container = document.getElementById('balance-summary-cards');
+            const overview = document.getElementById('balance-overview');
+            const overviewHelp = document.getElementById('balance-overview-help');
+            if (!companySummary.length) { overview.classList.add('hidden'); return; }
+            overview.classList.remove('hidden');
+            if (overviewHelp) overviewHelp.innerHTML = infoTip('stores.balance.help.overview');
+
+            container.innerHTML = companySummary.map(cs => {
+                const cc = getCC(cs.company);
+                const totalAmount = parseFloat(cs.total_amount) || 0;
+                const principal = parseFloat(cs.total_principal) || 0;
+                const commission = parseFloat(cs.total_commission) || 0;
+                return `<div class="card ${cc.bg} ${cc.border} border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-2.5 h-2.5 rounded-full ${cc.dot}"></div>
+                        <span class="text-xs font-bold uppercase tracking-wider ${cc.text}">${esc(cs.company)}</span>
+                        <span class="ml-auto text-xs text-text-muted">${t('stores.balance.reports_count', { count: cs.report_count })}</span>
+                    </div>
+                    <p class="text-xl font-bold ${cc.text} font-mono tabular-nums">${fmtMoney(totalAmount)}</p>
+                    <p class="text-xs text-text-muted mt-1">${t('stores.balance.total_amount_txns', { amount: fmtMoney(totalAmount), count: parseInt(cs.total_transactions).toLocaleString(localeTag()) })}</p>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs">
+                        <span class="text-text-secondary inline-flex items-center gap-1">${t('stores.balance.principal')}${infoTip('stores.balance.help.principal')}: ${fmtMoney(principal)}</span>
+                        <span class="text-text-secondary inline-flex items-center gap-1">${t('stores.balance.fees')}${infoTip('stores.balance.help.fees')}: ${fmtMoney(cs.total_fees)}</span>
+                        <span class="text-success font-medium inline-flex items-center gap-1">${t('stores.balance.comm')}${infoTip('stores.balance.help.comm')}: ${fmtMoney(commission)}</span>
+                    </div>
+                </div>`;
+            }).join('');
+            bindInfoTips(overview);
+        }
+
+        function renderStores() {
+            const grid = document.getElementById('stores-grid');
+            const visibleStores = showInactiveStores
+                ? storesList
+                : storesList.filter(storeIsActive);
+            const toggleBtn = document.getElementById('btn-toggle-inactive');
+            if (toggleBtn) {
+                toggleBtn.textContent = t(showInactiveStores ? 'stores.hide_inactive' : 'stores.show_inactive');
+            }
+            if (!visibleStores.length) {
+                grid.innerHTML = '<div class="card flex items-center justify-center py-12 text-text-muted col-span-full">' + esc(t('stores.empty.no_stores')) + '</div>';
+                return;
+            }
+            grid.innerHTML = visibleStores.map(s => {
+                const active = storeIsActive(s);
+                const hasAgency = s.barri_agency_number || s.barri_operator_number || s.viamericas_agency_number || s.intercambio_agency_number || s.intermex_agency_number;
+                const bal = storeBalances[s.id];
+                const totalBal = bal ? bal.total_balance : null;
+
+                let balanceHtml = '';
+                if (bal && bal.companies && bal.companies.length) {
+                    const balBadge = totalBal >= 0
+                        ? `<span class="text-lg font-bold font-mono tabular-nums text-success">${fmtMoney(totalBal)}</span>`
+                        : `<span class="text-lg font-bold font-mono tabular-nums text-danger">${fmtMoney(totalBal)}</span>`;
+
+                    balanceHtml = '<div class="mt-3 pt-3 border-t border-border/50">'
+                        + '<div class="flex items-center justify-between gap-2 mb-2">'
+                        + '<div class="text-xs font-semibold text-text-secondary uppercase tracking-wider">' + esc(t('stores.balance.account_balances')) + '</div>'
+                        + '<div class="flex items-center gap-1.5">'
+                        + balBadge
+                        + infoTip('stores.balance.help.account_balances', { align: 'end', wide: true, lg: true, label: 'stores.balance.help.what_is_this' })
+                        + '</div>'
+                        + '</div>'
+                        + '<div class="space-y-2">'
+                        + bal.companies.map(c => {
+                            const cc = getCC(c.company);
+                            const eb = parseFloat(c.ending_balance) || 0;
+                            const isNeg = eb < 0;
+                            return `<div class="flex items-center justify-between ${cc.bg} rounded-lg px-3 py-2 ${cc.border} border">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full ${cc.dot}"></div>
+                                    <span class="text-xs font-semibold ${cc.text}">${esc(c.company)}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-mono text-sm font-bold tabular-nums ${isNeg ? 'text-danger' : 'text-success'}">${fmtMoney(eb)}</span>
+                                    <p class="text-[10px] text-text-muted">${esc(c.report_date_from)} — ${esc(c.report_date_to)}</p>
+                                </div>
+                            </div>`;
+                        }).join('')
+                        + '</div>'
+                        + '<div class="grid grid-cols-3 gap-2 mt-2">'
+                        + bal.companies.map(c => {
+                            const cc = getCC(c.company);
+                            const amt = c.total_amount || c.total_principal;
+                            return `<div class="text-center">
+                                <div class="text-[10px] ${cc.text} font-semibold">${esc(c.company)}</div>
+                                <p class="font-mono text-xs tabular-nums text-text-primary">${fmtMoney(amt)}</p>
+                                <p class="text-[9px] text-text-muted">${c.total_transactions} ${t('stores.txns_short')}</p>
+                            </div>`;
+                        }).join('')
+                        + '</div></div>';
+                }
+
+                let agencyHtml = '';
+                if (hasAgency) {
+                    agencyHtml = '<div class="mt-3 pt-3 border-t border-border/50"><div class="text-xs font-semibold text-accent/80 uppercase tracking-wider mb-2 inline-flex items-center gap-1">' + esc(t('stores.report_integration')) + infoTip('stores.balance.help.report_integration') + '</div><div class="grid grid-cols-2 gap-2">'
+                        + (s.barri_agency_number ? '<div class="bg-bg-base/50 rounded-lg px-3 py-2"><p class="text-[10px] text-text-muted uppercase">' + esc(t('stores.company.barri')) + '</p><p class="font-mono text-sm text-text-primary">' + esc(s.barri_agency_number) + '</p></div>' : '')
+                        + (s.barri_operator_number ? '<div class="bg-bg-base/50 rounded-lg px-3 py-2"><p class="text-[10px] text-text-muted uppercase">' + esc(t('stores.balance.operator')) + '</p><p class="font-mono text-sm text-text-primary">' + esc(s.barri_operator_number) + '</p></div>' : '')
+                        + (s.viamericas_agency_number ? '<div class="bg-bg-base/50 rounded-lg px-3 py-2"><p class="text-[10px] text-text-muted uppercase">' + esc(t('stores.company.viamericas')) + '</p><p class="font-mono text-sm text-text-primary">' + esc(s.viamericas_agency_number) + '</p></div>' : '')
+                        + (s.intercambio_agency_number ? '<div class="bg-bg-base/50 rounded-lg px-3 py-2"><p class="text-[10px] text-text-muted uppercase">' + esc(t('stores.company.intercambio')) + '</p><p class="font-mono text-sm text-text-primary">' + esc(s.intercambio_agency_number) + '</p></div>' : '')
+                        + (s.intermex_agency_number ? '<div class="bg-bg-base/50 rounded-lg px-3 py-2"><p class="text-[10px] text-text-muted uppercase">' + esc(t('stores.company.intermex_ria')) + '</p><p class="font-mono text-sm text-text-primary">' + esc(s.intermex_agency_number) + '</p></div>' : '')
+                        + '</div></div>';
+                } else if (!bal || !bal.companies?.length) {
+                    agencyHtml = '<div class="mt-3 pt-3 border-t border-border/50"><p class="text-xs text-text-muted flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>' + esc(t('stores.balance.no_report_integration')) + '</p></div>';
+                }
+
+                return '<div class="card card-hover relative group' + (active ? ' cursor-pointer' : ' opacity-80') + '" data-store-id="' + s.id + '" data-store-active="' + (active ? '1' : '0') + '">'
+                    + '<div class="flex items-start justify-between mb-4">'
+                    + '<div class="flex items-center gap-3">'
+                    + '<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">'
+                    + '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-accent" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>'
+                    + '</div>'
+                    + '<div><h3 class="font-bold text-text-primary">' + esc(s.name)
+                    + (!active ? ' <span class="badge badge-warning ml-1">' + esc(t('stores.inactive_badge')) + '</span>' : '')
+                    + '</h3><p class="text-xs text-text-muted">' + esc(s.address || t('stores.balance.no_address')) + '</p>'
+                    + '<div class="flex flex-wrap gap-1.5 mt-2">'
+                    + (storePublishInventory(s)
+                        ? '<span class="badge badge-success text-[10px]">' + esc(t('stores.publish_on')) + '</span>'
+                        : '<span class="badge badge-warning text-[10px]">' + esc(t('stores.publish_off')) + '</span>')
+                    + (storePublishPrices(s) && storePublishInventory(s)
+                        ? '<span class="badge badge-info text-[10px]">' + esc(t('stores.prices_on')) + '</span>'
+                        : '')
+                    + '</div></div>'
+                    + '</div>'
+                    + '<div class="flex items-center gap-1 relative z-10">'
+                    + '<button type="button" data-edit="' + s.id + '" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-accent transition-colors" title="' + esc(t('action.edit')) + '">'
+                    + '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>'
+                    + '</button>'
+                    + (active
+                        ? '<button type="button" data-delete="' + s.id + '" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" title="' + esc(t('action.delete')) + '">'
+                          + '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>'
+                          + '</button>'
+                        : '<button type="button" data-reactivate="' + s.id + '" class="px-2.5 py-1.5 rounded-lg btn-secondary text-xs">' + esc(t('action.reactivate')) + '</button>'
+                          + '<button type="button" data-delete="' + s.id + '" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" title="' + esc(t('action.delete')) + '">'
+                          + '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>'
+                          + '</button>')
+                    + '</div></div>'
+                    + (s.phone ? '<div class="flex items-center gap-2 text-sm text-text-secondary mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>' + esc(s.phone) + '</div>' : '')
+                    + balanceHtml
+                    + agencyHtml
+                    + '</div>';
+            }).join('');
+
+            grid.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const s = storesList.find(st => st.id == btn.dataset.edit);
+                    if (s) openStoreModal(s);
+                });
+            });
+
+            grid.querySelectorAll('[data-delete]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteStore(btn.dataset.delete);
+                });
+            });
+
+            grid.querySelectorAll('[data-reactivate]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    reactivateStore(btn.dataset.reactivate);
+                });
+            });
+
+            grid.querySelectorAll('[data-store-id]').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('[data-info-tip], [data-edit], [data-delete], [data-reactivate]')) return;
+                    if (card.dataset.storeActive !== '1') return;
+                    const storeId = card.dataset.storeId;
+                    const store = storesList.find(st => st.id == storeId);
+                    const name = store ? store.name : '';
+                    window.location.href = `/reports?store_id=${storeId}&store_name=${encodeURIComponent(name)}`;
+                });
+            });
+            bindInfoTips(grid);
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            if (App.user?.role !== 'admin') {
+                App.toastKey('toast.admin_required', 'danger');
+                location.href = 'dashboard';
+                return;
+            }
+            document.getElementById('team-section')?.classList.remove('hidden');
+            document.getElementById('account-section')?.classList.remove('hidden');
+            const accountEmail = document.getElementById('account-email');
+            if (accountEmail && App.user?.email) accountEmail.textContent = App.user.email;
+            App.initSidebar();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user && App.user.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('page-date').textContent = new Date().toLocaleDateString(localeTag(), { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('btn-add-store').addEventListener('click', function() { openStoreModal(null); });
+            document.getElementById('btn-add-user')?.addEventListener('click', () => openUserModal(null));
+            document.getElementById('change-password-form')?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const currentPassword = document.getElementById('current-password-input').value;
+                const newPassword = document.getElementById('new-password-input').value;
+                const confirmPassword = document.getElementById('confirm-password-input').value;
+                const btn = document.getElementById('btn-change-password');
+                if (newPassword.length < 8) {
+                    App.toast(t('stores.form.password_ph'), 'danger');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    App.toastKey('toast.password_mismatch', 'danger');
+                    return;
+                }
+                btn.disabled = true;
+                btn.textContent = t('common.saving');
+                try {
+                    await App.api('POST', '/api/auth', {
+                        action: 'change_password',
+                        current_password: currentPassword,
+                        new_password: newPassword,
+                        confirm_password: confirmPassword,
+                    });
+                    document.getElementById('change-password-form').reset();
+                    App.toastKey('toast.password_changed', 'success');
+                } catch (err) {
+                    App.toast(err.message || t('toast.error_generic'), 'danger');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = t('stores.change_password');
+                }
+            });
+            document.getElementById('btn-generate-create-password')?.addEventListener('click', () => {
+                document.getElementById('user-password-input').value = generateTempPassword();
+            });
+            document.getElementById('btn-generate-set-password')?.addEventListener('click', () => {
+                document.getElementById('set-password-input').value = generateTempPassword();
+            });
+            document.getElementById('btn-copy-password')?.addEventListener('click', copyPasswordToClipboard);
+            document.getElementById('set-password-form')?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const userId = document.getElementById('set-password-user-id').value;
+                const password = document.getElementById('set-password-input').value;
+                const u = usersList.find(x => String(x.id) === String(userId));
+                if (!u) return;
+                if (!App.confirmKey('confirm.set_user_password', { name: u.name })) return;
+                const btn = document.getElementById('btn-save-set-password');
+                btn.disabled = true;
+                btn.textContent = t('common.saving');
+                try {
+                    await App.api('POST', '/api/users', {
+                        action: 'update',
+                        id: parseInt(userId, 10),
+                        password,
+                    });
+                    closeSetPasswordModal();
+                    showPasswordReveal(u.id, u.name, u.email, password);
+                    App.toastKey('toast.password_updated', 'success', { name: u.name });
+                    await loadUsers();
+                } catch (err) {
+                    App.toast(err.message || t('toast.error_generic'), 'danger');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = t('stores.set_password_apply');
+                }
+            });
+            document.getElementById('user-form')?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('btn-save-user');
+                const userId = document.getElementById('user-id-input').value;
+                const name = document.getElementById('user-name-input').value.trim();
+                const email = document.getElementById('user-email-input').value.trim();
+                const password = document.getElementById('user-password-input').value;
+                const role = document.getElementById('user-role-input').value;
+                const storeVal = document.getElementById('user-store-input').value;
+                const storeId = storeVal ? parseInt(storeVal, 10) : null;
+                const editing = !!userId;
+                btn.disabled = true;
+                btn.textContent = editing ? t('common.saving') : t('common.creating');
+                try {
+                    if (editing) {
+                        const isSelf = String(userId) === String(App.user?.id || '');
+                        const currentPassword = document.getElementById('user-current-password-input')?.value || '';
+                        const payload = {
+                            action: 'update',
+                            id: parseInt(userId, 10),
+                            name,
+                            email,
+                            role,
+                            store_id: storeId,
+                        };
+                        if (password) {
+                            if (isSelf && !currentPassword) {
+                                App.toastKey('toast.current_password_required', 'danger');
+                                btn.disabled = false;
+                                btn.textContent = t('stores.save_user');
+                                return;
+                            }
+                            payload.password = password;
+                            if (isSelf) payload.current_password = currentPassword;
+                        }
+                        await App.api('POST', '/api/users', payload);
+                        App.toastKey(password && isSelf ? 'toast.password_changed' : 'toast.user_updated', 'success', { name });
+                        closeUserModal();
+                        if (password && !isSelf) {
+                            cacheUserPassword(userId, name, email, password);
+                            showPasswordReveal(userId, name, email, password);
+                        }
+                    } else {
+                        if (!password || password.length < 8) {
+                            App.toast(t('stores.form.password_ph'), 'danger');
+                            btn.disabled = false;
+                            btn.textContent = t('stores.create_user');
+                            return;
+                        }
+                        const res = await App.api('POST', '/api/users', {
+                            action: 'create',
+                            name,
+                            email,
+                            password,
+                            role,
+                            store_id: storeId,
+                        });
+                        App.toastKey('toast.user_created', 'success');
+                        closeUserModal();
+                        if (res.id) {
+                            cacheUserPassword(res.id, name, email, password);
+                            showPasswordReveal(res.id, name, email, password);
+                        }
+                    }
+                    await loadUsers();
+                } catch (err) {
+                    App.toast(err.message || t('toast.error_generic'), 'danger');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = editing ? t('stores.save_user') : t('stores.create_user');
+                }
+            });
+            document.getElementById('store-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const id = document.getElementById('store-id').value;
+                const payload = {
+                    action: id ? 'update' : 'create',
+                    name: document.getElementById('store-name').value.trim(),
+                    address: document.getElementById('store-address').value.trim(),
+                    phone: document.getElementById('store-phone').value.trim(),
+                    barri_agency_number: document.getElementById('store-agency').value.trim(),
+                    barri_operator_number: document.getElementById('store-operator').value.trim(),
+                    viamericas_agency_number: document.getElementById('store-viamericas').value.trim(),
+                    intercambio_agency_number: document.getElementById('store-intercambio').value.trim(),
+                    intermex_agency_number: document.getElementById('store-intermex').value.trim(),
+                    publish_inventory: document.getElementById('store-publish-inventory').checked,
+                    publish_prices: document.getElementById('store-publish-prices').checked,
+                };
+                if (id) payload.id = parseInt(id);
+                const btn = document.getElementById('btn-save');
+                btn.disabled = true; btn.textContent = t('common.saving');
+                try {
+                    await App.api('POST', '/api/stores', payload);
+                    App.toastKey(id ? 'toast.store_updated' : 'toast.store_created', 'success');
+                    closeModal();
+                    await loadStores();
+                    await loadBalances();
+                    const authRes = await App.api('GET', '/api/auth');
+                    App.stores = authRes.stores;
+                } catch (err) { App.toastKey('toast.error_generic', 'danger'); }
+                finally { btn.disabled = false; btn.textContent = t('stores.save_store'); }
+            });
+            document.getElementById('btn-toggle-inactive')?.addEventListener('click', () => {
+                showInactiveStores = !showInactiveStores;
+                renderStores();
+            });
+
+            await loadStores();
+            await loadBalances();
+            await loadUsers();
+
+            document.addEventListener('language-changed', () => {
+                hideFloatingTip();
+                document.getElementById('page-date').textContent = new Date().toLocaleDateString(localeTag(), { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                if (lastCompanySummary.length) renderBalanceSummary(lastCompanySummary);
+                renderStores();
+                loadUsers();
+            });
+            window.addEventListener('scroll', hideFloatingTip, true);
+        })();
+    </script>
+</body>
+</html>

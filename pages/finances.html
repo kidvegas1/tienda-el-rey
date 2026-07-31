@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+        .period-tab {
+            padding: 0.55rem 0.95rem; border-radius: 0.75rem; font-size: 0.8125rem;
+            font-weight: 600; color: oklch(0.54 0.025 55); transition: all 0.15s ease-out;
+            min-height: 2.5rem;
+        }
+        .period-tab:hover { background: oklch(0.95 0.02 225); color: oklch(0.27 0.04 55); }
+        .period-tab.active { background: oklch(0.48 0.09 55 / 0.14); color: oklch(0.42 0.08 50); }
+        @media (max-width: 767px) {
+            main { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important; }
+            #btn-tax-download { width: 100%; min-height: 2.75rem; }
+            .period-tab { min-height: 2.75rem; }
+        }
+        .verdict-profit { background: oklch(0.52 0.14 155 / 0.12); color: oklch(0.42 0.12 155); }
+        .verdict-loss { background: oklch(0.55 0.18 25 / 0.12); color: oklch(0.48 0.16 25); }
+        .verdict-break { background: oklch(0.60 0.14 85 / 0.14); color: oklch(0.48 0.12 75); }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.finances">Finanzas</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M2 7h20"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh min-w-0 overflow-x-hidden">
+        <header class="sticky top-0 z-30 glass-strong px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <div class="min-w-0">
+                    <h2 class="text-xl font-bold tracking-tight flex items-center gap-2" id="page-title">
+                        <span data-i18n="page.finances.heading">Chequeo de realidad</span>
+                        <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.page" aria-label="Info"></button>
+                    </h2>
+                    <p class="text-xs text-text-muted" data-i18n="finances.subtitle">¿Estamos ganando o perdiendo dinero?</p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <div class="text-xs text-text-muted shrink-0 self-center" id="date-range-label"></div>
+                <button type="button" id="btn-tax-download" class="btn-primary !py-2 !px-3 !text-xs justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="finances.download_taxes">Descargar para impuestos</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-4 sm:p-6 lg:p-8 space-y-5 max-w-full">
+            <div class="card !p-2">
+                <div class="period-scroll">
+                    <button class="period-tab" data-period="daily" data-i18n="finances.period.day">Hoy</button>
+                    <button class="period-tab" data-period="weekly" data-i18n="finances.period.week">Semana</button>
+                    <button class="period-tab active" data-period="monthly" data-i18n="finances.period.month">Mes</button>
+                    <button class="period-tab" data-period="annual" data-i18n="finances.period.year">Año</button>
+                    <button class="period-tab" data-period="custom" data-i18n="finances.period.custom">Personalizado</button>
+                </div>
+            </div>
+
+            <div class="card !py-3 !px-4">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wider shrink-0" data-i18n="finances.filter.store">Tienda</label>
+                        <select id="filter-store" class="input !w-full sm:!w-auto py-1.5 px-3 text-sm min-w-0 sm:min-w-[140px]"></select>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap hidden" id="custom-date-wrap">
+                        <input type="date" id="filter-date-from" class="input !w-full sm:!w-auto py-1.5 px-3 text-sm">
+                        <span class="text-text-muted text-sm" data-i18n="common.to">a</span>
+                        <input type="date" id="filter-date-to" class="input !w-full sm:!w-auto py-1.5 px-3 text-sm">
+                    </div>
+                    <button class="btn-secondary !py-1.5 !px-3 !text-xs" id="btn-apply" data-i18n="common.apply">Aplicar</button>
+                </div>
+            </div>
+
+            <section class="card card-hover !p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+                            <span data-i18n="finances.verdict.label">Veredicto</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.verdict" aria-label="Info"></button>
+                        </p>
+                        <p class="text-2xl sm:text-3xl font-bold mt-1" id="verdict-text">—</p>
+                    </div>
+                    <div class="flex items-end gap-4 sm:gap-6 flex-wrap">
+                        <div>
+                            <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1">
+                                <span data-i18n="finances.totals.profit">Ganancia neta</span>
+                                <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.profit" aria-label="Info"></button>
+                            </p>
+                            <p class="text-2xl font-bold font-mono tabular-nums" id="total-profit">$0.00</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider" data-i18n="finances.totals.revenue">Ingresos</p>
+                            <p class="text-xl font-bold font-mono tabular-nums text-text-secondary" id="total-revenue">$0.00</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1">
+                                <span data-i18n="finances.totals.tax">Impuestos cobrados</span>
+                                <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.tax" aria-label="Info"></button>
+                            </p>
+                            <p class="text-xl font-bold font-mono tabular-nums text-info" id="total-tax">$0.00</p>
+                            <p class="text-[10px] text-text-muted mt-0.5" id="tax-meta"></p>
+                        </div>
+                    </div>
+                </div>
+                <span id="verdict-badge" class="inline-flex mt-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider verdict-break">—</span>
+            </section>
+
+            <section>
+                <h3 class="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                    <span data-i18n="finances.streams.title">Por línea de negocio</span>
+                    <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.streams" aria-label="Info"></button>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.stream.inventory">Inventario (ventas)</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.inventory" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-accent" id="inv-profit">$0.00</p>
+                        <p class="text-[11px] text-text-muted mt-1" id="inv-meta"></p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.stream.giros">Envíos / giros</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.giros" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-success" id="giros-profit">$0.00</p>
+                        <p class="text-[11px] text-text-muted mt-1" id="giros-meta"></p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.stream.cambio">Cambio de cheques</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.cambio" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-warning" id="cambio-profit">$0.00</p>
+                        <p class="text-[11px] text-text-muted mt-1" id="cambio-meta"></p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                    <span data-i18n="finances.kpis.title">Indicadores</span>
+                    <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.kpis" aria-label="Info"></button>
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.taxes_paid">Impuestos pagados</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.taxes_paid" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-danger" id="kpi-taxes-paid">$0.00</p>
+                        <p class="text-[10px] text-text-muted mt-0.5" id="taxes-paid-meta"></p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.expenses">Gastos (recibos)</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.expenses" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-warning" id="kpi-expenses">$0.00</p>
+                        <a href="receipts" class="text-[10px] text-accent font-semibold mt-1 inline-block" data-i18n="finances.link_receipts">Ver recibos →</a>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.net_tax">Deuda neta de impuesto</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.net_tax" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-text-primary" id="kpi-net-tax">$0.00</p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.debt_ratio">Ratio de deuda</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.debt_ratio" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-text-primary" id="kpi-debt-ratio">0%</p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.fee_rate">Tasa de comisión</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.fee_rate" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-text-primary" id="kpi-fee-rate">0%</p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.margin">Margen inventario</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.margin" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-text-primary" id="kpi-margin">0%</p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label flex items-center gap-1">
+                            <span data-i18n="finances.kpi.cents">Centavos perdidos</span>
+                            <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.cents" aria-label="Info"></button>
+                        </p>
+                        <p class="metric-card-value text-danger" id="kpi-cents">$0.00</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                    <span data-i18n="finances.debt.title">Deudas y pendientes</span>
+                    <button type="button" class="info-tip" data-info-tip data-tip-key="finances.help.debt" aria-label="Info"></button>
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label" data-i18n="finances.debt.owed_to_store">Nos deben</p>
+                        <p class="metric-card-value text-success" id="debt-owed">$0.00</p>
+                    </div>
+                    <div class="card metric-card !p-4">
+                        <p class="metric-card-label" data-i18n="finances.debt.store_owes">Debemos</p>
+                        <p class="metric-card-value text-danger" id="debt-owes">$0.00</p>
+                    </div>
+                    <div class="card metric-card !p-4 col-span-2 md:col-span-1">
+                        <p class="metric-card-label" data-i18n="finances.debt.variance">Varianzas abiertas</p>
+                        <p class="metric-card-value text-warning" id="debt-variance">$0.00</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+    (async () => {
+        const ok = await App.init();
+        if (!ok) return;
+        App.initSidebar();
+        App.initUserMenu();
+
+        // Fill info-tip SVG icons (empty buttons from markup)
+        document.querySelectorAll('.info-tip:not(:has(svg))').forEach((btn) => {
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
+        });
+        App.bindInfoTips();
+
+        let period = 'monthly';
+        const storeSel = document.getElementById('filter-store');
+        const isAdmin = App.user?.role === 'admin';
+        storeSel.innerHTML = (isAdmin ? `<option value="">${App.t('finances.filter.all_stores')}</option>` : '')
+            + App.stores.map((s) => `<option value="${s.id}" ${s.id == App.currentStore?.id ? 'selected' : ''}>${s.name}</option>`).join('');
+        if (!isAdmin) storeSel.disabled = true;
+
+        document.querySelectorAll('.period-tab').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.period-tab').forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                period = btn.dataset.period;
+                document.getElementById('custom-date-wrap').classList.toggle('hidden', period !== 'custom');
+                if (period !== 'custom') load();
+            });
+        });
+        document.getElementById('btn-apply').addEventListener('click', load);
+        window.addEventListener('language-changed', () => { App.bindInfoTips(); load(); });
+
+        function buildParams(extra = {}) {
+            const params = new URLSearchParams({ period, ...extra });
+            const sid = storeSel.value;
+            if (sid) params.set('store_id', sid);
+            if (period === 'custom') {
+                const f = document.getElementById('filter-date-from').value;
+                const t = document.getElementById('filter-date-to').value;
+                if (f && t) { params.set('date_from', f); params.set('date_to', t); }
+            }
+            return params;
+        }
+
+        document.getElementById('btn-tax-download').addEventListener('click', async () => {
+            try {
+                const params = buildParams({ action: 'tax_export' });
+                const res = await fetch('/api/finances?' + params.toString(), { credentials: 'same-origin' });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || `HTTP ${res.status}`);
+                }
+                const blob = await res.blob();
+                const cd = res.headers.get('Content-Disposition') || '';
+                const m = cd.match(/filename="([^"]+)"/);
+                const name = m ? m[1] : 'tax-cpa-export.csv';
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = name;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                App.toast(App.t('finances.download_ok'), 'success');
+            } catch (e) {
+                App.toast(e.message || App.t('finances.download_failed'), 'danger');
+            }
+        });
+
+        async function load() {
+            try {
+                const d = await App.api('GET', '/api/finances?' + buildParams().toString());
+                render(d);
+            } catch (e) {
+                App.toast(e.message || App.t('finances.load_failed'), 'danger');
+            }
+        }
+
+        function render(d) {
+            document.getElementById('date-range-label').textContent = `${d.date_from} — ${d.date_to}`;
+            App.setMoneyMetric(document.getElementById('total-profit'), d.totals.profit);
+            App.setMoneyMetric(document.getElementById('total-revenue'), d.totals.revenue);
+            App.setMoneyMetric(document.getElementById('total-tax'), d.totals.tax_collected || 0);
+            const tb = d.totals.tax_breakdown || {};
+            document.getElementById('tax-meta').textContent = App.t('finances.totals.tax_meta', {
+                inventory: App.money(tb.inventory || 0),
+                giros: App.money(tb.giros || 0),
+                cambio: App.money(tb.cambio || 0),
+            });
+
+            const verdictEl = document.getElementById('verdict-text');
+            const badge = document.getElementById('verdict-badge');
+            badge.classList.remove('verdict-profit', 'verdict-loss', 'verdict-break');
+            if (d.verdict === 'profit') {
+                verdictEl.textContent = App.t('finances.verdict.profit');
+                badge.textContent = App.t('finances.verdict.badge_profit');
+                badge.classList.add('verdict-profit');
+                document.getElementById('total-profit').classList.add('text-success');
+                document.getElementById('total-profit').classList.remove('text-danger');
+            } else if (d.verdict === 'loss') {
+                verdictEl.textContent = App.t('finances.verdict.loss');
+                badge.textContent = App.t('finances.verdict.badge_loss');
+                badge.classList.add('verdict-loss');
+                document.getElementById('total-profit').classList.add('text-danger');
+                document.getElementById('total-profit').classList.remove('text-success');
+            } else {
+                verdictEl.textContent = App.t('finances.verdict.break');
+                badge.textContent = App.t('finances.verdict.badge_break');
+                badge.classList.add('verdict-break');
+            }
+
+            const inv = d.streams.inventory;
+            const giros = d.streams.giros;
+            const cambio = d.streams.cambio;
+            App.setMoneyMetric(document.getElementById('inv-profit'), inv.profit);
+            App.setMoneyMetric(document.getElementById('giros-profit'), giros.profit);
+            App.setMoneyMetric(document.getElementById('cambio-profit'), cambio.profit);
+            document.getElementById('inv-meta').textContent = App.t('finances.stream.inventory_meta', {
+                count: inv.count, revenue: App.money(inv.revenue), cogs: App.money(inv.cogs), tax: App.money(inv.tax || 0),
+            });
+            document.getElementById('giros-meta').textContent = App.t('finances.stream.giros_meta', {
+                count: giros.count, volume: App.money(giros.volume), fees: App.money(giros.fees), tax: App.money(giros.tax || 0),
+            });
+            document.getElementById('cambio-meta').textContent = App.t('finances.stream.cambio_meta', {
+                count: cambio.count, volume: App.money(cambio.volume), cents: App.money(cambio.cents_lost), tax: App.money(cambio.tax || 0),
+            });
+
+            App.setMoneyMetric(document.getElementById('kpi-taxes-paid'), d.totals.taxes_paid || 0);
+            const tpb = d.totals.taxes_paid_breakdown || {};
+            document.getElementById('taxes-paid-meta').textContent = App.t('finances.totals.taxes_paid_meta', {
+                receipts: App.money(tpb.receipts || 0),
+                accounting: App.money(tpb.accounting || 0),
+            });
+            App.setMoneyMetric(document.getElementById('kpi-expenses'), d.totals.expenses || 0);
+            App.setMoneyMetric(document.getElementById('kpi-net-tax'), d.kpis.net_tax_liability || 0);
+            document.getElementById('kpi-debt-ratio').textContent = `${(d.kpis.debt_ratio * 100).toFixed(1)}%`;
+            document.getElementById('kpi-fee-rate').textContent = `${d.kpis.fee_rate_pct}%`;
+            document.getElementById('kpi-margin').textContent = `${d.kpis.inventory_margin}%`;
+            App.setMoneyMetric(document.getElementById('kpi-cents'), cambio.cents_lost);
+
+            App.setMoneyMetric(document.getElementById('debt-owed'), d.debt.ledger_owed_to_store);
+            App.setMoneyMetric(document.getElementById('debt-owes'), d.debt.ledger_store_owes);
+            App.setMoneyMetric(document.getElementById('debt-variance'), d.debt.variance_open);
+            App.bindInfoTips();
+        }
+
+        await load();
+    })();
+    </script>
+</body>
+</html>

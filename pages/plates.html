@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Plates — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div><h1 class="text-sm font-bold text-text-primary" data-i18n="app.name">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="page.plates.heading">License Plates</p></div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-4 sm:px-6 py-4 flex flex-col gap-3">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.plates.heading">License Plates</h2>
+                <div class="status-filter-row flex items-center gap-1.5 flex-wrap">
+                    <button class="status-filter px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-accent/20 text-accent" data-status="" data-i18n="plates.filter.all">All</button>
+                    <button class="status-filter px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-text-secondary hover:bg-bg-elevated" data-status="pending" data-i18n="plates.filter.pending">Pending</button>
+                    <button class="status-filter px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-text-secondary hover:bg-bg-elevated" data-status="in_progress" data-i18n="plates.filter.in_progress">In Progress</button>
+                    <button class="status-filter px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-text-secondary hover:bg-bg-elevated" data-status="completed" data-i18n="plates.filter.completed">Completed</button>
+                    <button class="status-filter px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-text-secondary hover:bg-bg-elevated" data-status="delivered" data-i18n="plates.filter.delivered">Delivered</button>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="add-service-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="plates.add_service">Add Service</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8">
+            <div class="table-container overflow-x-auto mobile-cards">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="events.col.client_name">Client Name</th>
+                            <th data-i18n="common.phone">Phone</th>
+                            <th data-i18n="plates.col.vin">VIN</th>
+                            <th data-i18n="plates.col.service_type">Service Type</th>
+                            <th data-i18n="plates.col.delivery_date">Delivery Date</th>
+                            <th data-i18n="plates.col.payment">Payment</th>
+                            <th data-i18n="common.balance">Balance</th>
+                            <th data-i18n="common.total">Total</th>
+                            <th data-i18n="plates.col.agent">Agent</th>
+                            <th data-i18n="common.status">Status</th>
+                            <th data-i18n="common.actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plates-tbody">
+                        <tr><td colspan="11" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Service Modal -->
+    <div class="modal-backdrop" id="plate-modal-backdrop"></div>
+    <div class="modal-content max-w-2xl" id="plate-modal">
+        <h3 class="text-lg font-bold mb-4" id="plate-modal-title" data-i18n="plates.add_service">Add Service</h3>
+        <form id="plate-form" class="space-y-4">
+            <input type="hidden" name="id">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="events.col.client_name">Client Name</label><input type="text" name="client_name" class="input" required></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.phone">Phone</label><input type="text" name="phone" class="input" data-i18n-placeholder="events.phone_placeholder" placeholder="Phone number"></div>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.vin">VIN</label><input type="text" name="vin" class="input font-mono" data-i18n-placeholder="plates.placeholder.vin" placeholder="Vehicle Identification Number"></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.service_type">Service Type</label><input type="text" name="service_type" class="input" data-i18n-placeholder="plates.placeholder.service_type" placeholder="e.g. Registration, Title"></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.delivery_date">Delivery Date</label><input type="date" name="delivery_date" class="input"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.payment_amount">Payment ($)</label><input type="number" name="payment" class="input font-mono" step="0.01" value="0"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.balance_amount">Balance ($)</label><input type="number" name="balance" class="input font-mono" step="0.01" value="0"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.total_amount">Total ($)</label><input type="number" name="total" class="input font-mono" step="0.01" value="0"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.agent_name">Agent Name</label><input type="text" name="agent_name" class="input"></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="plates.col.agent_fee">Agent Fee ($)</label><input type="number" name="agent_fee" class="input font-mono" step="0.01" value="0"></div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.status">Status</label>
+                <select name="status" class="input">
+                    <option value="pending" data-i18n="plates.filter.pending">Pending</option>
+                    <option value="in_progress" data-i18n="plates.filter.in_progress">In Progress</option>
+                    <option value="completed" data-i18n="plates.filter.completed">Completed</option>
+                    <option value="delivered" data-i18n="plates.filter.delivered">Delivered</option>
+                </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label><textarea name="notes" class="input" rows="3"></textarea></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('plate-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        let currentStatus = '';
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            loadPlates();
+
+            document.querySelectorAll('.status-filter').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentStatus = btn.dataset.status || '';
+                    document.querySelectorAll('.status-filter').forEach(b => {
+                        b.classList.remove('bg-accent/20', 'text-accent');
+                        b.classList.add('text-text-secondary', 'hover:bg-bg-elevated');
+                    });
+                    btn.classList.remove('text-text-secondary', 'hover:bg-bg-elevated');
+                    btn.classList.add('bg-accent/20', 'text-accent');
+                    loadPlates();
+                });
+            });
+
+            document.getElementById('add-service-btn').addEventListener('click', () => {
+                document.getElementById('plate-modal-title').textContent = App.t('plates.add_service');
+                document.getElementById('plate-form').reset();
+                document.querySelector('#plate-form [name=id]').value = '';
+                document.querySelector('#plate-form [name=payment]').value = '0';
+                document.querySelector('#plate-form [name=balance]').value = '0';
+                document.querySelector('#plate-form [name=total]').value = '0';
+                document.querySelector('#plate-form [name=agent_fee]').value = '0';
+                App.openModal('plate-modal');
+            });
+
+            document.getElementById('plate-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const id = fd.get('id');
+                const action = id ? 'update' : 'create';
+                const payload = {
+                    action,
+                    client_name: fd.get('client_name'),
+                    phone: fd.get('phone'),
+                    vin: fd.get('vin'),
+                    service_type: fd.get('service_type'),
+                    delivery_date: fd.get('delivery_date') || null,
+                    payment: parseFloat(fd.get('payment')) || 0,
+                    balance: parseFloat(fd.get('balance')) || 0,
+                    total: parseFloat(fd.get('total')) || 0,
+                    agent_name: fd.get('agent_name'),
+                    agent_fee: parseFloat(fd.get('agent_fee')) || 0,
+                    status: fd.get('status') || 'pending',
+                    notes: fd.get('notes'),
+                };
+                if (id) payload.id = parseInt(id);
+                try {
+                    await App.api('POST', '/api/plates', payload);
+                    App.closeModal('plate-modal');
+                    App.toastKey(id ? 'toast.service_updated' : 'toast.service_added', 'success');
+                    loadPlates();
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+        })();
+
+        function statusBadgeClass(status) {
+            switch (status) {
+                case 'delivered': return 'badge badge-success';
+                case 'completed': return 'badge badge-info';
+                case 'in_progress': return 'badge badge-warning';
+                case 'pending': return 'badge badge-danger';
+                default: return 'badge badge-info';
+            }
+        }
+
+        function statusLabel(status) {
+            const map = {
+                pending: 'plates.filter.pending',
+                in_progress: 'plates.filter.in_progress',
+                completed: 'plates.filter.completed',
+                delivered: 'plates.filter.delivered',
+            };
+            return map[status] ? App.t(map[status]) : status;
+        }
+
+        async function loadPlates() {
+            try {
+                const url = currentStatus ? `/api/plates?status=${encodeURIComponent(currentStatus)}` : '/api/plates';
+                const res = await App.api('GET', url);
+                const plates = res.plates || [];
+                const tbody = document.getElementById('plates-tbody');
+                if (!plates.length) {
+                    tbody.innerHTML = `<tr><td colspan="11" class="text-center text-text-muted py-8">${App.t('plates.no_services')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = plates.map(p => `
+                    <tr>
+                        <td class="font-medium">${p.client_name || App.t('empty.none')}</td>
+                        <td class="text-sm">${p.phone || App.t('empty.none')}</td>
+                        <td class="font-mono text-xs text-text-secondary">${p.vin || App.t('empty.none')}</td>
+                        <td class="text-sm">${p.service_type || App.t('empty.none')}</td>
+                        <td class="text-sm">${p.delivery_date ? App.formatDate(p.delivery_date) : App.t('empty.none')}</td>
+                        <td class="font-mono tabular-nums text-sm">${App.money(p.payment)}</td>
+                        <td class="font-mono tabular-nums text-sm">${App.money(p.balance)}</td>
+                        <td class="font-mono tabular-nums font-semibold">${App.money(p.total)}</td>
+                        <td class="text-sm">${p.agent_name || App.t('empty.none')}</td>
+                        <td><span class="${statusBadgeClass(p.status)}">${statusLabel(p.status)}</span></td>
+                        <td>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editPlate(${p.id})" class="btn-secondary text-xs py-1 px-2.5">${App.t('action.edit')}</button>
+                                <button onclick="deletePlate(${p.id})" class="p-1.5 rounded-lg hover:bg-danger/15 text-text-muted hover:text-danger transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function editPlate(id) {
+            try {
+                const res = await App.api('GET', '/api/plates');
+                let p = (res.plates || []).find(pl => pl.id === id);
+                if (!p) {
+                    const allRes = await App.api('GET', '/api/plates?status=');
+                    p = (allRes.plates || []).find(pl => pl.id === id);
+                }
+                if (!p) return App.toastKey('toast.service_not_found', 'danger');
+
+                document.getElementById('plate-modal-title').textContent = App.t('plates.edit_service');
+                const form = document.getElementById('plate-form');
+                form.querySelector('[name=id]').value = p.id;
+                form.querySelector('[name=client_name]').value = p.client_name || '';
+                form.querySelector('[name=phone]').value = p.phone || '';
+                form.querySelector('[name=vin]').value = p.vin || '';
+                form.querySelector('[name=service_type]').value = p.service_type || '';
+                form.querySelector('[name=delivery_date]').value = p.delivery_date ? p.delivery_date.split('T')[0] : '';
+                form.querySelector('[name=payment]').value = p.payment ?? 0;
+                form.querySelector('[name=balance]').value = p.balance ?? 0;
+                form.querySelector('[name=total]').value = p.total ?? 0;
+                form.querySelector('[name=agent_name]').value = p.agent_name || '';
+                form.querySelector('[name=agent_fee]').value = p.agent_fee ?? 0;
+                form.querySelector('[name=status]').value = p.status || 'pending';
+                form.querySelector('[name=notes]').value = p.notes || '';
+                App.openModal('plate-modal');
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function deletePlate(id) {
+            if (!App.confirmKey('confirm.delete_service')) return;
+            try {
+                await App.api('POST', '/api/plates', { action: 'delete', id });
+                App.toastKey('toast.service_deleted', 'success');
+                loadPlates();
+            } catch (err) { App.toastKey('toast.error_generic', 'danger', err.message); }
+        }
+
+        document.addEventListener('language-changed', () => loadPlates());
+    </script>
+</body>
+</html>

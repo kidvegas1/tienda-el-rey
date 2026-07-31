@@ -1,0 +1,49 @@
+# Manual Render deployment for Tienda Hispana El Rey.
+#
+# One-time setup (GitHub repo → Settings → Secrets and variables → Actions):
+#   RENDER_API_KEY   — from https://dashboard.render.com/u/settings#api-keys
+#   RENDER_SERVICE_ID — new service identifier (srv-...), never reuse another app
+
+name: Deploy to Render
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: tienda-el-rey-render-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Render service identity
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          EXPECTED_SERVICE_NAME: tienda-hispana-el-rey
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "::error::Set RENDER_API_KEY and the new Tienda El Rey RENDER_SERVICE_ID."
+            exit 1
+          fi
+          SERVICE_NAME="$(curl -fsS "https://api.render.com/v1/services/${RENDER_SERVICE_ID}" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" | jq -r '.name // empty')"
+          if [ "$SERVICE_NAME" != "$EXPECTED_SERVICE_NAME" ]; then
+            echo "::error::Refusing deploy: service is '${SERVICE_NAME:-unknown}', expected '$EXPECTED_SERVICE_NAME'."
+            exit 1
+          fi
+
+      - name: Trigger Render deployment
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          curl -fsS -X POST "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache":"do_not_clear"}'
+          echo "Render deploy triggered for service ${RENDER_SERVICE_ID}"

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
+                    <p class="text-xs text-text-secondary" data-i18n="nav.accounting">Accounting</p>
+                </div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-text-primary truncate" id="user-name"></p>
+                    <p class="text-xs text-text-muted capitalize" id="user-role"></p>
+                </div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.accounting.heading">Accounting</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="category-filter" class="input py-2 px-3 text-sm w-full sm:w-44">
+                    <option value="" data-i18n="accounting.all_categories">All Categories</option>
+                </select>
+                <button id="add-entry-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="accounting.add_entry">Add Entry</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="accounting.total_receivable">Total Receivable</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1 text-success" id="stat-receivable">$0.00</p>
+                        </div>
+                        <div class="stat-icon stat-icon-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" data-i18n="accounting.subtitle_receivable">Money owed to you</p>
+                </div>
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="accounting.total_payable">Total Payable</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1 text-danger" id="stat-payable">$0.00</p>
+                        </div>
+                        <div class="stat-icon stat-icon-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" data-i18n="accounting.subtitle_payable">Money you owe</p>
+                </div>
+                <div class="card card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="accounting.net_balance">Net Balance</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="stat-net">$0.00</p>
+                        </div>
+                        <div class="stat-icon stat-icon-accent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted mt-2" data-i18n="accounting.subtitle_net">Receivable minus payable</p>
+                </div>
+            </section>
+
+            <section class="table-container mobile-cards">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="common.date">Date</th>
+                            <th data-i18n="common.category">Category</th>
+                            <th data-i18n="common.description">Description</th>
+                            <th data-i18n="common.type">Type</th>
+                            <th class="text-right" data-i18n="common.amount">Amount</th>
+                            <th data-i18n="common.notes">Notes</th>
+                            <th data-i18n="common.actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entries-tbody">
+                        <tr><td colspan="7" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="entry-modal-backdrop"></div>
+    <div class="modal-content" id="entry-modal">
+        <h3 class="text-lg font-bold mb-4" id="modal-title" data-i18n="accounting.add_entry_modal">Add Entry</h3>
+        <form id="entry-form" class="space-y-4">
+            <input type="hidden" name="entry_id" value="">
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.date">Date</label>
+                <input type="date" name="entry_date" class="input" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.category">Category</label>
+                <input type="text" name="category" class="input" list="category-list" data-i18n-placeholder="accounting.category_placeholder" placeholder="e.g. Rent, Utilities, Commission" required>
+                <datalist id="category-list"></datalist>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.description">Description</label>
+                <input type="text" name="description" class="input" data-i18n-placeholder="accounting.description_placeholder" placeholder="Brief description" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="accounting.amount_label">Amount ($)</label>
+                    <input type="number" name="amount" class="input font-mono" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.type">Type</label>
+                    <select name="type" class="input" required>
+                        <option value="receivable" data-i18n="accounting.receivable">Receivable</option>
+                        <option value="payable" data-i18n="accounting.payable">Payable</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label>
+                <textarea name="notes" class="input" rows="2" data-i18n-placeholder="accounting.notes_placeholder" placeholder="Optional notes"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('entry-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" id="modal-submit-btn" data-i18n="accounting.save_entry">Save Entry</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        let allCategories = [];
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            document.getElementById('add-entry-btn').addEventListener('click', () => openEntryModal());
+            document.getElementById('category-filter').addEventListener('change', loadData);
+
+            document.getElementById('entry-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const entryId = fd.get('entry_id');
+                const payload = {
+                    action: entryId ? 'update' : 'create',
+                    entry_date: fd.get('entry_date'),
+                    category: fd.get('category'),
+                    description: fd.get('description'),
+                    amount: parseFloat(fd.get('amount')) || 0,
+                    type: fd.get('type'),
+                    notes: fd.get('notes'),
+                };
+                if (entryId) payload.id = parseInt(entryId);
+
+                try {
+                    await App.api('POST', '/api/accounting', payload);
+                    App.closeModal('entry-modal');
+                    App.toastKey(entryId ? 'toast.entry_updated' : 'toast.entry_created', 'success');
+                    loadData();
+                } catch (err) {
+                    App.toastKey('toast.error_generic', 'danger', err.message);
+                }
+            });
+
+            async function loadData() {
+                const category = document.getElementById('category-filter').value;
+                const qs = category ? `?category=${encodeURIComponent(category)}` : '';
+                try {
+                    const data = await App.api('GET', `/api/accounting${qs}`);
+
+                    document.getElementById('stat-receivable').textContent = App.money(data.total_receivable);
+                    document.getElementById('stat-payable').textContent = App.money(data.total_payable);
+
+                    const net = (data.total_receivable || 0) - (data.total_payable || 0);
+                    const netEl = document.getElementById('stat-net');
+                    netEl.textContent = App.money(Math.abs(net));
+                    if (net > 0) {
+                        netEl.className = 'text-2xl font-bold font-mono tabular-nums mt-1 text-success';
+                        netEl.textContent = '+' + App.money(net);
+                    } else if (net < 0) {
+                        netEl.className = 'text-2xl font-bold font-mono tabular-nums mt-1 text-danger';
+                        netEl.textContent = '-' + App.money(Math.abs(net));
+                    } else {
+                        netEl.className = 'text-2xl font-bold font-mono tabular-nums mt-1';
+                        netEl.textContent = App.money(0);
+                    }
+
+                    if (data.categories?.length) {
+                        allCategories = data.categories;
+                        const filter = document.getElementById('category-filter');
+                        const current = filter.value;
+                        filter.innerHTML = `<option value="">${App.t('accounting.all_categories')}</option>` +
+                            data.categories.map(c => `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
+                        document.getElementById('category-list').innerHTML =
+                            data.categories.map(c => `<option value="${escapeHtml(c)}"></option>`).join('');
+                    }
+
+                    renderEntries(data.entries || []);
+                } catch (err) {
+                    App.toastKey('toast.error_generic', 'danger', err.message);
+                }
+            }
+
+            function renderEntries(entries) {
+                const tbody = document.getElementById('entries-tbody');
+                if (!entries.length) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-text-muted py-8">${App.t('accounting.no_entries')}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = entries.map(e => {
+                    const side = e.finance_class === 'side_finances';
+                    const incomplete = e.data_completeness === 'incomplete_vital';
+                    const rowCls = side ? 'finance-side-row' : '';
+                    const catBadge = side
+                        ? `<span class="px-2 py-0.5 rounded-md text-xs font-medium badge-side-finances">${escapeHtml(e.category)}</span>`
+                        : `<span class="px-2 py-0.5 rounded-md bg-bg-elevated text-xs font-medium text-text-secondary">${escapeHtml(e.category)}</span>`;
+                    const vitalNote = incomplete ? `<span class="badge badge-side-finances text-[10px] ml-1">${App.t('reports.side_finances.incomplete_vital')}</span>` : '';
+                    return `
+                    <tr class="${rowCls}">
+                        <td class="font-medium whitespace-nowrap">${App.formatDate(e.entry_date)}</td>
+                        <td>${catBadge}</td>
+                        <td>${escapeHtml(e.description)}${vitalNote}</td>
+                        <td><span class="badge ${e.type === 'receivable' ? 'badge-success' : 'badge-danger'}">${e.type === 'receivable' ? App.t('accounting.receivable') : App.t('accounting.payable')}</span></td>
+                        <td class="text-right font-mono tabular-nums font-semibold ${side ? 'finance-side-text' : (e.type === 'receivable' ? 'text-success' : 'text-danger')}">${App.money(e.amount)}</td>
+                        <td class="text-text-muted text-sm max-w-[200px] truncate">${escapeHtml(e.notes || App.t('empty.none'))}</td>
+                        <td>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editEntry(${e.id})" class="btn-secondary text-xs py-1 px-2.5" title="${App.t('action.edit')}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                                    ${App.t('action.edit')}
+                                </button>
+                                <button onclick="deleteEntry(${e.id})" class="p-1.5 rounded-lg hover:bg-[oklch(0.65_0.2_25_/_0.15)] text-text-muted hover:text-danger transition-colors" title="${App.t('action.delete')}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+
+            window.openEntryModal = function(entry = null) {
+                const form = document.getElementById('entry-form');
+                form.reset();
+                if (entry) {
+                    document.getElementById('modal-title').textContent = App.t('accounting.edit_entry');
+                    document.getElementById('modal-submit-btn').textContent = App.t('accounting.update_entry');
+                    form.entry_id.value = entry.id;
+                    form.entry_date.value = entry.entry_date;
+                    form.category.value = entry.category;
+                    form.description.value = entry.description;
+                    form.amount.value = entry.amount;
+                    form.type.value = entry.type;
+                    form.notes.value = entry.notes || '';
+                } else {
+                    document.getElementById('modal-title').textContent = App.t('accounting.add_entry_modal');
+                    document.getElementById('modal-submit-btn').textContent = App.t('accounting.save_entry');
+                    form.entry_id.value = '';
+                    form.entry_date.value = new Date().toISOString().split('T')[0];
+                }
+                App.openModal('entry-modal');
+            };
+
+            window.editEntry = async function(id) {
+                try {
+                    const data = await App.api('GET', `/api/accounting?id=${id}`);
+                    const entry = data.entries?.[0] || data.entry;
+                    if (entry) openEntryModal(entry);
+                } catch (err) {
+                    App.toastKey('toast.error_generic', 'danger', err.message);
+                }
+            };
+
+            window.deleteEntry = async function(id) {
+                if (!App.confirmKey('confirm.delete_entry')) return;
+                try {
+                    await App.api('POST', '/api/accounting', { action: 'delete', id });
+                    App.toastKey('toast.entry_deleted', 'success');
+                    loadData();
+                } catch (err) {
+                    App.toastKey('toast.error_generic', 'danger', err.message);
+                }
+            };
+
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function refreshModalI18n() {
+                const modal = document.getElementById('entry-modal');
+                if (!modal?.classList.contains('open')) return;
+                const form = document.getElementById('entry-form');
+                if (form.entry_id.value) {
+                    document.getElementById('modal-title').textContent = App.t('accounting.edit_entry');
+                    document.getElementById('modal-submit-btn').textContent = App.t('accounting.update_entry');
+                } else {
+                    document.getElementById('modal-title').textContent = App.t('accounting.add_entry_modal');
+                    document.getElementById('modal-submit-btn').textContent = App.t('accounting.save_entry');
+                }
+            }
+
+            loadData();
+            window.addEventListener('store-changed', loadData);
+            document.addEventListener('language-changed', () => {
+                loadData();
+                refreshModalI18n();
+            });
+        })();
+    </script>
+</body>
+</html>

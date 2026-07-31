@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro interno — Tienda Hispana El Rey</title>
+    <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: oklch(0.97 0.018 230);
+            --color-bg-surface: oklch(1 0 0);
+            --color-bg-elevated: oklch(0.94 0.035 225);
+            --color-accent: oklch(0.48 0.09 55);
+            --color-accent-hover: oklch(0.42 0.08 50);
+            --color-success: oklch(0.52 0.14 155);
+            --color-danger: oklch(0.55 0.18 25);
+            --color-warning: oklch(0.60 0.14 85);
+            --color-info: oklch(0.55 0.12 50);
+            --color-text-primary: oklch(0.27 0.04 55);
+            --color-text-secondary: oklch(0.43 0.035 55);
+            --color-text-muted: oklch(0.54 0.025 55);
+            --color-border: oklch(0.87 0.025 225);
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-bg-base text-text-primary font-sans">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar fixed top-0 left-0 h-dvh flex flex-col z-40" id="sidebar">
+        <div class="p-5 border-b border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[oklch(0.55_0.12_40)] flex items-center justify-center shadow-lg shadow-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div><h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1><p class="text-xs text-text-secondary" data-i18n="nav.libro_interno">Libro interno</p></div>
+            </div>
+        </div>
+                        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <a href="dashboard" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="caja" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="nav-label" data-i18n="nav.caja">Cash Register</span></a>
+            <a href="clients" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.clients">Clients</span></a>
+            <a href="company-verification" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-label" data-i18n="nav.company_verification">Company Verification</span></a>
+            <a href="libro-interno" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg><span class="nav-label" data-i18n="nav.libro_interno">Libro interno</span></a>
+            <a href="schedule" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label" data-i18n="nav.schedule">Schedule & Clock-In</span></a>
+            <a href="employees" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label" data-i18n="nav.employees">Employees</span></a>
+            <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
+            <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
+            <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
+            <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
+            <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
+            <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
+            <a href="finances" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg><span class="nav-label" data-i18n="nav.finances">Finanzas</span></a>
+            <a href="receipts" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span class="nav-label" data-i18n="nav.receipts">Recibos</span></a>
+            <a href="inventory" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span class="nav-label" data-i18n="nav.inventory">Inventory</span></a>
+            <a href="sales-log" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.sales_log">Sales Log</span></a>
+            <a href="import" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="nav-label" data-i18n="nav.import">Import Excel</span></a>
+            <a href="stores" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="nav-label" data-i18n="nav.stores">Stores</span></a>
+        </nav>
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-sm font-semibold text-accent" id="user-avatar"></div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-text-primary truncate" id="user-name"></p><p class="text-xs text-text-muted capitalize" id="user-role"></p></div>
+                <button id="logout-btn" class="p-2 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-danger transition-colors" data-i18n-title="action.sign_out" title="Sign out"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-[280px] min-h-dvh">
+        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.libro_interno.heading">Libro interno</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="employee-filter" class="input py-2 px-3 text-sm w-full sm:w-44">
+                    <option value="" data-i18n="ledger.all_employees">All Employees</option>
+                </select>
+                <select id="status-filter" class="input py-2 px-3 text-sm w-full sm:w-32" title="Status">
+                    <option value="open" selected data-i18n="ledger.filter_open">Open</option>
+                    <option value="paid" data-i18n="ledger.filter_paid">Paid</option>
+                    <option value="all" data-i18n="ledger.filter_all">All</option>
+                </select>
+                <button id="add-entry-btn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="ledger.add_entry">Add Entry</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 lg:p-8 space-y-6">
+            <!-- Balance Summary -->
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="card p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon stat-icon-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.owed">Por pagar a El Rey</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums text-danger" id="total-owed">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon stat-icon-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.store_owes">El Rey debe</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums text-success" id="total-store-owes">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon stat-icon-accent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.net">Net Balance</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums" id="net-balance">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Store commission tracker -->
+            <section class="card p-5 sm:p-6 space-y-5" id="commission-tracker" aria-labelledby="commission-title">
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-semibold text-accent uppercase tracking-[0.14em]" data-i18n="ledger.commission.eyebrow">Store commission</p>
+                        <h3 class="text-lg font-bold mt-1" id="commission-title" data-i18n="ledger.commission.title">Commission tracker</h3>
+                        <p class="text-sm text-text-muted mt-1" data-i18n="ledger.commission.subtitle">$1 per $100 at 1% · past $2k → 2% · past $4k → 3% · past $7k → 4%</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" for="commission-from" data-i18n="recon.from">From</label>
+                            <input type="date" id="commission-from" class="input py-2 px-3 text-sm w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" for="commission-to" data-i18n="recon.to">To</label>
+                            <input type="date" id="commission-to" class="input py-2 px-3 text-sm w-full">
+                        </div>
+                        <button type="button" id="commission-refresh-btn" class="btn-secondary justify-center whitespace-nowrap" data-i18n="ledger.commission.refresh">Update</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="rounded-xl bg-bg-elevated p-4">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.commission.volume">Volume</p>
+                        <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="comm-volume">$0.00</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-4">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.commission.earned">Commission earned</p>
+                        <p class="text-2xl font-bold font-mono tabular-nums text-success mt-1" id="comm-earned">$0.00</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-4">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.commission.current_rate">Current rate</p>
+                        <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="comm-rate">1%</p>
+                        <p class="text-xs text-text-muted mt-1" id="comm-per-100">$1.00 / $100</p>
+                    </div>
+                    <div class="rounded-xl bg-bg-elevated p-4">
+                        <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="ledger.commission.next">Next tier</p>
+                        <p class="text-sm font-semibold mt-1 leading-snug" id="comm-next">—</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between gap-3 mb-2">
+                        <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider" data-i18n="ledger.commission.progress">Progress to $7,000</p>
+                        <p class="text-xs font-mono text-text-muted" id="comm-overall-pct">0%</p>
+                    </div>
+                    <div class="relative h-4 rounded-full bg-bg-elevated border border-border overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="comm-bar-wrap">
+                        <div id="comm-bar" class="h-full rounded-full bg-gradient-to-r from-[oklch(0.55_0.12_145)] via-[oklch(0.58_0.12_85)] to-[oklch(0.52_0.14_55)] transition-all duration-500" style="width:0%"></div>
+                    </div>
+                    <div class="relative mt-2 h-5 text-[10px] sm:text-xs font-mono text-text-muted">
+                        <span class="absolute left-0">$0</span>
+                        <span class="absolute" style="left:28.57%;transform:translateX(-50%)">$2k</span>
+                        <span class="absolute" style="left:57.14%;transform:translateX(-50%)">$4k</span>
+                        <span class="absolute" style="left:100%;transform:translateX(-100%)">$7k+</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2" id="comm-tier-cards"></div>
+                <p class="text-xs text-text-muted" id="comm-source-note"></p>
+            </section>
+
+            <!-- Admin: Cents Reconciliation (admin only) -->
+            <section id="recon-panel" class="hidden space-y-4">
+                <div class="card p-5">
+                    <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold" data-i18n="recon.title">Missing Cents — All Stores</h3>
+                            <p class="text-sm text-text-muted" data-i18n="recon.subtitle">Money lost when employees round check payouts down to whole dollars. Data comes from imported company reports.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 w-full sm:w-auto">
+                            <div class="w-full sm:w-auto">
+                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" data-i18n="recon.from">From</label>
+                                <input type="date" id="recon-date-from" class="input py-2 px-3 text-sm w-full">
+                            </div>
+                            <div class="w-full sm:w-auto">
+                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" data-i18n="recon.to">To</label>
+                                <input type="date" id="recon-date-to" class="input py-2 px-3 text-sm w-full">
+                            </div>
+                            <button type="button" id="recon-load-btn" class="btn-primary w-full sm:w-auto justify-center" data-i18n="recon.load">Search</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                        <div class="rounded-xl bg-bg-elevated p-4">
+                            <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="recon.total_cents">Total missing cents</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums text-warning" id="recon-total-cents">$0.00</p>
+                        </div>
+                        <div class="rounded-xl bg-bg-elevated p-4">
+                            <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="recon.reports_count">Imported reports</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums" id="recon-reports-count">0</p>
+                        </div>
+                        <div class="rounded-xl bg-bg-elevated p-4">
+                            <p class="text-xs text-text-muted uppercase tracking-wider" data-i18n="recon.open_variances">Excel mismatches</p>
+                            <p class="text-2xl font-bold font-mono tabular-nums text-danger" id="recon-variance-count">0</p>
+                        </div>
+                    </div>
+                    <h4 class="text-sm font-bold mb-2" data-i18n="recon.by_store">By store</h4>
+                    <div id="recon-store-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6"></div>
+                    <div class="table-container mb-6 mobile-cards">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="recon.store">Store</th>
+                                    <th data-i18n="recon.company">Company</th>
+                                    <th class="text-right" data-i18n="recon.cambio_count">Checks cashed</th>
+                                    <th class="text-right" data-i18n="recon.giros_count">Transfers</th>
+                                    <th class="text-right" data-i18n="recon.cents_lost">Missing cents</th>
+                                    <th data-i18n="col.status">Status</th>
+                                    <th data-i18n="col.actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recon-summary-tbody">
+                                <tr><td colspan="7" class="text-center text-text-muted py-6" data-i18n="recon.no_data">Pick dates and click Search</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h4 class="text-sm font-bold mb-2" data-i18n="recon.reports_heading">Reports used in this search</h4>
+                    <div class="table-container mb-6 mobile-cards">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="recon.store">Store</th>
+                                    <th data-i18n="recon.company">Company</th>
+                                    <th data-i18n="col.date">Period</th>
+                                    <th class="text-right" data-i18n="recon.transactions">Transactions</th>
+                                    <th data-i18n="recon.file">File</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recon-reports-tbody">
+                                <tr><td colspan="5" class="text-center text-text-muted py-6" data-i18n="recon.no_reports">No reports in this date range</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h4 class="text-sm font-bold mb-2" data-i18n="recon.variances_heading">Excel vs report differences</h4>
+                    <div class="table-container mobile-cards">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="col.date">Date</th>
+                                    <th data-i18n="recon.store">Store</th>
+                                    <th data-i18n="recon.company">Company</th>
+                                    <th class="text-right" data-i18n="recon.excel_amount">Excel total</th>
+                                    <th class="text-right" data-i18n="recon.report_amount">Report total</th>
+                                    <th class="text-right" data-i18n="recon.diff">Difference</th>
+                                    <th data-i18n="col.actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recon-variances-tbody">
+                                <tr><td colspan="7" class="text-center text-text-muted py-6" data-i18n="recon.no_variances">No differences found</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Entries Table -->
+            <div class="table-container mobile-cards">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="col.date">Date</th>
+                            <th data-i18n="col.employee">Employee</th>
+                            <th data-i18n="col.description">Description</th>
+                            <th class="text-right" data-i18n="col.owed_to_store">Por pagar a El Rey</th>
+                            <th class="text-right" data-i18n="col.store_owes">El Rey debe</th>
+                            <th data-i18n="col.notes">Notes</th>
+                            <th data-i18n="col.status">Status</th>
+                            <th data-i18n="col.actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-tbody">
+                        <tr><td colspan="8" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-backdrop" id="ledger-modal-backdrop"></div>
+    <div class="modal-content" id="ledger-modal">
+        <h3 class="text-lg font-bold mb-4" id="ledger-modal-title" data-i18n="ledger.add_title">Add Ledger Entry</h3>
+        <form id="ledger-form" class="space-y-4">
+            <input type="hidden" name="id">
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="col.date">Date</label><input type="date" name="entry_date" class="input" required></div>
+                <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="col.employee">Employee</label><input type="text" name="employee_name" class="input" data-i18n-placeholder="ledger.employee_placeholder" placeholder="Employee name" list="employee-datalist"></div>
+            </div>
+            <datalist id="employee-datalist"></datalist>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="col.description">Description</label><input type="text" name="description" class="input" required data-i18n-placeholder="ledger.description_placeholder" placeholder="e.g. cheques pagados, comision barri..."></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="ledger.owed_amount">Por pagar a El Rey ($)</label>
+                    <input type="number" name="owed_to_store" class="input font-mono" step="0.01" value="0">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="ledger.store_owes_amount">El Rey debe ($)</label>
+                    <input type="number" name="store_owes" class="input font-mono" step="0.01" value="0">
+                </div>
+            </div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="col.notes">Notes</label><textarea name="notes" class="input" rows="2"></textarea></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('ledger-modal')" data-i18n="action.cancel">Cancel</button>
+                <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="assets/js/i18n.js?v=20260730-commission"></script>
+    <script src="assets/js/app.js?v=20260730-commission"></script>
+    <script>
+        let canSettleLedger = false;
+
+        function applyLedgerPageI18n() {
+            const statusFilter = document.getElementById('status-filter');
+            if (statusFilter) statusFilter.title = App.t('ledger.filter_status');
+            const filter = document.getElementById('employee-filter');
+            if (filter?.disabled) {
+                filter.title = App.t('ledger.employee_filter_locked');
+            }
+            const modal = document.getElementById('ledger-modal');
+            if (modal?.classList.contains('open')) {
+                const id = document.querySelector('#ledger-form [name=id]')?.value;
+                document.getElementById('ledger-modal-title').textContent = App.t(id ? 'ledger.edit_title' : 'ledger.add_title');
+            }
+        }
+
+        (async () => {
+            const ok = await App.init();
+            if (!ok) return;
+            App.initSidebar();
+            App.initStoreSelector();
+            App.initUserMenu();
+            const avatar = document.getElementById('user-avatar');
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            canSettleLedger = App.user.role === 'admin' || App.user.role === 'manager';
+
+            const isAdmin = App.user.role === 'admin';
+            if (isAdmin) {
+                const reconPanel = document.getElementById('recon-panel');
+                reconPanel.classList.remove('hidden');
+                const now = new Date();
+                document.getElementById('recon-date-from').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+                document.getElementById('recon-date-to').value = now.toISOString().split('T')[0];
+                document.getElementById('recon-load-btn').addEventListener('click', loadReconciliation);
+                App.applyI18n();
+            }
+
+            const lockedEmployee = App.user?.employee;
+            const personalScope = ['employee', 'cashier'].includes(App.user?.role);
+            if (lockedEmployee && personalScope) {
+                const filter = document.getElementById('employee-filter');
+                filter.value = lockedEmployee.name;
+                filter.disabled = true;
+                filter.title = App.t('ledger.employee_filter_locked');
+                filter.classList.add('opacity-70', 'cursor-not-allowed');
+            }
+
+            const now = new Date();
+            const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+            const today = now.toISOString().split('T')[0];
+            const commFromEl = document.getElementById('commission-from');
+            const commToEl = document.getElementById('commission-to');
+            if (commFromEl) commFromEl.value = monthStart;
+            if (commToEl) commToEl.value = today;
+            document.getElementById('commission-refresh-btn')?.addEventListener('click', loadLedger);
+
+            applyLedgerPageI18n();
+            loadLedger();
+            if (isAdmin) loadReconciliation();
+
+            document.getElementById('employee-filter').addEventListener('change', loadLedger);
+            document.getElementById('status-filter').addEventListener('change', loadLedger);
+
+            document.getElementById('add-entry-btn').addEventListener('click', () => {
+                document.getElementById('ledger-modal-title').textContent = App.t('ledger.add_title');
+                document.getElementById('ledger-form').reset();
+                document.querySelector('#ledger-form [name=id]').value = '';
+                document.querySelector('#ledger-form [name=entry_date]').value = new Date().toISOString().split('T')[0];
+                const empInput = document.querySelector('#ledger-form [name=employee_name]');
+                if (lockedEmployee && personalScope) {
+                    empInput.value = lockedEmployee.name;
+                    empInput.readOnly = true;
+                } else {
+                    empInput.readOnly = false;
+                    if (lockedEmployee) {
+                        empInput.value = lockedEmployee.name;
+                    }
+                }
+                App.openModal('ledger-modal');
+            });
+
+            document.getElementById('ledger-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const id = fd.get('id');
+                try {
+                    await App.api('POST', '/api/libro-interno', {
+                        action: id ? 'update' : 'create',
+                        id: id ? parseInt(id) : undefined,
+                        employee_name: fd.get('employee_name'),
+                        description: fd.get('description'),
+                        owed_to_store: parseFloat(fd.get('owed_to_store')) || 0,
+                        store_owes: parseFloat(fd.get('store_owes')) || 0,
+                        entry_date: fd.get('entry_date'),
+                        notes: fd.get('notes'),
+                    });
+                    App.closeModal('ledger-modal');
+                    App.toast(id ? App.t('ledger.entry_updated') : App.t('ledger.entry_added'), 'success');
+                    loadLedger();
+                } catch (err) { App.toast(err.message, 'danger'); }
+            });
+
+            window.addEventListener('store-changed', () => {
+                loadLedger();
+                if (App.user?.role === 'admin') loadReconciliation();
+            });
+            document.addEventListener('language-changed', () => {
+                applyLedgerPageI18n();
+                loadLedger();
+                if (App.user?.role === 'admin') loadReconciliation();
+            });
+        })();
+
+        function renderCommissionTracker(comm) {
+            if (!comm) return;
+            const volumeEl = document.getElementById('comm-volume');
+            if (!volumeEl) return;
+
+            volumeEl.textContent = App.money(comm.volume || 0);
+            document.getElementById('comm-earned').textContent = App.money(comm.commission || 0);
+            document.getElementById('comm-rate').textContent = comm.current_tier_label || `${comm.current_rate_pct || 1}%`;
+            document.getElementById('comm-per-100').textContent = App.t('ledger.commission.per_100', {
+                amount: App.money(comm.per_100 || 1),
+            });
+
+            const nextEl = document.getElementById('comm-next');
+            if (comm.next_tier && comm.next_tier.remaining > 0) {
+                nextEl.textContent = App.t('ledger.commission.next_detail', {
+                    remaining: App.money(comm.next_tier.remaining),
+                    rate: comm.next_tier.label || `${comm.next_tier.rate_pct}%`,
+                });
+            } else {
+                nextEl.textContent = App.t('ledger.commission.top_tier');
+            }
+
+            const pct = Number(comm.overall_progress_pct) || 0;
+            document.getElementById('comm-overall-pct').textContent = `${pct}%`;
+            const bar = document.getElementById('comm-bar');
+            const wrap = document.getElementById('comm-bar-wrap');
+            if (bar) bar.style.width = `${Math.min(100, pct)}%`;
+            if (wrap) wrap.setAttribute('aria-valuenow', String(Math.min(100, pct)));
+
+            const cards = document.getElementById('comm-tier-cards');
+            if (cards && Array.isArray(comm.breakdown)) {
+                cards.innerHTML = comm.breakdown.map((band) => {
+                    const range = band.max == null
+                        ? `${App.money(band.min)}+`
+                        : `${App.money(band.min)} – ${App.money(band.max)}`;
+                    const current = band.is_current
+                        ? 'border-accent bg-[oklch(0.97_0.03_85)] shadow-sm'
+                        : 'border-border bg-bg-base';
+                    const active = band.active ? 'text-text-primary' : 'text-text-muted';
+                    return `<div class="rounded-xl border p-3 ${current}">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wide ${band.is_current ? 'text-accent' : 'text-text-muted'}">${band.label}</span>
+                            ${band.is_current ? `<span class="badge badge-info text-[10px]">${App.t('ledger.commission.current')}</span>` : ''}
+                        </div>
+                        <p class="text-[11px] text-text-muted mt-1">${range}</p>
+                        <p class="font-mono text-sm font-bold mt-2 ${active}">${App.money(band.commission || 0)}</p>
+                        <p class="text-[11px] text-text-muted">${App.t('ledger.commission.in_tier')}: ${App.money(band.volume_in_tier || 0)}</p>
+                    </div>`;
+                }).join('');
+            }
+
+            const note = document.getElementById('comm-source-note');
+            if (note) {
+                const src = comm.source || 'none';
+                const from = comm.date_from || '';
+                const to = comm.date_to || '';
+                note.textContent = App.t('ledger.commission.source_' + src, {
+                    ledger: App.money(comm.ledger_volume || 0),
+                    reports: App.money(comm.report_volume || 0),
+                    from,
+                    to,
+                });
+            }
+        }
+
+        async function loadLedger() {
+            const employee = document.getElementById('employee-filter').value;
+            const status = document.getElementById('status-filter').value;
+            const commFrom = document.getElementById('commission-from')?.value || '';
+            const commTo = document.getElementById('commission-to')?.value || '';
+            try {
+                const qs = new URLSearchParams({
+                    employee,
+                    status,
+                });
+                if (commFrom) qs.set('commission_from', commFrom);
+                if (commTo) qs.set('commission_to', commTo);
+                const res = await App.api('GET', `/api/libro-interno?${qs.toString()}`);
+
+                document.getElementById('total-owed').textContent = App.money(res.total_owed_to_store);
+                document.getElementById('total-store-owes').textContent = App.money(res.total_store_owes);
+                const netEl = document.getElementById('net-balance');
+                netEl.textContent = App.money(Math.abs(res.difference));
+                netEl.className = `text-2xl font-bold font-mono tabular-nums ${res.difference > 0 ? 'text-success' : res.difference < 0 ? 'text-danger' : ''}`;
+                renderCommissionTracker(res.commission);
+
+                const sel = document.getElementById('employee-filter');
+                const current = sel.disabled ? sel.value : sel.value;
+                if (!sel.disabled) {
+                    const opts = `<option value="">${App.t('ledger.all_employees')}</option>` + res.employees.map(e => `<option value="${e}" ${e === current ? 'selected' : ''}>${e}</option>`).join('');
+                    sel.innerHTML = opts;
+                }
+
+                document.getElementById('employee-datalist').innerHTML = res.employees.map(e => `<option value="${e}">`).join('');
+
+                const tbody = document.getElementById('ledger-tbody');
+                if (!res.entries.length) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-text-muted py-8">${App.t('ledger.no_entries')}</td></tr>`;
+                    return;
+                }
+                const empty = App.t('empty.none');
+                tbody.innerHTML = res.entries.map(e => {
+                    const isPaid = e.status === 'paid';
+                    const owedAmt = parseFloat(e.owed_to_store);
+                    const owesAmt = parseFloat(e.store_owes);
+                    const paidClass = isPaid ? 'opacity-60 line-through' : '';
+                    const statusBadge = isPaid
+                        ? `<span class="badge badge-success">${App.t('ledger.status_paid')}</span>`
+                        : `<span class="badge badge-info">${App.t('ledger.status_open')}</span>`;
+                    const showMarkPaid = canSettleLedger && !isPaid && (owedAmt > 0 || owesAmt > 0);
+                    const showReopen = canSettleLedger && isPaid;
+                    return `
+                    <tr class="${isPaid ? 'opacity-90' : ''}">
+                        <td class="text-sm">${App.formatDate(e.entry_date)}</td>
+                        <td class="font-medium text-sm">${e.employee_name || empty}</td>
+                        <td class="text-sm">${e.description}</td>
+                        <td class="text-right font-mono tabular-nums ${paidClass} ${owedAmt > 0 ? 'text-danger font-semibold' : 'text-text-muted'}">${owedAmt > 0 ? App.money(e.owed_to_store) : empty}</td>
+                        <td class="text-right font-mono tabular-nums ${paidClass} ${owesAmt > 0 ? 'text-success font-semibold' : 'text-text-muted'}">${owesAmt > 0 ? App.money(e.store_owes) : empty}</td>
+                        <td class="text-xs text-text-muted max-w-[200px] truncate">${e.notes || ''}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="flex flex-wrap gap-1">
+                                ${showMarkPaid ? `<button onclick="markPaid(${e.id})" class="btn-secondary text-xs py-1 px-2">${App.t('ledger.mark_paid')}</button>` : ''}
+                                ${showReopen ? `<button onclick="reopenEntry(${e.id})" class="btn-secondary text-xs py-1 px-2">${App.t('ledger.reopen')}</button>` : ''}
+                                ${!isPaid ? `<button onclick="editEntry(${e.id})" class="btn-secondary text-xs py-1 px-2">${App.t('action.edit')}</button>` : ''}
+                                <button onclick="deleteEntry(${e.id})" class="p-1 rounded hover:bg-[oklch(0.65_0.2_25_/_0.15)] text-text-muted hover:text-danger transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+                document.getElementById('ledger-tbody').innerHTML =
+                    `<tr><td colspan="8" class="text-center text-danger py-8">${App.t('ledger.load_failed')}</td></tr>`;
+            }
+        }
+
+        async function editEntry(id) {
+            try {
+                const res = await App.api('GET', '/api/libro-interno?status=all');
+                const entry = res.entries.find(e => e.id == id);
+                if (!entry) return;
+                const form = document.getElementById('ledger-form');
+                form.querySelector('[name=id]').value = entry.id;
+                form.querySelector('[name=entry_date]').value = entry.entry_date;
+                form.querySelector('[name=employee_name]').value = entry.employee_name || '';
+                const me = App.user?.employee;
+                if (me && ['employee', 'cashier'].includes(App.user?.role)) {
+                    form.querySelector('[name=employee_name]').readOnly = true;
+                } else {
+                    form.querySelector('[name=employee_name]').readOnly = false;
+                }
+                form.querySelector('[name=description]').value = entry.description;
+                form.querySelector('[name=owed_to_store]').value = entry.owed_to_store;
+                form.querySelector('[name=store_owes]').value = entry.store_owes;
+                form.querySelector('[name=notes]').value = entry.notes || '';
+                document.getElementById('ledger-modal-title').textContent = App.t('ledger.edit_title');
+                App.openModal('ledger-modal');
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function deleteEntry(id) {
+            if (!confirm(App.t('ledger.confirm_delete'))) return;
+            try {
+                await App.api('POST', '/api/libro-interno', { action: 'delete', id });
+                App.toast(App.t('ledger.entry_deleted'), 'success');
+                loadLedger();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function markPaid(id) {
+            if (!confirm(App.t('ledger.confirm_mark_paid'))) return;
+            try {
+                await App.api('POST', '/api/libro-interno', { action: 'mark_paid', id });
+                App.toast(App.t('ledger.marked_paid'), 'success');
+                loadLedger();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function reopenEntry(id) {
+            try {
+                await App.api('POST', '/api/libro-interno', { action: 'reopen', id });
+                App.toast(App.t('ledger.reopened'), 'success');
+                loadLedger();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        let reconDateFrom = '';
+        let reconDateTo = '';
+
+        async function loadReconciliation() {
+            if (App.user?.role !== 'admin') return;
+
+            reconDateFrom = document.getElementById('recon-date-from').value;
+            reconDateTo = document.getElementById('recon-date-to').value;
+            const q = `scope=all&date_from=${encodeURIComponent(reconDateFrom)}&date_to=${encodeURIComponent(reconDateTo)}`;
+
+            try {
+                const [summaryRes, varRes] = await Promise.all([
+                    App.api('GET', `/api/reconciliation?action=summary&${q}`),
+                    App.api('GET', `/api/reconciliation?action=variances&${q}&status=open`),
+                ]);
+
+                document.getElementById('recon-total-cents').textContent = App.money(summaryRes.total_cents || 0);
+                document.getElementById('recon-reports-count').textContent = String(summaryRes.reports?.length || 0);
+                document.getElementById('recon-variance-count').textContent = String(varRes.variances?.length || 0);
+
+                const storeCards = document.getElementById('recon-store-cards');
+                const totals = summaryRes.store_totals || [];
+                if (!totals.length) {
+                    storeCards.innerHTML = `<p class="text-sm text-text-muted col-span-full">${App.t('recon.no_data')}</p>`;
+                } else {
+                    storeCards.innerHTML = totals.map(st => `
+                        <div class="rounded-xl border border-border p-4 bg-bg-surface">
+                            <p class="font-semibold text-sm">${st.store_name}</p>
+                            <p class="text-xs text-text-muted mt-1">${st.cambio_count} ${App.t('recon.checks_short')} · ${st.giros_count} ${App.t('recon.transfers_short')}</p>
+                            <p class="text-lg font-bold font-mono tabular-nums text-warning mt-2">${App.money(st.cents_lost || 0)}</p>
+                            <p class="text-xs text-text-muted">${st.report_count || 0} ${App.t('recon.reports_short')}</p>
+                        </div>
+                    `).join('');
+                }
+
+                const summaryBody = document.getElementById('recon-summary-tbody');
+                if (!summaryRes.summary?.length) {
+                    summaryBody.innerHTML = `<tr><td colspan="7" class="text-center text-text-muted py-6">${App.t('recon.no_data')}</td></tr>`;
+                } else {
+                    summaryBody.innerHTML = summaryRes.summary.map(row => {
+                        const posted = row.posted_to_ledger;
+                        const canPost = !posted && parseFloat(row.cents_lost) > 0;
+                        const statusBadge = posted
+                            ? `<span class="badge badge-success">${App.t('recon.posted')}</span>`
+                            : `<span class="badge badge-warning">${App.t('recon.pending')}</span>`;
+                        const companyEsc = String(row.company).replace(/'/g, "\\'");
+                        const postBtn = canPost
+                            ? `<button type="button" class="btn-primary text-xs py-1 px-3" onclick="postCents(${row.store_id}, '${companyEsc}')">${App.t('recon.post_to_ledger')}</button>`
+                            : '';
+                        return `<tr>
+                            <td class="font-medium text-sm">${row.store_name || '—'}</td>
+                            <td class="text-sm">${row.company}</td>
+                            <td class="text-right font-mono tabular-nums">${row.cambio_count || 0}</td>
+                            <td class="text-right font-mono tabular-nums">${row.giros_count || 0}</td>
+                            <td class="text-right font-mono tabular-nums text-warning font-semibold">${App.money(row.cents_lost || 0)}</td>
+                            <td>${statusBadge}</td>
+                            <td>${postBtn}</td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                const reportsBody = document.getElementById('recon-reports-tbody');
+                if (!summaryRes.reports?.length) {
+                    reportsBody.innerHTML = `<tr><td colspan="5" class="text-center text-text-muted py-6">${App.t('recon.no_reports')}</td></tr>`;
+                } else {
+                    reportsBody.innerHTML = summaryRes.reports.map(r => `
+                        <tr>
+                            <td class="font-medium text-sm">${r.store_name}</td>
+                            <td class="text-sm">${r.company || 'Barri'}</td>
+                            <td class="text-sm">${App.formatDate(r.report_date_from)} – ${App.formatDate(r.report_date_to)}</td>
+                            <td class="text-right font-mono tabular-nums">${r.total_transactions || 0}</td>
+                            <td class="text-xs text-text-muted max-w-[220px] truncate" title="${r.original_name || ''}">${r.original_name || '—'}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                const varBody = document.getElementById('recon-variances-tbody');
+                if (!varRes.variances?.length) {
+                    varBody.innerHTML = `<tr><td colspan="7" class="text-center text-text-muted py-6">${App.t('recon.no_variances')}</td></tr>`;
+                } else {
+                    varBody.innerHTML = varRes.variances.map(v => {
+                        const diff = parseFloat(v.diff_amount);
+                        return `<tr>
+                            <td class="text-sm">${App.formatDate(v.variance_date)}</td>
+                            <td class="text-sm font-medium">${v.store_name || '—'}</td>
+                            <td class="text-sm">${v.company}</td>
+                            <td class="text-right font-mono tabular-nums">${App.money(v.excel_amount)}</td>
+                            <td class="text-right font-mono tabular-nums">${App.money(v.report_amount)}</td>
+                            <td class="text-right font-mono tabular-nums ${diff !== 0 ? 'text-danger font-semibold' : ''}">${App.money(diff)}</td>
+                            <td><button type="button" class="btn-secondary text-xs py-1 px-3" onclick="dismissVariance(${v.id})">${App.t('recon.dismiss')}</button></td>
+                        </tr>`;
+                    }).join('');
+                }
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function postCents(storeId, company) {
+            if (!confirm(App.t('recon.confirm_post'))) return;
+            const periodMonth = reconDateFrom.slice(0, 7);
+            try {
+                await App.api('POST', '/api/reconciliation', {
+                    action: 'post_cents',
+                    store_id: storeId,
+                    company,
+                    period_month: periodMonth,
+                    date_from: reconDateFrom,
+                    date_to: reconDateTo,
+                });
+                App.toast(App.t('recon.posted_success'), 'success');
+                loadReconciliation();
+                loadLedger();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function dismissVariance(id) {
+            try {
+                await App.api('POST', '/api/reconciliation', {
+                    action: 'dismiss_variance',
+                    id,
+                });
+                App.toast(App.t('recon.dismissed'), 'success');
+                loadReconciliation();
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+    </script>
+</body>
+</html>

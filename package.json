@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "test": "bash scripts/run-tests.sh"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^4.0.379",
+    "xlsx": "^0.18.5"
+  },
+  "name": "tienda-hispana-el-rey",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Sitio y sistema administrativo de Tienda Hispana El Rey"
+}
