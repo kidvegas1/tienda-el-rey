@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/helpers.php';
 
 auth_start();
+app_enforce_canonical_host();
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 

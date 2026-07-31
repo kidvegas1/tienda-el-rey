@@ -2,6 +2,35 @@
 
 require_once __DIR__ . '/storage.php';
 
+/**
+ * Redirect Render/default hostnames to the canonical APP_URL domain.
+ */
+function app_enforce_canonical_host(): void {
+    if (PHP_SAPI === 'cli' || PHP_SAPI === 'cli-server') {
+        return;
+    }
+
+    $canonicalHost = parse_url(APP_URL, PHP_URL_HOST);
+    if (!$canonicalHost) {
+        return;
+    }
+
+    $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
+    if ($host === '' || $host === strtolower($canonicalHost)) {
+        return;
+    }
+
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    if ($method !== 'GET' && $method !== 'HEAD') {
+        return;
+    }
+
+    $scheme = parse_url(APP_URL, PHP_URL_SCHEME) ?: 'https';
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    header('Location: ' . $scheme . '://' . $canonicalHost . $uri, true, 301);
+    exit;
+}
+
 function money(float|string|null $amount): string {
     return number_format((float)($amount ?? 0), 2, '.', ',');
 }

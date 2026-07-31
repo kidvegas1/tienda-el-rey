@@ -21,7 +21,7 @@ services:
       - key: APP_NAME
         value: Tienda Hispana El Rey
       - key: APP_URL
-        sync: false
+        value: https://tiendarey.com
       - key: DATABASE_URL
         sync: false
       - key: SUPABASE_URL
