@@ -8,3 +8,5 @@ node_modules/
 *.log
 .vercel
 .gstack/
+assets/DOCS/*.pdf
+assets/DOCS/*.xlsx
