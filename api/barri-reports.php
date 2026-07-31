@@ -1174,7 +1174,66 @@ if ($method === 'POST') {
     }
 
     if ($act === 'delete') {
-        json_error('Uploaded reports are retained and cannot be deleted.', 403);
+        auth_require_admin();
+        validate_required($data, ['report_id']);
+        $reportId = (int)$data['report_id'];
+
+        $stmt = $pdo->prepare('SELECT * FROM barri_reports WHERE id = ?');
+        $stmt->execute([$reportId]);
+        $report = $stmt->fetch();
+        if (!$report) json_error('Report not found', 404);
+
+        $reportStoreId = (int)$report['store_id'];
+
+        // Transfers that were synced to client records from this report.
+        $tidStmt = $pdo->prepare('SELECT transfer_id FROM barri_transactions WHERE report_id = ? AND transfer_id IS NOT NULL');
+        $tidStmt->execute([$reportId]);
+        $transferIds = array_map('intval', array_column($tidStmt->fetchAll(), 'transfer_id'));
+
+        $pdo->beginTransaction();
+        try {
+            if ($transferIds) {
+                $ph = implode(',', array_fill(0, count($transferIds), '?'));
+                // Security alerts reference transfers without cascade; detach first.
+                $pdo->prepare("UPDATE transfer_security_alerts SET transfer_id = NULL WHERE transfer_id IN ($ph)")
+                    ->execute($transferIds);
+            }
+            $pdo->prepare('DELETE FROM accounting_entries WHERE source_report_id = ?')->execute([$reportId]);
+            $pdo->prepare('DELETE FROM reconciliation_variances WHERE barri_report_id = ?')->execute([$reportId]);
+            // Cascades barri_transactions rows.
+            $pdo->prepare('DELETE FROM barri_reports WHERE id = ?')->execute([$reportId]);
+            if ($transferIds) {
+                $ph = implode(',', array_fill(0, count($transferIds), '?'));
+                $pdo->prepare("DELETE FROM transfers WHERE id IN ($ph) AND source = 'report_import'")
+                    ->execute($transferIds);
+            }
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+
+        // Remove the stored PDF (best effort — DB is already consistent).
+        if (!empty($report['filename'])) {
+            try {
+                storage_delete($report['filename']);
+            } catch (Throwable $e) {
+                error_log('[barri-reports] storage delete after report delete: ' . $e->getMessage());
+            }
+        }
+
+        try {
+            require_once __DIR__ . '/../includes/reconciliation.php';
+            recon_refresh_report_period($pdo, $reportStoreId, $report['report_date_from'], $report['report_date_to']);
+        } catch (Throwable $e) {
+            error_log('[barri-reports] reconciliation refresh after delete: ' . $e->getMessage());
+        }
+
+        json_response([
+            'success' => true,
+            'deleted_report_id' => $reportId,
+            'deleted_transfers' => count($transferIds),
+        ]);
     }
 
     json_error('Unknown action');

@@ -74,6 +74,22 @@ function storage_upload(string $localPath, string $bucket, string $objectPath): 
 }
 
 /**
+ * Best-effort delete of a stored object. Returns true when removed.
+ */
+function storage_delete(string $storedPath): bool {
+    $parsed = storage_parse_uri($storedPath);
+    if ($parsed === null) {
+        return false;
+    }
+    [$bucket, $objectPath] = $parsed;
+    $url = rtrim(SUPABASE_URL, '/') . '/storage/v1/object/' . rawurlencode($bucket) . '/' . storage_encode_object_path($objectPath);
+    $response = storage_http_request('DELETE', $url, null, [
+        'Authorization: Bearer ' . SUPABASE_SERVICE_ROLE_KEY,
+    ]);
+    return $response['code'] >= 200 && $response['code'] < 300;
+}
+
+/**
  * Create a time-limited signed URL for a private object.
  */
 function storage_signed_url(string $bucket, string $objectPath, int $expiresSeconds = 3600): string {

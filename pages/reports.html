@@ -552,6 +552,21 @@
         </div>
     </div>
 
+    <!-- Delete Report Modal -->
+    <div class="modal-backdrop" id="delete-report-modal-backdrop"></div>
+    <div class="modal-content" id="delete-report-modal">
+        <h3 class="text-lg font-semibold text-text-primary mb-2" data-i18n="reports.delete_modal.title">Delete Report</h3>
+        <p class="text-sm text-text-secondary mb-2" data-i18n="reports.delete_modal.body">This will permanently delete this report and all its transactions. This action cannot be undone.</p>
+        <p class="text-sm font-mono text-text-primary mb-6" id="delete-report-label"></p>
+        <div class="flex items-center justify-end gap-3">
+            <button class="btn-secondary" id="btn-delete-report-cancel"><span data-i18n="action.cancel">Cancel</span></button>
+            <button class="btn-danger" id="btn-delete-report-confirm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span data-i18n="reports.delete_modal.confirm">Delete Report</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Reassign Store Modal -->
     <div class="modal-backdrop" id="reassign-modal-backdrop"></div>
     <div class="modal-content" id="reassign-modal">
@@ -736,6 +751,37 @@
 
             document.getElementById('btn-reassign-cancel').addEventListener('click', () => App.closeModal('reassign-modal'));
             document.getElementById('btn-reassign-confirm').addEventListener('click', () => this.confirmReassign());
+
+            document.getElementById('btn-delete-report-cancel').addEventListener('click', () => App.closeModal('delete-report-modal'));
+            document.getElementById('btn-delete-report-confirm').addEventListener('click', () => this.confirmDeleteReport());
+        },
+
+        deleteReportId: null,
+
+        openDeleteModal(reportId, label) {
+            this.deleteReportId = reportId;
+            document.getElementById('delete-report-label').textContent = label || `#${reportId}`;
+            App.openModal('delete-report-modal');
+        },
+
+        async confirmDeleteReport() {
+            if (!this.deleteReportId) return;
+            const btn = document.getElementById('btn-delete-report-confirm');
+            btn.disabled = true;
+            try {
+                await App.api('POST', '/api/barri-reports', {
+                    action: 'delete',
+                    report_id: this.deleteReportId,
+                });
+                App.closeModal('delete-report-modal');
+                this.deleteReportId = null;
+                App.toastKey('reports.delete_success', 'success');
+                this.loadReports();
+            } catch (err) {
+                App.toast(err.message && err.message.length < 220 ? err.message : this.t('reports.delete_failed'), 'danger');
+            } finally {
+                btn.disabled = false;
+            }
         },
 
         reassignReportId: null,
@@ -859,6 +905,10 @@
                         ? `<button class="p-1.5 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-accent transition-colors" onclick="Reports.openReassignModal(${r.id}, ${r.store_id})" title="${this.t('reports.action.reassign')}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M2 7h20"/><path d="m9 15 3 3 3-3"/></svg>
                             </button>` : '';
+                    const deleteBtn = isAdmin
+                        ? `<button class="p-1.5 rounded-lg hover:bg-danger/10 text-text-muted hover:text-danger transition-colors" onclick="Reports.openDeleteModal(${r.id}, '${this.esc(r.date_from)} — ${this.esc(r.date_to)}')" title="${this.t('reports.action.delete')}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            </button>` : '';
                     return `<tr class="${r.finance_class === 'side_finances' ? 'finance-side-row' : ''}">
                         <td class="text-text-primary font-mono text-sm whitespace-nowrap">${this.esc(r.date_from)} — ${this.esc(r.date_to)}</td>
                         <td class="text-text-secondary text-sm">${this.esc(r.agency_name)}${companyBadge}${sideBadge}${storeBadge}</td>
@@ -875,6 +925,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                 </button>
                                 ${reassignBtn}
+                                ${deleteBtn}
                             </div>
                         </td>
                     </tr>`;
@@ -1193,6 +1244,14 @@
 
             document.getElementById('parse-status').textContent = this.t('reports.parse_status.parsing_transactions');
             const allText = allLines.join(' ');
+
+            const isRiaTxnReport = /Reporte de Transacciones/i.test(allText) && /Cantidad enviada/i.test(allText);
+            if (isRiaTxnReport) {
+                console.log('[Report Parser] Detected RIA TRANSACTION REPORT format');
+                const riaParsed = this.parseRiaTransactionReport(allLines);
+                if (riaParsed?.transactions?.length) return riaParsed;
+            }
+
             const isRiaTxnSearch = /B[uú]squeda de Transacciones/i.test(allText)
                 || ((/Ria Money Transfer|Dandelion Payments/i.test(allText)) && /Env[ií]os de Dinero/i.test(allText));
 
@@ -1732,6 +1791,139 @@
             }
         },
 
+        // ── Ria "Reporte de Transacciones" (operational transaction report) PDF/paste ──
+        // Sections: Envíos de Dinero (remittances), Cambio de Cheques (check cashing).
+        // Cheques en Grupo (HSCP) is excluded — the report's own Gran Total excludes it.
+        parseRiaTransactionReport(lines) {
+            const allText = lines.join(' ');
+            const result = {
+                agency_number: '', agency_name: '', agency_address: '', operator_number: '',
+                date_from: '', date_to: '', currency: 'USD',
+                beginning_balance: 0, ending_balance: 0,
+                company: 'Ria',
+                transactions: [],
+                totals: { qty: 0, principal: 0, fee: 0, tax: 0, total: 0, agcomm: 0, var_fee: 0, var_fx: 0 },
+            };
+
+            const range = allText.match(/Fecha Inicial:\s*(\d{1,2}\/\d{1,2}\/\d{2,4})[\s\S]*?Fecha Final:\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i)
+                || allText.match(/(\d{1,2}\/\d{1,2}\/\d{4})\s+(\d{1,2}\/\d{1,2}\/\d{4})/);
+            if (range) {
+                result.date_from = this.parseBarriDate(range[1]);
+                result.date_to = this.parseBarriDate(range[2]);
+            }
+
+            // Prefer "Agency Name (TX1234)" where the name is not just the code repeated.
+            for (const raw of lines) {
+                const m = raw.replace(/\s+/g, ' ').trim().match(/([A-Za-z][\w\s#.&'-]{2,}?)\s*\(\s*([A-Z]{1,3}\d{3,6})\s*\)/);
+                if (!m) continue;
+                if (!result.agency_number) result.agency_number = m[2];
+                if (m[1].trim().toUpperCase() !== m[2].toUpperCase()) {
+                    result.agency_name = m[1].trim();
+                    result.agency_number = m[2];
+                    break;
+                }
+            }
+            if (!result.agency_name) result.agency_name = 'Ria Agency';
+
+            const num = (s) => parseFloat(String(s).replace(/,/g, '')) || 0;
+            // US1234567890 7/1/2026 CLIENT NAME 4009 852.27 USD 10.00 8.52 0.00 870.79 5.00
+            const envioRe = /^(US\d{8,12})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(.+?)\s+(\d{1,6})\s+(-?[\d,]+\.\d{2})\s+USD\s+(-?[\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})$/;
+            // 253588364 7/2/2026 7/2/2026 1438 ISSUER Client Name -782.00 USD 0.25 0.00
+            const chequeRe = /^(\d{6,12})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(\S+)\s+(.+?)\s+(-?[\d,]+\.\d{2})\s+USD\s+(-?[\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})$/;
+
+            let section = '';
+            let lastTxn = null;
+            for (const rawLine of lines) {
+                const line = rawLine.replace(/\s+/g, ' ').trim();
+                if (!line) continue;
+
+                if (/^No\. de Orden Fecha de la orden/i.test(line)) { section = 'envios'; lastTxn = null; continue; }
+                if (/^No\. Transaccion Fecha de la transacci/i.test(line)) { section = 'cheques'; lastTxn = null; continue; }
+                if (/^No\. de grupo Fecha de Transacci/i.test(line)) { section = 'grupo'; lastTxn = null; continue; }
+                if (/^(Env[ií]os de Dinero|Cambio de Cheques|Cheques en Grupo)\s*\((?:HSCP\)\s*\()?\d+\)/i.test(line)) { section = ''; lastTxn = null; continue; }
+
+                const granTotal = line.match(/^Gran Total\s+(\d+)\s+(-?[\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})\s+USD\s+([\d,]+\.\d{2})$/i);
+                if (granTotal) {
+                    result.totals = {
+                        qty: parseInt(granTotal[1], 10),
+                        principal: num(granTotal[2]),
+                        tax: num(granTotal[3]),
+                        fee: num(granTotal[4]) + num(granTotal[6]),
+                        total: num(granTotal[7]),
+                        agcomm: num(granTotal[8]),
+                        var_fee: 0, var_fx: 0,
+                    };
+                    continue;
+                }
+
+                if (section === 'envios') {
+                    const m = line.match(envioRe);
+                    if (m) {
+                        lastTxn = {
+                            time: '00:00', type: 'giros',
+                            reference: m[1],
+                            customer_name: m[3].trim(),
+                            beneficiary: '',
+                            operator: result.agency_number || '',
+                            qty: 1,
+                            principal: num(m[5]), fee: num(m[6]), tax: num(m[7]),
+                            total: num(m[9]),
+                            balance: 0, agcomm: num(m[10]), var_fee: 0, var_fx: 0,
+                            transaction_date: this.parseBarriDate(m[2]) || result.date_from,
+                        };
+                        result.transactions.push(lastTxn);
+                        continue;
+                    }
+                } else if (section === 'cheques') {
+                    const m = line.match(chequeRe);
+                    if (m) {
+                        lastTxn = {
+                            time: '00:00', type: 'cambio_cheque',
+                            reference: m[1],
+                            customer_name: m[5].trim(),
+                            beneficiary: '',
+                            operator: result.agency_number || '',
+                            qty: 1,
+                            principal: num(m[6]), fee: num(m[7]), tax: 0,
+                            total: num(m[6]) + num(m[7]),
+                            balance: 0, agcomm: num(m[8]), var_fee: 0, var_fx: 0,
+                            transaction_date: this.parseBarriDate(m[2]) || result.date_from,
+                        };
+                        result.transactions.push(lastTxn);
+                        continue;
+                    }
+                } else if (section === 'grupo') {
+                    continue;
+                }
+
+                // Wrapped customer/issuer name continuation (pure text lines only)
+                if (lastTxn && section && /^[A-Za-z][A-Za-z\s&.,'-]*$/.test(line)) {
+                    lastTxn.customer_name = (lastTxn.customer_name + ' ' + line).trim();
+                }
+            }
+
+            if (!result.totals.qty && result.transactions.length) {
+                result.totals.qty = result.transactions.length;
+                result.totals.principal = result.transactions.reduce((s, t) => s + t.principal, 0);
+                result.totals.fee = result.transactions.reduce((s, t) => s + t.fee, 0);
+                result.totals.tax = result.transactions.reduce((s, t) => s + t.tax, 0);
+                result.totals.total = result.transactions.reduce((s, t) => s + t.total, 0);
+                result.totals.agcomm = result.transactions.reduce((s, t) => s + t.agcomm, 0);
+            }
+            if (!result.date_from && result.transactions.length) {
+                const dates = result.transactions.map(t => t.transaction_date).filter(Boolean).sort();
+                result.date_from = dates[0] || '';
+                result.date_to = dates[dates.length - 1] || result.date_from;
+            }
+
+            console.log('[Ria Txn Report] Parsed:', {
+                agency: result.agency_number, name: result.agency_name,
+                from: result.date_from, to: result.date_to,
+                txns: result.transactions.length, totals: result.totals,
+            });
+            return result;
+        },
+
         // DD/MM/YYYY → YYYY-MM-DD
         parseDMYDate(str) {
             if (!str) return '';
@@ -1850,6 +2042,14 @@
             if (isViamericas) {
                 console.log('[Report Parser] Detected VIAMERICAS format');
                 return finish(this.parseViamericasFormat(lines));
+            }
+
+            // Detect Ria "Reporte de Transacciones" (operational transaction report)
+            const isRiaTxnReport = /Reporte de Transacciones/i.test(allText) && /Cantidad enviada/i.test(allText);
+            if (isRiaTxnReport) {
+                console.log('[Report Parser] Detected RIA TRANSACTION REPORT format (text)');
+                const riaReportParsed = this.parseRiaTransactionReport(lines);
+                if (riaReportParsed?.transactions?.length) return finish(riaReportParsed);
             }
 
             // Detect Ria Transaction Search export (Búsqueda de Transacciones)
