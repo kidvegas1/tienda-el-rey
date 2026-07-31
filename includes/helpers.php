@@ -126,7 +126,7 @@ function upload_file(array $file, string $subdir = ''): string|false {
         $bucket = storage_bucket_for_subdir($subdir);
         $objectPath = ($subdir !== '' ? $subdir . '/' : '') . $name;
         try {
-            return storage_upload($file['tmp_name'], $bucket, $objectPath);
+            return storage_upload($file['tmp_name'], $bucket, $objectPath, (string)($file['name'] ?? ''));
         } catch (Throwable $e) {
             error_log('[storage] upload failed: ' . $e->getMessage());
             return false;

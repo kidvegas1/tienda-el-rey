@@ -63,9 +63,28 @@ function storage_path_in_subdir(string $storedPath, string $subdir): bool {
 }
 
 /**
- * Upload a local file to Supabase Storage. Returns storage:// URI on success.
+ * Resolve the MIME type sent to Storage.
+ *
+ * XLSX containers are ZIP archives, so fileinfo commonly reports
+ * application/zip. Supabase validates Content-Type against the bucket's
+ * allowed MIME types and requires the official spreadsheet type.
  */
-function storage_upload(string $localPath, string $bucket, string $objectPath): string {
+function storage_upload_content_type(string $localPath, string $originalName = ''): string {
+    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    return match ($ext) {
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'xls' => 'application/vnd.ms-excel',
+        default => mime_content_type($localPath) ?: 'application/octet-stream',
+    };
+}
+
+/** Upload a local file to Supabase Storage. Returns storage:// URI on success. */
+function storage_upload(
+    string $localPath,
+    string $bucket,
+    string $objectPath,
+    string $originalName = ''
+): string {
     if (!is_file($localPath)) {
         throw new RuntimeException('Upload source file not found');
     }
@@ -73,7 +92,7 @@ function storage_upload(string $localPath, string $bucket, string $objectPath): 
     $objectPath = ltrim(str_replace('\\', '/', $objectPath), '/');
     $url = rtrim(SUPABASE_URL, '/') . '/storage/v1/object/' . rawurlencode($bucket) . '/' . storage_encode_object_path($objectPath);
 
-    $mime = mime_content_type($localPath) ?: 'application/octet-stream';
+    $mime = storage_upload_content_type($localPath, $originalName);
     $body = file_get_contents($localPath);
     if ($body === false) {
         throw new RuntimeException('Failed to read upload source file');
