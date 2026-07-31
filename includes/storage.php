@@ -43,6 +43,25 @@ function storage_is_remote(string $storedPath): bool {
     return storage_parse_uri($storedPath) !== null;
 }
 
+/** True when a stored path points at a known upload subdir (local disk or Supabase bucket). */
+function storage_path_in_subdir(string $storedPath, string $subdir): bool {
+    $subdir = trim($subdir, '/');
+    if ($subdir === '') {
+        return false;
+    }
+    $normalized = ltrim(str_replace('\\', '/', $storedPath), '/');
+    if (str_starts_with($normalized, 'assets/uploads/' . $subdir . '/')) {
+        return true;
+    }
+    $parsed = storage_parse_uri($storedPath);
+    if ($parsed === null) {
+        return false;
+    }
+    [$bucket, $objectPath] = $parsed;
+    return $bucket === storage_bucket_for_subdir($subdir)
+        && str_starts_with($objectPath, $subdir . '/');
+}
+
 /**
  * Upload a local file to Supabase Storage. Returns storage:// URI on success.
  */

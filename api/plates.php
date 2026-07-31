@@ -1,6 +1,6 @@
 <?php
 $user = auth_require();
-$method = get_method();
+json_error('This module has been retired. Use Inventory instead.', 410);
 $pdo = db();
 
 if ($method === 'GET') {

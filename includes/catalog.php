@@ -24,8 +24,7 @@ function catalog_is_public_image_ref(string $ref): bool {
     }
     $normalized = ltrim(str_replace('\\', '/', $ref), '/');
     if (storage_is_remote($ref)) {
-        $parsed = storage_parse_uri($ref);
-        return $parsed !== null && $parsed[0] === 'inventory';
+        return storage_path_in_subdir($ref, 'inventory');
     }
     return (bool) preg_match('#^assets/uploads/inventory/[A-Za-z0-9._/-]+$#', $normalized);
 }

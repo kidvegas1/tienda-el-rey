@@ -355,6 +355,12 @@ const App = {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         if (toggle && sidebar) {
+            if (!toggle.getAttribute('aria-label')) {
+                toggle.setAttribute('aria-label', this.t('action.open_menu'));
+            }
+            if (!toggle.getAttribute('type')) {
+                toggle.setAttribute('type', 'button');
+            }
             toggle.addEventListener('click', () => {
                 sidebar.classList.toggle('open');
                 overlay?.classList.toggle('open');
@@ -381,8 +387,8 @@ const App = {
         const page = location.pathname.split('/').pop() || 'dashboard';
         if (role === 'admin') return;
         // Keep in sync with includes/auth.php auth_admin_only_paths() + reports-center.
-        const adminOnly = ['stores', 'employees', 'analytics', 'security', 'reports-center'];
-        const managerPlus = ['import'];
+        const adminOnly = ['stores', 'employees', 'analytics', 'metas', 'security', 'reports-center'];
+        const managerPlus = ['import', 'sales-log'];
         document.querySelectorAll('.sidebar-link').forEach(link => {
             const href = link.getAttribute('href');
             if (adminOnly.includes(href)) {
@@ -398,7 +404,7 @@ const App = {
     },
 
     initStoreSelector() {
-        const sels = document.querySelectorAll('select#store-selector');
+        const sels = document.querySelectorAll('select#store-selector, select#store-selector-sidebar');
         if (!sels.length) return;
         const isAdmin = this.user?.role === 'admin';
         sels.forEach(sel => {

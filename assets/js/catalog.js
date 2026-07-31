@@ -1,10 +1,10 @@
 (function () {
     'use strict';
 
-    const LANG_KEY = 'el-rey-lang';
+    const LANG_KEY = 'app_lang';
 
     function detectLang() {
-        const saved = localStorage.getItem(LANG_KEY);
+        const saved = localStorage.getItem(LANG_KEY) || localStorage.getItem('el-rey-lang');
         if (saved === 'en' || saved === 'es') return saved;
         const nav = (navigator.language || 'es').toLowerCase();
         return nav.startsWith('en') ? 'en' : 'es';

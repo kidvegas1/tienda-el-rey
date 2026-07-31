@@ -672,7 +672,8 @@
             }
 
             window.addEventListener('popstate', () => {
-                const id = parseInt(new URLSearchParams(window.location.search).get('client_id') || '', 10);
+                const params = new URLSearchParams(window.location.search);
+                const id = parseInt(params.get('client_id') || params.get('id') || '', 10);
                 if (Number.isFinite(id) && id > 0) {
                     openClient(id, { skipHistory: true });
                 } else if (currentClientId) {

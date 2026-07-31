@@ -657,7 +657,8 @@
                 }).join('');
             } catch (err) {
                 console.error('Failed to load import history:', err);
-                document.getElementById('history-tbody').innerHTML = `<tr><td colspan="6" class="text-center text-text-muted py-8">${App.t('import.load_failed')}</td></tr>`;
+                App.toast(err.message || App.t('import.load_failed'), 'danger');
+                document.getElementById('history-tbody').innerHTML = `<tr><td colspan="6" class="text-center text-danger py-8">${App.t('import.load_failed')}</td></tr>`;
             }
         }
 

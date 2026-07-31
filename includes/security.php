@@ -61,3 +61,25 @@ function get_json_body(): array {
 function get_method(): string {
     return $_SERVER['REQUEST_METHOD'];
 }
+
+/** Bounded login attempt tracking (per email + IP). */
+function auth_login_rate_limit(string $email): void {
+    $email = strtolower(trim($email));
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $key = hash('sha256', $email . '|' . $ip);
+    $file = sys_get_temp_dir() . '/tienda_login_' . $key;
+    $window = 900;
+    $maxAttempts = 12;
+    $now = time();
+    $attempts = [];
+    if (is_file($file)) {
+        $raw = @file_get_contents($file);
+        $attempts = $raw ? (json_decode($raw, true) ?: []) : [];
+    }
+    $attempts = array_values(array_filter($attempts, static fn($ts) => ($now - (int)$ts) < $window));
+    if (count($attempts) >= $maxAttempts) {
+        json_error('Too many login attempts. Try again in a few minutes.', 429);
+    }
+    $attempts[] = $now;
+    @file_put_contents($file, json_encode($attempts));
+}

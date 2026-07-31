@@ -272,13 +272,11 @@ function auth_require_stored_path_access(string $storedPath): void {
     if ($storedPath === '') {
         json_error('Access denied', 403);
     }
-    // Inventory product images are shared across authenticated staff.
-    $normalized = ltrim(str_replace('\\', '/', $storedPath), '/');
+    // Inventory/receipt images live under assets/uploads/* or storage://client-ids/*.
     if (
-        str_starts_with($normalized, 'assets/uploads/inventory/')
-        || str_starts_with($storedPath, 'storage://inventory/')
-        || str_starts_with($normalized, 'assets/uploads/receipts/')
-        || str_starts_with($storedPath, 'storage://receipts/')
+        storage_path_in_subdir($storedPath, 'inventory')
+        || storage_path_in_subdir($storedPath, 'receipts')
+        || storage_path_in_subdir($storedPath, 'caja-checks')
     ) {
         return;
     }

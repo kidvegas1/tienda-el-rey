@@ -7,6 +7,7 @@ $method = get_method();
 $pdo = db();
 require_once __DIR__ . '/../includes/reconciliation.php';
 require_once __DIR__ . '/../includes/settings.php';
+require_once __DIR__ . '/../includes/commission.php';
 
 if ($method !== 'GET') {
     json_error('Method not allowed', 405);
@@ -78,16 +79,17 @@ $barriStmt->execute(array_merge([$dateFrom, $dateTo], $storeParams));
 $barriRows = $barriStmt->fetchAll();
 
 $giros = ['count' => 0, 'volume' => 0.0, 'fees' => 0.0, 'tax' => 0.0, 'commission' => 0.0];
-$cambio = ['count' => 0, 'volume' => 0.0, 'fees' => 0.0, 'tax' => 0.0, 'commission' => 0.0, 'cents_lost' => 0.0];
+$cambio = ['count' => 0, 'volume' => 0.0, 'fees' => 0.0, 'tax' => 0.0, 'commission' => 0.0, 'cents_lost' => 0.0, 'tier_commission' => 0.0];
 
 foreach ($barriRows as $row) {
     $type = (string)($row['transaction_type'] ?? '');
     $norm = str_replace(' ', '_', strtolower(trim($type)));
-    $isCambio = recon_is_cambio_type($type);
+    $principal = abs((float)$row['principal']);
+    $isCheckCashing = commission_is_check_cashing_type($type);
     $isGiros = $norm === 'giros' || $norm === 'money_transfer';
-    if ($isCambio) {
+    if ($isCheckCashing) {
         $cambio['count']++;
-        $cambio['volume'] += (float)$row['principal'];
+        $cambio['volume'] += $principal;
         $cambio['fees'] += (float)$row['fee'];
         $cambio['tax'] += (float)$row['tax'];
         $cambio['commission'] += (float)$row['ag_commission'];
@@ -126,8 +128,13 @@ foreach (['volume', 'fees', 'tax', 'commission', 'cents_lost'] as $k) {
     $cambio[$k] = round($cambio[$k], 2);
 }
 
+$checkCommission = commission_tracker_payload($pdo, $storeId, $dateFrom, $dateTo);
+$cambio['tier_commission'] = round((float)($checkCommission['commission'] ?? 0), 2);
+$cambio['effective_rate_pct'] = round((float)($checkCommission['current_rate_pct'] ?? 0), 2);
+$cambio['check_count'] = (int)($checkCommission['check_count'] ?? $cambio['count']);
+
 $girosProfit = round($giros['commission'] > 0 ? $giros['commission'] : $giros['fees'], 2);
-$cambioProfit = round($cambio['fees'] + $cambio['commission'] - $cambio['cents_lost'], 2);
+$cambioProfit = round($cambio['tier_commission'] + $cambio['fees'] - $cambio['cents_lost'], 2);
 
 // ── Receipt expenses + tax paid on purchases ──
 $receiptSql = "SELECT
@@ -156,7 +163,8 @@ $acctTaxPaid = (float)(($taxPayStmt->fetch() ?: [])['tax_paid'] ?? 0);
 
 $taxesPaid = round($receiptTaxPaid + $acctTaxPaid, 2);
 $totalProfit = round($invProfit + $girosProfit + $cambioProfit - $expenses, 2);
-$totalRevenue = round($invRevenue + $girosProfit + $cambio['fees'] + $cambio['commission'], 2);
+$operatingIncome = round($invRevenue + $girosProfit + $cambioProfit, 2);
+$totalRevenue = $operatingIncome;
 $taxCollected = round($invTax + $giros['tax'] + $cambio['tax'], 2);
 
 $ledgerSql = "SELECT
@@ -224,11 +232,13 @@ $payload = [
             'profit'     => $girosProfit,
         ],
         'cambio' => [
-            'count'      => $cambio['count'],
-            'volume'     => $cambio['volume'],
+            'count'      => $cambio['check_count'] ?: $cambio['count'],
+            'volume'     => round($checkCommission['volume'] ?? $cambio['volume'], 2),
             'fees'       => $cambio['fees'],
             'tax'        => $cambio['tax'],
             'commission' => $cambio['commission'],
+            'tier_commission' => $cambio['tier_commission'],
+            'effective_rate_pct' => $cambio['effective_rate_pct'],
             'cents_lost' => $cambio['cents_lost'],
             'profit'     => $cambioProfit,
         ],
@@ -240,6 +250,7 @@ $payload = [
     ],
     'totals' => [
         'revenue'       => $totalRevenue,
+        'operating_income' => $operatingIncome,
         'profit'        => $totalProfit,
         'loss'          => $totalProfit < 0 ? abs($totalProfit) : 0.0,
         'expenses'      => round($expenses, 2),
@@ -289,7 +300,8 @@ if ($action === 'tax_export') {
 
     $rcptSql = "SELECT receipt_date, vendor, category, subtotal, tax, total, status
      FROM receipts
-     WHERE COALESCE(receipt_date, DATE(created_at)) BETWEEN ? AND ?" . $storeSql
+     WHERE status = 'approved'
+       AND COALESCE(receipt_date, DATE(created_at)) BETWEEN ? AND ?" . $storeSql
         . ' ORDER BY receipt_date, id';
     $rcptStmt = $pdo->prepare($rcptSql);
     $rcptStmt->execute(array_merge([$dateFrom, $dateTo], $storeParams));
@@ -317,6 +329,8 @@ if ($action === 'tax_export') {
     fputcsv($out, ['Tax collected — giros', $payload['totals']['tax_breakdown']['giros']]);
     fputcsv($out, ['Tax collected — cambio', $payload['totals']['tax_breakdown']['cambio']]);
     fputcsv($out, ['Tax collected — TOTAL', $payload['totals']['tax_collected']]);
+    fputcsv($out, ['Check-cashing tier commission', $payload['streams']['cambio']['tier_commission']]);
+    fputcsv($out, ['Check-cashing effective rate %', $payload['streams']['cambio']['effective_rate_pct']]);
     fputcsv($out, ['Taxes paid — purchase receipts', $payload['totals']['taxes_paid_breakdown']['receipts']]);
     fputcsv($out, ['Taxes paid — accounting (tax category)', $payload['totals']['taxes_paid_breakdown']['accounting']]);
     fputcsv($out, ['Taxes paid — TOTAL', $payload['totals']['taxes_paid']]);
@@ -339,11 +353,11 @@ if ($action === 'tax_export') {
     }
     fputcsv($out, []);
     fputcsv($out, ['REMITTANCE TAX DETAIL (barri)']);
-    fputcsv($out, ['Date', 'Stream', 'Type', 'Reference', 'Principal', 'Fee', 'Tax', 'Total']);
+    fputcsv($out, ['Date', 'Stream', 'Type', 'Reference', 'Principal', 'Fee', 'AgCommission', 'Tax', 'Total']);
     foreach ($barriRows as $row) {
         $type = (string)($row['transaction_type'] ?? '');
         $norm = str_replace(' ', '_', strtolower(trim($type)));
-        $stream = recon_is_cambio_type($type) ? 'cambio' : (($norm === 'giros' || $norm === 'money_transfer') ? 'giros' : 'other');
+        $stream = commission_is_check_cashing_type($type) ? 'cambio' : (($norm === 'giros' || $norm === 'money_transfer') ? 'giros' : 'other');
         if ($stream === 'other') continue;
         fputcsv($out, [
             $row['transaction_date'],
@@ -352,6 +366,7 @@ if ($action === 'tax_export') {
             $row['reference_number'] ?? '',
             $row['principal'],
             $row['fee'],
+            $row['ag_commission'] ?? 0,
             $row['tax'],
             $row['total'],
         ]);

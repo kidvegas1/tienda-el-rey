@@ -163,7 +163,7 @@
                             <p class="text-2xl font-bold font-mono tabular-nums" id="total-profit">$0.00</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider" data-i18n="finances.totals.revenue">Ingresos</p>
+                            <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider" data-i18n="finances.totals.revenue">Operating income</p>
                             <p class="text-xl font-bold font-mono tabular-nums text-text-secondary" id="total-revenue">$0.00</p>
                         </div>
                         <div>
@@ -364,12 +364,45 @@
             }
         });
 
+        function setLoading(loading) {
+            const dash = '—';
+            const ids = ['total-profit', 'total-revenue', 'total-tax', 'inv-profit', 'giros-profit', 'cambio-profit',
+                'kpi-taxes-paid', 'kpi-expenses', 'kpi-net-tax', 'kpi-cents', 'debt-owed', 'debt-owes', 'debt-variance'];
+            ids.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = loading ? dash : el.textContent;
+            });
+            if (loading) {
+                document.getElementById('verdict-text').textContent = dash;
+                document.getElementById('verdict-badge').textContent = dash;
+                document.getElementById('tax-meta').textContent = '';
+                ['inv-meta', 'giros-meta', 'cambio-meta', 'taxes-paid-meta'].forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = '';
+                });
+            }
+        }
+
         async function load() {
+            if (period === 'custom') {
+                const f = document.getElementById('filter-date-from').value;
+                const t = document.getElementById('filter-date-to').value;
+                if (!f || !t) {
+                    App.toast(App.t('finances.custom_dates_required'), 'warning');
+                    return;
+                }
+                if (f > t) {
+                    App.toast(App.t('finances.custom_dates_invalid'), 'warning');
+                    return;
+                }
+            }
+            setLoading(true);
             try {
                 const d = await App.api('GET', '/api/finances?' + buildParams().toString());
                 render(d);
             } catch (e) {
                 App.toast(e.message || App.t('finances.load_failed'), 'danger');
+                setLoading(true);
             }
         }
 
@@ -404,6 +437,7 @@
                 verdictEl.textContent = App.t('finances.verdict.break');
                 badge.textContent = App.t('finances.verdict.badge_break');
                 badge.classList.add('verdict-break');
+                document.getElementById('total-profit').classList.remove('text-success', 'text-danger');
             }
 
             const inv = d.streams.inventory;
@@ -419,7 +453,12 @@
                 count: giros.count, volume: App.money(giros.volume), fees: App.money(giros.fees), tax: App.money(giros.tax || 0),
             });
             document.getElementById('cambio-meta').textContent = App.t('finances.stream.cambio_meta', {
-                count: cambio.count, volume: App.money(cambio.volume), cents: App.money(cambio.cents_lost), tax: App.money(cambio.tax || 0),
+                count: cambio.count,
+                volume: App.money(cambio.volume),
+                commission: App.money(cambio.tier_commission || 0),
+                rate: cambio.effective_rate_pct || 0,
+                cents: App.money(cambio.cents_lost),
+                tax: App.money(cambio.tax || 0),
             });
 
             App.setMoneyMetric(document.getElementById('kpi-taxes-paid'), d.totals.taxes_paid || 0);

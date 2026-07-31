@@ -42,7 +42,7 @@
                 </div>
                 <div>
                     <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
-                    <select id="store-selector" class="text-xs bg-transparent text-text-secondary border-none outline-none cursor-pointer -ml-0.5"></select>
+                    <select id="store-selector-sidebar" class="text-xs bg-transparent text-text-secondary border-none outline-none cursor-pointer -ml-0.5 hidden lg:block"></select>
                 </div>
             </div>
         </div>
@@ -283,6 +283,15 @@
                     netEl.className = `text-lg font-bold font-mono tabular-nums ${net > 0 ? 'text-success' : net < 0 ? 'text-danger' : ''}`;
                 } catch (err) {
                     console.error('Dashboard load error:', err);
+                    App.toast(err.message || App.t('toast.error_generic'), 'danger');
+                    ['stat-caja', 'stat-transfers', 'stat-clients', 'stat-clocked', 'ledger-owed', 'ledger-store-owes', 'ledger-net'].forEach((id) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = '—';
+                    });
+                    ['stat-caja-sessions', 'stat-transfer-count'].forEach((id) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = '—';
+                    });
                 }
             }
 

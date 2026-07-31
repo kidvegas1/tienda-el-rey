@@ -257,13 +257,25 @@
             }
 
             document.addEventListener('DOMContentLoaded', async () => {
-                await App.init();
+                const ok = await App.init();
+                if (!ok) return;
+
+                App.initSidebar();
+                App.initStoreSelector();
+                App.initUserMenu();
+
+                const avatar = document.getElementById('user-avatar');
+                if (avatar && App.user?.name) {
+                    avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                }
+
                 initPeriodPicker();
                 await loadGoals();
 
                 periodPicker.addEventListener('change', loadGoals);
                 refreshBtn.addEventListener('click', loadGoals);
                 document.addEventListener('store-changed', loadGoals);
+                document.addEventListener('language-changed', () => loadGoals());
             });
         })();
     </script>

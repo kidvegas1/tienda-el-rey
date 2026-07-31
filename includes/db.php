@@ -69,16 +69,9 @@ function db(): PDO {
             if ($pdo === null) {
                 throw new RuntimeException('DATABASE_URL must be a postgres:// or postgresql:// URI');
             }
-        } elseif (env('ALLOW_MYSQL_FALLBACK') === '1') {
-            $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET;
-            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ]);
         } else {
             throw new RuntimeException(
-                'DATABASE_URL is required (Supabase Postgres). MySQL fallback is disabled.'
+                'DATABASE_URL is required (Supabase Postgres).'
             );
         }
         sql_set_driver($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));

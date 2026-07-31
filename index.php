@@ -60,7 +60,8 @@ if (str_starts_with($path, '/api/')) {
             require $apiFile;
         } catch (\Throwable $e) {
             ob_end_clean();
-            json_error($e->getMessage(), 500);
+            error_log('[API error] ' . $path . ': ' . $e->getMessage());
+            json_error('Internal server error', 500);
         }
     } else {
         ob_end_clean();
@@ -94,6 +95,7 @@ $pageMap = [
     '/reports'        => 'pages/reports.html',
     '/reports-center' => 'pages/reports-center.html',
     '/analytics'      => 'pages/analytics.html',
+    '/metas'          => 'pages/metas.html',
     '/security'       => 'pages/security.html',
     '/stores'         => 'pages/stores.html',
     '/tienda'         => 'pages/catalog.html',

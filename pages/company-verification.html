@@ -284,14 +284,14 @@
         async function verifyName() {
             const q = ($('company-q').value || '').trim();
             if (!q) {
-                App.toast(t('company_verification.name_required', 'Enter a company name'), 'error');
+                App.toast(t('company_verification.name_required', 'Enter a company name'), 'danger');
                 return;
             }
             try {
                 const res = await App.api('GET', '/api/company-verification?q=' + encodeURIComponent(q));
                 render(res);
             } catch (e) {
-                App.toast(e.message || 'Error', 'error');
+                App.toast(e.message || 'Error', 'danger');
             }
         }
 
@@ -306,7 +306,7 @@
             const company = (last && last.query) || ($('company-q').value || '').trim();
             const reason = ($('flag-reason').value || '').trim();
             if (!company || !reason) {
-                App.toast(t('company_verification.reason_required', 'Company and reason required'), 'error');
+                App.toast(t('company_verification.reason_required', 'Company and reason required'), 'danger');
                 return;
             }
             try {
@@ -315,7 +315,7 @@
                 await verifyName();
                 loadFlags();
             } catch (e) {
-                App.toast(e.message || 'Error', 'error');
+                App.toast(e.message || 'Error', 'danger');
             }
         });
 
@@ -328,7 +328,7 @@
                 await verifyName();
                 loadFlags();
             } catch (e) {
-                App.toast(e.message || 'Error', 'error');
+                App.toast(e.message || 'Error', 'danger');
             }
         });
 
@@ -360,11 +360,11 @@
                 const res = await App.apiForm('/api/company-verification', fd);
                 if (res.query) $('company-q').value = res.query;
                 render(res);
-                if (res.warning) App.toast(res.warning, 'error');
+                if (res.warning) App.toast(res.warning, 'danger');
                 status.textContent = t('company_verification.parse_done', 'Done');
             } catch (e) {
                 status.textContent = '';
-                App.toast(e.message || 'Error', 'error');
+                App.toast(e.message || 'Error', 'danger');
             }
         }
 

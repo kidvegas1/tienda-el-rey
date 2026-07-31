@@ -7,6 +7,7 @@ if ($method === 'POST') {
 
     if ($action === 'login') {
         validate_required($data, ['email', 'password']);
+        auth_login_rate_limit((string)$data['email']);
         $user = auth_login($data['email'], $data['password']);
         if (!$user) {
             json_error('Invalid email or password.', 401);

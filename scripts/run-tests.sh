@@ -27,6 +27,9 @@ node scripts/test-viamericas-check-cashing-xlsx.mjs
 echo "== per-check commission =="
 php scripts/test-check-commission.php
 
+echo "== finances commission alignment =="
+php scripts/test-finances.php
+
 echo "== viamericas pdf parse =="
 node scripts/test-viamericas-pdf-parse.mjs
 
@@ -48,6 +51,9 @@ php scripts/test-barri-auto-match.php
 
 echo "== store filter bindings =="
 php scripts/test-store-filter-bindings.php
+
+echo "== storage path ACL helpers =="
+php scripts/test-storage-paths.php
 
 echo "== caja update guards =="
 php scripts/test-caja-update.php

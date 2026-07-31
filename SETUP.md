@@ -1,15 +1,19 @@
 # Configuración segura
 
-## Desarrollo local con MySQL
+## Desarrollo local (Supabase Postgres)
 
-1. Copia `.env.example` como `.env` y configura la conexión.
-2. Crea el esquema:
+Production and local development both use **Supabase Postgres** via `DATABASE_URL`.
+
+1. Copy `.env.example` to `.env` and set:
+   - `DATABASE_URL=postgresql://...` (Supabase connection string)
+   - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for file uploads
+2. Apply migrations (or let Docker entrypoint apply them on first boot):
 
    ```bash
-   mysql -u root -p < schema.sql
+   for f in supabase/migrations/[0-9]*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
    ```
 
-3. Crea el primer administrador con credenciales propias:
+3. Create the first admin:
 
    ```bash
    read -rsp "Contraseña inicial: " ADMIN_BOOTSTRAP_PASSWORD && echo
@@ -20,19 +24,15 @@
    unset ADMIN_BOOTSTRAP_PASSWORD
    ```
 
-   La contraseña debe tener al menos 14 caracteres e incluir mayúscula, minúscula,
-   número y símbolo. El comando no reemplaza administradores existentes.
-
-4. Borra `ADMIN_BOOTSTRAP_PASSWORD` del entorno y arranca la aplicación:
+4. Start the app:
 
    ```bash
    php -S 127.0.0.1:8080 index.php
    ```
 
-## PostgreSQL en contenedor
+## PostgreSQL en contenedor (Render)
 
-El punto de entrada crea el esquema únicamente cuando la base está vacía y aplica
-las migraciones numeradas hasta `007_reconciliation.sql`. Nunca elimina un esquema
-parcial. Para el primer despliegue, configura temporalmente los tres valores
-`ADMIN_BOOTSTRAP_*`; después de crear el administrador, elimina la contraseña del
-entorno del servicio.
+The entrypoint seeds `001_initial.sql` only on an empty database, backfills
+`schema_migrations` on existing schemas, then applies any new numbered migrations
+once. For the first deploy, set `ADMIN_BOOTSTRAP_*` temporarily; remove the
+password from the service environment after bootstrap.

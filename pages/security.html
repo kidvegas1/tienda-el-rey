@@ -240,6 +240,11 @@
                     document.getElementById('card-low').textContent = data.by_severity?.low ?? 0;
                 } catch (err) {
                     console.error('Summary load error:', err);
+                    App.toast(err.message || App.t('toast.error_generic'), 'danger');
+                    ['card-open', 'card-high', 'card-medium', 'card-low'].forEach((id) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = '—';
+                    });
                 }
             }
 
