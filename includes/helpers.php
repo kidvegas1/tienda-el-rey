@@ -9,6 +9,9 @@ function app_enforce_canonical_host(): void {
     if (PHP_SAPI === 'cli' || PHP_SAPI === 'cli-server') {
         return;
     }
+    if (env('CANONICAL_REDIRECT', '1') !== '1') {
+        return;
+    }
 
     $canonicalHost = parse_url(APP_URL, PHP_URL_HOST);
     if (!$canonicalHost) {

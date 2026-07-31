@@ -21,6 +21,7 @@ function db_pdo_from_database_url(string $databaseUrl): ?PDO {
     }
 
     $sslmode = $query['sslmode'] ?? 'require';
+    $connectTimeout = (int)($query['connect_timeout'] ?? 15);
     $port = $parts['port'] ?? 5432;
     $dbname = ltrim($parts['path'] ?? '/postgres', '/');
     $dsn = sprintf(
@@ -34,11 +35,29 @@ function db_pdo_from_database_url(string $databaseUrl): ?PDO {
     $user = $parts['user'] ?? null;
     $pass = $parts['pass'] ?? null;
 
-    return new PDO($dsn, $user, $pass, [
+    $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
-    ]);
+        PDO::ATTR_TIMEOUT            => max(5, $connectTimeout),
+    ];
+
+    $attempts = 0;
+    $lastError = null;
+    while ($attempts < 3) {
+        $attempts++;
+        try {
+            return new PDO($dsn, $user, $pass, $options);
+        } catch (PDOException $e) {
+            $lastError = $e;
+            if ($attempts >= 3) {
+                throw $e;
+            }
+            usleep(250000 * $attempts);
+        }
+    }
+
+    throw $lastError ?? new RuntimeException('Unable to connect to Postgres');
 }
 
 function db(): PDO {
