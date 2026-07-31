@@ -36,25 +36,44 @@ function commission_rate_for_check(float $amount): float {
     return 0.04;
 }
 
+function commission_is_check_cashing_type(string $type): bool {
+    $normalized = strtolower(trim(str_replace([' ', '-'], '_', $type)));
+    if (in_array($normalized, [
+        'cambio_cheque',
+        'cambio_cheques',
+        'cambio_de_cheques',
+        'check_cashing',
+        'cheque_escaneado',
+    ], true)) {
+        return true;
+    }
+    return str_contains($normalized, 'cambio') && str_contains($normalized, 'cheque');
+}
+
 /**
  * Check-cashing volume only. Money transfers and generic ledger volume are excluded.
  * Every returned amount represents one check and is priced independently.
  */
 function commission_volume_for_period(PDO $pdo, ?int $storeId, string $dateFrom, string $dateTo, ?string $employeeName = null): array {
     $params = [$dateFrom, $dateTo];
-    $sql = "SELECT ABS(principal) AS check_amount
+    $sql = "SELECT transaction_type, ABS(principal) AS check_amount
         FROM barri_transactions
         WHERE transaction_date >= ? AND transaction_date <= ?
-          AND LOWER(REPLACE(transaction_type, ' ', '_')) IN ('cambio_cheque', 'cambio_de_cheques', 'check_cashing')";
+          AND principal <> 0";
     if ($storeId) {
         $sql .= ' AND store_id = ?';
         $params[] = $storeId;
     }
-    $sql .= ' AND principal <> 0 ORDER BY principal';
+    $sql .= ' ORDER BY principal';
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $amounts = array_values(array_filter(
-        array_map(static fn(array $row): float => round(abs((float)$row['check_amount']), 2), $stmt->fetchAll()),
+        array_map(
+            static fn(array $row): float => commission_is_check_cashing_type((string)$row['transaction_type'])
+                ? round(abs((float)$row['check_amount']), 2)
+                : 0.0,
+            $stmt->fetchAll()
+        ),
         static fn(float $amount): bool => $amount > 0
     ));
 
