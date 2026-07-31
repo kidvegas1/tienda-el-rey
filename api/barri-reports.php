@@ -1105,6 +1105,74 @@ if ($method === 'POST') {
         json_response(['success' => true, 'pushed_count' => $pushedCount]);
     }
 
+    if ($act === 'reassign_store') {
+        auth_require_admin();
+        validate_required($data, ['report_id']);
+        $reportId = (int)$data['report_id'];
+        $targetStoreId = (int)($data['target_store_id'] ?? $data['store_id'] ?? 0);
+        if ($targetStoreId <= 0) {
+            json_error('target_store_id is required', 400);
+        }
+
+        $stmt = $pdo->prepare('SELECT * FROM barri_reports WHERE id = ?');
+        $stmt->execute([$reportId]);
+        $report = $stmt->fetch();
+        if (!$report) json_error('Report not found', 404);
+
+        $oldStoreId = (int)$report['store_id'];
+        if ($targetStoreId === $oldStoreId) {
+            json_error('Report is already assigned to that store', 400);
+        }
+
+        $storeStmt = $pdo->prepare('SELECT id, name FROM stores WHERE id = ? AND ' . sql_is_active());
+        $storeStmt->execute([$targetStoreId]);
+        $targetStore = $storeStmt->fetch();
+        if (!$targetStore) json_error('Target store not found', 404);
+
+        // Same duplicate key as import: don't allow two copies of the report at the target store.
+        $dup = $pdo->prepare('SELECT id FROM barri_reports WHERE store_id = ? AND agency_number = ? AND report_date_from = ? AND report_date_to = ? AND id <> ?');
+        $dup->execute([$targetStoreId, $report['agency_number'], $report['report_date_from'], $report['report_date_to'], $reportId]);
+        if ($dup->fetch()) {
+            json_error('The target store already has a report for this agency and date range', 409);
+        }
+
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare('UPDATE barri_reports SET store_id = ? WHERE id = ?')
+                ->execute([$targetStoreId, $reportId]);
+            $pdo->prepare('UPDATE barri_transactions SET store_id = ? WHERE report_id = ?')
+                ->execute([$targetStoreId, $reportId]);
+            // Transfers created from this report (via "sync to clients").
+            $pdo->prepare('UPDATE transfers SET store_id = ? WHERE id IN (SELECT transfer_id FROM barri_transactions WHERE report_id = ? AND transfer_id IS NOT NULL)')
+                ->execute([$targetStoreId, $reportId]);
+            // Side-finance / money-order summaries booked from this report.
+            $pdo->prepare('UPDATE accounting_entries SET store_id = ? WHERE source_report_id = ?')
+                ->execute([$targetStoreId, $reportId]);
+            // Stale variances are recomputed below for both stores.
+            $pdo->prepare('DELETE FROM reconciliation_variances WHERE barri_report_id = ?')
+                ->execute([$reportId]);
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+
+        try {
+            require_once __DIR__ . '/../includes/reconciliation.php';
+            recon_refresh_report_period($pdo, $oldStoreId, $report['report_date_from'], $report['report_date_to']);
+            recon_refresh_report_period($pdo, $targetStoreId, $report['report_date_from'], $report['report_date_to']);
+        } catch (Throwable $e) {
+            error_log('[barri-reports] reconciliation refresh after reassign: ' . $e->getMessage());
+        }
+
+        json_response([
+            'success' => true,
+            'report_id' => $reportId,
+            'store_id' => $targetStoreId,
+            'store_name' => $targetStore['name'],
+        ]);
+    }
+
     if ($act === 'delete') {
         json_error('Uploaded reports are retained and cannot be deleted.', 403);
     }

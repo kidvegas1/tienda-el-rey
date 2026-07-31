@@ -313,6 +313,7 @@ body {
 .badge-warning { background: oklch(0.8 0.15 85 / 0.12); color: oklch(0.55 0.14 85); }
 .badge-info { background: oklch(0.82 0.12 55 / 0.15); color: oklch(0.55 0.12 50); }
 .badge-side-finances { background: oklch(0.88 0.10 300 / 0.18); color: oklch(0.42 0.16 300); border: 1px solid oklch(0.75 0.12 300 / 0.35); }
+.badge-neutral { background: oklch(0.55 0.02 260 / 0.12); color: oklch(0.45 0.03 260); }
 
 /* ── Side finances (no client names — incomplete but vital) ── */
 .finance-side-banner { background: oklch(0.94 0.06 300 / 0.55); border: 1px solid oklch(0.78 0.10 300 / 0.45); border-radius: 0.875rem; padding: 0.875rem 1rem; color: oklch(0.38 0.14 300); }
