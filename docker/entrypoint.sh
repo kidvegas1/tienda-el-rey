@@ -28,18 +28,13 @@ if [ -n "${DATABASE_URL:-}" ] && [ -f /var/www/html/supabase/migrations/001_init
     fi
 
     # Application migrations are additive/idempotent and safe on fresh or existing schemas.
-    for migration in \
-      003_internal_ledger_status.sql \
-      004_side_finances.sql \
-      005_company_flags.sql \
-      006_client_security.sql \
-      007_reconciliation.sql
-    do
-      migration_path="/var/www/html/supabase/migrations/${migration}"
-      if [ ! -f "$migration_path" ]; then
-        echo "[entrypoint] ERROR: Required migration missing: ${migration}"
-        exit 1
-      fi
+    for migration_path in /var/www/html/supabase/migrations/[0-9]*.sql; do
+      migration="$(basename "$migration_path")"
+      case "$migration" in
+        001_initial.sql|002_storage_buckets.sql)
+          continue
+          ;;
+      esac
       echo "[entrypoint] Applying ${migration}..."
       psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration_path"
     done
