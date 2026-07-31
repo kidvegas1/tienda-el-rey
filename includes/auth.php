@@ -17,7 +17,8 @@ function auth_start(): void {
 }
 
 function auth_login(string $email, string $password): array|false {
-    $stmt = db()->prepare('SELECT id, name, email, password_hash, role, store_id FROM users WHERE email = ? AND ' . sql_is_active() . ' LIMIT 1');
+    $email = strtolower(trim($email));
+    $stmt = db()->prepare('SELECT id, name, email, password_hash, role, store_id FROM users WHERE LOWER(email) = ? AND ' . sql_is_active() . ' LIMIT 1');
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 

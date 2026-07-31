@@ -8,6 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            var canonical = 'tiendarey.com';
+            var host = location.hostname.toLowerCase();
+            if (host !== canonical && host !== 'www.' + canonical && host.endsWith('.onrender.com')) {
+                location.replace('https://' + canonical + location.pathname + location.search + location.hash);
+            }
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
         @theme {
@@ -148,7 +157,7 @@
                 try {
                     await App.api('POST', '/api/auth', {
                         action: 'login',
-                        email: document.getElementById('email').value,
+                        email: document.getElementById('email').value.trim().toLowerCase(),
                         password: document.getElementById('password').value,
                     });
                     location.href = '/dashboard';
