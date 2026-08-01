@@ -1492,12 +1492,12 @@
 
                 // Activity timeline
                 const timeline = document.getElementById('activity-timeline');
-                const activity = res.activity || [];
-                if (!activity.length) {
+                const activityEvents = res.activity || [];
+                if (!activityEvents.length) {
                     timeline.innerHTML = `<p class="text-sm text-text-muted py-4">${App.t('clients.activity_empty')}</p>`;
                 } else {
-                    timeline.innerHTML = activity.map((ev, i) => {
-                        const isLast = i === activity.length - 1;
+                    timeline.innerHTML = activityEvents.map((ev, i) => {
+                        const isLast = i === activityEvents.length - 1;
                         const typeColors = {
                             transfer_added: 'bg-accent/20 text-accent',
                             limit_updated: 'bg-warning/20 text-warning',
