@@ -585,6 +585,7 @@
 
     <script src="assets/js/i18n.js"></script>
     <script src="assets/js/app.js"></script>
+    <script src="assets/js/check-cashing-xlsx.js"></script>
     <script type="module">
 
     const Reports = {
@@ -898,6 +899,8 @@
                     const companyBadge = r.company ? `<span class="badge badge-info text-[10px] ml-1">${this.esc(r.company)}</span>` : '';
                     const sideBadge = (r.finance_class === 'side_finances' || r.report_type === 'intermex_side')
                         ? `<span class="badge badge-side-finances text-[10px] ml-1">${this.t('reports.side_finances.short')}</span>` : '';
+                    const checkBadge = (r.report_type === 'viamericas_check_cashing')
+                        ? `<span class="badge badge-success text-[10px] ml-1">${this.t('reports.check_cashing.short')}</span>` : '';
                     const storeName = App.stores?.find(s => s.id == r.store_id)?.name || '';
                     const storeBadge = (isAdmin && storeName)
                         ? `<span class="badge badge-neutral text-[10px] ml-1">${this.esc(storeName)}</span>` : '';
@@ -911,7 +914,7 @@
                             </button>` : '';
                     return `<tr class="${r.finance_class === 'side_finances' ? 'finance-side-row' : ''}">
                         <td class="text-text-primary font-mono text-sm whitespace-nowrap">${this.esc(r.date_from)} — ${this.esc(r.date_to)}</td>
-                        <td class="text-text-secondary text-sm">${this.esc(r.agency_name)}${companyBadge}${sideBadge}${storeBadge}</td>
+                        <td class="text-text-secondary text-sm">${this.esc(r.agency_name)}${companyBadge}${checkBadge}${sideBadge}${storeBadge}</td>
                         <td class="text-right font-mono tabular-nums">${r.total_transactions}</td>
                         <td class="text-right font-mono tabular-nums">${App.money(r.total_principal)}</td>
                         <td class="text-right font-mono tabular-nums">${App.money(r.total_fees)}</td>
@@ -1283,6 +1286,50 @@
 
             document.getElementById('parse-status').textContent = this.t('reports.parse_status.analyzing_excel');
             console.log('[Excel Parser] Sheets:', wb.SheetNames);
+
+            if (typeof CheckCashingXlsx !== 'undefined') {
+                const checkParse = CheckCashingXlsx.detectWorkbook(wb, XLSX);
+                if (checkParse?.transactions?.length) {
+                    return {
+                        agency_number: checkParse.agency_number,
+                        agency_name: 'Viamericas Check Cashing',
+                        company: 'Viamericas',
+                        report_type: 'viamericas_check_cashing',
+                        report_format: 'viamericas_check_cashing',
+                        date_from: checkParse.date_from,
+                        date_to: checkParse.date_to,
+                        currency: 'USD',
+                        beginning_balance: 0,
+                        ending_balance: 0,
+                        transactions: checkParse.transactions.map(tx => ({
+                            time: tx.transaction_time || '00:00:00',
+                            type: 'cambio_cheque',
+                            reference: tx.reference,
+                            customer_name: tx.customer_name || 'Unknown customer',
+                            beneficiary: '',
+                            operator: tx.operator || tx.agency_number || '',
+                            qty: 1,
+                            principal: tx.amount,
+                            fee: 0,
+                            tax: 0,
+                            total: tx.amount,
+                            agcomm: tx.commission || 0,
+                            description: tx.issuer || '',
+                            transaction_status: tx.status || 'Enviado',
+                        })),
+                        totals: {
+                            qty: checkParse.totals.count,
+                            principal: checkParse.totals.amount,
+                            fee: 0,
+                            tax: 0,
+                            total: checkParse.totals.amount,
+                            agcomm: checkParse.totals.commission,
+                            var_fee: 0,
+                            var_fx: 0,
+                        },
+                    };
+                }
+            }
 
             for (const sheetName of wb.SheetNames) {
                 const ws = wb.Sheets[sheetName];

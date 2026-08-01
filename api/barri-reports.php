@@ -448,7 +448,10 @@ function barri_import_report(PDO $pdo, array $user, array $data, array $options 
             $financeClass = 'side_finances';
             $dataCompleteness = 'incomplete_vital';
         }
-        if (($data['report_format'] ?? '') === 'agency_activity' || ($data['report_type'] ?? '') === 'agency_activity') {
+        if (($data['report_format'] ?? '') === 'viamericas_check_cashing'
+            || ($data['report_type'] ?? '') === 'viamericas_check_cashing') {
+            $reportType = 'viamericas_check_cashing';
+        } elseif (($data['report_format'] ?? '') === 'agency_activity' || ($data['report_type'] ?? '') === 'agency_activity') {
             $reportType = 'agency_activity';
         } elseif ($isSideFinance) {
             $reportType = 'intermex_side';

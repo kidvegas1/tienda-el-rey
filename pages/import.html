@@ -157,7 +157,13 @@
 
             <!-- Import History -->
             <section>
-                <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4" data-i18n="import.history">Import History</h3>
+                <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
+                    <div>
+                        <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="import.history">Import History</h3>
+                        <p class="text-xs text-text-muted mt-1" data-i18n="import.history_help">Check-cashing Excel imports appear here and as company reports you can open or move between stores.</p>
+                    </div>
+                    <a href="/reports" class="btn-secondary text-xs" data-i18n="import.open_reports">Open Reports</a>
+                </div>
                 <div class="table-container mobile-cards">
                     <table>
                         <thead>
@@ -165,13 +171,15 @@
                                 <th data-i18n="common.date">Date</th>
                                 <th data-i18n="import.col.filename">Filename</th>
                                 <th data-i18n="import.col.module">Module</th>
+                                <th data-i18n="import.col.details">Details</th>
                                 <th data-i18n="import.col.rows">Rows Imported</th>
                                 <th data-i18n="common.status">Status</th>
                                 <th data-i18n="common.user">User</th>
+                                <th data-i18n="common.actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="history-tbody">
-                            <tr><td colspan="6" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                            <tr><td colspan="8" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -617,7 +625,21 @@
                 progressText.textContent = App.t('import.progress.done', { count: result.rows_imported ?? 0 });
 
                 setTimeout(() => {
-                    App.toastKey('toast.import_complete', 'success', { count: result.rows_imported ?? 0 });
+                    const summary = result.summary || {};
+                    if (summary.agency_number && summary.date_from) {
+                        App.toast(
+                            App.t('toast.import_checks_complete', {
+                                count: result.rows_imported ?? 0,
+                                agency: summary.agency_number,
+                                from: summary.date_from,
+                                to: summary.date_to,
+                                volume: App.money(summary.volume || 0),
+                            }),
+                            'success'
+                        );
+                    } else {
+                        App.toastKey('toast.import_complete', 'success', { count: result.rows_imported ?? 0 });
+                    }
                     resetUpload();
                     loadImports();
                 }, 1500);
@@ -629,14 +651,69 @@
             }
         }
 
+        function importDetailsHtml(imp) {
+            const summary = imp.summary || {};
+            const parts = [];
+            if (imp.store_name) {
+                parts.push(`<div><span class="text-text-muted">${escapeHtml(App.t('import.detail.store'))}:</span> ${escapeHtml(imp.store_name)}</div>`);
+            }
+            if (summary.agency_number) {
+                parts.push(`<div><span class="text-text-muted">${escapeHtml(App.t('import.detail.agency'))}:</span> ${escapeHtml(summary.agency_number)}</div>`);
+            }
+            if (summary.date_from && summary.date_to) {
+                parts.push(`<div><span class="text-text-muted">${escapeHtml(App.t('import.detail.period'))}:</span> ${escapeHtml(summary.date_from)} — ${escapeHtml(summary.date_to)}</div>`);
+            }
+            if (summary.volume) {
+                parts.push(`<div><span class="text-text-muted">${escapeHtml(App.t('import.detail.volume'))}:</span> ${App.money(summary.volume)}</div>`);
+            }
+            if (summary.commission) {
+                parts.push(`<div><span class="text-text-muted">${escapeHtml(App.t('import.detail.commission'))}:</span> ${App.money(summary.commission)}</div>`);
+            }
+            if (!parts.length && imp.errors) {
+                parts.push(`<div class="text-danger">${escapeHtml(imp.errors)}</div>`);
+            }
+            return parts.length
+                ? `<div class="text-xs space-y-0.5">${parts.join('')}</div>`
+                : `<span class="text-xs text-text-muted">${escapeHtml(App.t('empty.none'))}</span>`;
+        }
+
+        async function moveImportReport(reportId, currentStoreId) {
+            if (!reportId || App.user?.role !== 'admin') return;
+            const stores = (App.stores || []).filter(s => Number(s.id) !== Number(currentStoreId));
+            if (!stores.length) {
+                App.toast(App.t('import.no_other_store'), 'warning');
+                return;
+            }
+            const choices = stores.map(s => `${s.id}: ${s.name}`).join('\n');
+            const picked = prompt(App.t('import.move_prompt', { choices }));
+            if (picked == null || picked === '') return;
+            const targetId = parseInt(String(picked).split(':')[0].trim(), 10);
+            if (!targetId) {
+                App.toast(App.t('import.move_invalid'), 'danger');
+                return;
+            }
+            try {
+                const res = await App.api('POST', '/api/barri-reports', {
+                    action: 'reassign_store',
+                    report_id: reportId,
+                    target_store_id: targetId,
+                });
+                App.toast(App.t('reports.reassign_success', { store: res.store_name || targetId }), 'success');
+                loadImports();
+            } catch (err) {
+                App.toast(err.message || App.t('import.move_failed'), 'danger');
+            }
+        }
+
         async function loadImports() {
             try {
                 const res = await App.api('GET', '/api/import');
                 const tbody = document.getElementById('history-tbody');
                 if (!res.imports || !res.imports.length) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-text-muted py-8">${App.t('import.no_imports')}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-text-muted py-8">${App.t('import.no_imports')}</td></tr>`;
                     return;
                 }
+                const isAdmin = App.user?.role === 'admin';
                 tbody.innerHTML = res.imports.map(imp => {
                     const statusMap = {
                         completed: 'success',
@@ -645,20 +722,39 @@
                         processing: 'info',
                     };
                     const badgeType = statusMap[imp.status] || 'info';
+                    const when = imp.imported_at || imp.created_at;
+                    const fileName = imp.display_name || imp.original_name || imp.filename || '';
+                    const reportId = Number(imp.summary?.report_id || 0);
+                    const actions = [];
+                    if (reportId) {
+                        actions.push(`<a class="btn-secondary px-2 py-1 text-xs" href="/reports?id=${reportId}">${escapeHtml(App.t('import.view_report'))}</a>`);
+                    }
+                    if (isAdmin && reportId) {
+                        actions.push(`<button type="button" class="btn-secondary px-2 py-1 text-xs move-import-btn" data-report-id="${reportId}" data-store-id="${imp.store_id}">${escapeHtml(App.t('reports.action.reassign'))}</button>`);
+                    }
                     return `
                     <tr>
-                        <td class="text-sm">${App.formatDate ? App.formatDate(imp.created_at) : new Date(imp.created_at).toLocaleDateString()}</td>
-                        <td class="font-medium text-sm">${escapeHtml(imp.filename)}</td>
+                        <td class="text-sm whitespace-nowrap">${when ? App.formatDateTime(when) : App.t('empty.none')}</td>
+                        <td class="font-medium text-sm">${escapeHtml(fileName || App.t('empty.none'))}</td>
                         <td class="text-xs text-text-muted">${escapeHtml(importModuleLabel(imp.module))}</td>
+                        <td>${importDetailsHtml(imp)}</td>
                         <td class="font-mono tabular-nums text-sm">${imp.rows_imported ?? 0}</td>
                         <td><span class="badge badge-${badgeType}">${importStatusLabel(imp.status)}</span></td>
                         <td class="text-sm text-text-secondary">${escapeHtml(imp.user_name || App.t('empty.none'))}</td>
+                        <td><div class="flex flex-wrap gap-1">${actions.join('') || `<span class="text-xs text-text-muted">${escapeHtml(App.t('empty.none'))}</span>`}</div></td>
                     </tr>`;
                 }).join('');
+
+                tbody.querySelectorAll('.move-import-btn').forEach(btn => {
+                    btn.addEventListener('click', () => moveImportReport(
+                        Number(btn.dataset.reportId),
+                        Number(btn.dataset.storeId)
+                    ));
+                });
             } catch (err) {
                 console.error('Failed to load import history:', err);
                 App.toast(err.message || App.t('import.load_failed'), 'danger');
-                document.getElementById('history-tbody').innerHTML = `<tr><td colspan="6" class="text-center text-danger py-8">${App.t('import.load_failed')}</td></tr>`;
+                document.getElementById('history-tbody').innerHTML = `<tr><td colspan="8" class="text-center text-danger py-8">${App.t('import.load_failed')}</td></tr>`;
             }
         }
 

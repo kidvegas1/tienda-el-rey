@@ -28,13 +28,16 @@ function parseMonthSpanish(string $m): int {
     return $map[strtolower(trim($m))] ?? (int)$m;
 }
 
+/**
+ * @return array{rows:int,report_id:int,agency_number:string,date_from:string,date_to:string,volume:float,commission:float}
+ */
 function import_viamericas_check_cashing(
     PDO $pdo,
     int $storeId,
     int $userId,
     array $rows,
     array $importRow
-): int {
+): array {
     $checks = [];
     foreach ($rows as $row) {
         $status = trim((string)($row['status'] ?? ''));
@@ -120,18 +123,111 @@ function import_viamericas_check_cashing(
             ]);
         }
         $pdo->commit();
-        return count($seen);
+        return [
+            'rows' => count($seen),
+            'report_id' => (int)$reportId,
+            'agency_number' => $agencyNumber,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'volume' => $totalAmount,
+            'commission' => $totalCommission,
+        ];
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         throw $e;
     }
 }
 
+function import_module_from_mapping(mixed $mapping): string {
+    if (is_string($mapping) && $mapping !== '') {
+        $decoded = json_decode($mapping, true);
+        $mapping = is_array($decoded) ? $decoded : [];
+    }
+    if (!is_array($mapping)) {
+        return '';
+    }
+    foreach ($mapping as $key => $value) {
+        if ($key === '_summary' || $key === '_meta') {
+            continue;
+        }
+        $module = is_array($value) ? (string)($value['module'] ?? '') : (string)$value;
+        if ($module !== '' && $module !== 'skip') {
+            return $module;
+        }
+    }
+    return '';
+}
+
 if ($method === 'GET') {
     $storeId = import_store_id();
-    $stmt = $pdo->prepare('SELECT ei.*, u.name as user_name FROM excel_imports ei LEFT JOIN users u ON u.id = ei.user_id WHERE ei.store_id = ? ORDER BY ei.imported_at DESC LIMIT 50');
+    $stmt = $pdo->prepare(
+        'SELECT ei.*, u.name as user_name, s.name as store_name
+         FROM excel_imports ei
+         LEFT JOIN users u ON u.id = ei.user_id
+         LEFT JOIN stores s ON s.id = ei.store_id
+         WHERE ei.store_id = ?
+         ORDER BY ei.imported_at DESC
+         LIMIT 50'
+    );
     $stmt->execute([$storeId]);
-    json_response(['imports' => $stmt->fetchAll()]);
+    $imports = $stmt->fetchAll();
+
+    $reportLookup = $pdo->prepare(
+        "SELECT id, agency_number, report_date_from, report_date_to, total_transactions,
+                total_principal, total_agcomm, report_type, store_id
+         FROM barri_reports
+         WHERE store_id = ? AND original_name = ? AND report_type = 'viamericas_check_cashing'
+         ORDER BY id DESC
+         LIMIT 1"
+    );
+
+    foreach ($imports as &$imp) {
+        $mapping = $imp['sheet_mapping'] ?? null;
+        if (is_string($mapping) && $mapping !== '') {
+            $decoded = json_decode($mapping, true);
+            $mapping = is_array($decoded) ? $decoded : [];
+        } elseif (!is_array($mapping)) {
+            $mapping = [];
+        }
+        $summary = is_array($mapping['_summary'] ?? null) ? $mapping['_summary'] : [];
+        $module = import_module_from_mapping($mapping);
+        $displayName = trim((string)($imp['original_name'] ?? ''));
+        if ($displayName === '') {
+            $displayName = basename((string)($imp['filename'] ?? ''));
+        }
+
+        $report = null;
+        if (!empty($summary['report_id'])) {
+            $reportId = (int)$summary['report_id'];
+            $rStmt = $pdo->prepare(
+                'SELECT id, agency_number, report_date_from, report_date_to, total_transactions,
+                        total_principal, total_agcomm, report_type, store_id
+                 FROM barri_reports WHERE id = ? LIMIT 1'
+            );
+            $rStmt->execute([$reportId]);
+            $report = $rStmt->fetch() ?: null;
+        } elseif ($module === 'cambio_cheques' && $displayName !== '') {
+            $reportLookup->execute([(int)$imp['store_id'], $displayName]);
+            $report = $reportLookup->fetch() ?: null;
+        }
+
+        $imp['display_name'] = $displayName;
+        $imp['module'] = $module;
+        $imp['created_at'] = $imp['imported_at'] ?? null;
+        $imp['summary'] = [
+            'report_id' => $report ? (int)$report['id'] : (int)($summary['report_id'] ?? 0),
+            'agency_number' => (string)($report['agency_number'] ?? $summary['agency_number'] ?? ''),
+            'date_from' => (string)($report['report_date_from'] ?? $summary['date_from'] ?? ''),
+            'date_to' => (string)($report['report_date_to'] ?? $summary['date_to'] ?? ''),
+            'volume' => (float)($report['total_principal'] ?? $summary['volume'] ?? 0),
+            'commission' => (float)($report['total_agcomm'] ?? $summary['commission'] ?? 0),
+            'rows' => (int)($report['total_transactions'] ?? $summary['rows'] ?? $imp['rows_imported'] ?? 0),
+            'report_type' => (string)($report['report_type'] ?? $summary['report_type'] ?? ''),
+        ];
+    }
+    unset($imp);
+
+    json_response(['imports' => $imports]);
 }
 
 if ($method === 'POST') {
@@ -164,7 +260,7 @@ if ($method === 'POST') {
             json_error('Original file name is required');
         }
         $stmt = $pdo->prepare('INSERT INTO excel_imports (store_id, user_id, filename, original_name, status) VALUES (?,?,?,?,?)');
-        $stmt->execute([$storeId, $user['id'], '', $originalName, 'pending']);
+        $stmt->execute([$storeId, $user['id'], $originalName, $originalName, 'pending']);
         json_response([
             'success'   => true,
             'import_id' => sql_last_insert_id($pdo, 'excel_imports'),
@@ -188,6 +284,7 @@ if ($method === 'POST') {
         $rowsImported = 0;
         $errors = [];
         $importedCaja = false;
+        $importSummary = [];
 
         // Support both formats: { rows: { module: [...] } } and { sheets: { sheetName: { module, rows } } }
         $moduleRows = [];
@@ -205,13 +302,18 @@ if ($method === 'POST') {
         foreach ($moduleRows as $module => $rows) {
             if ($module === 'cambio_cheques') {
                 try {
-                    $rowsImported += import_viamericas_check_cashing(
+                    $checkResult = import_viamericas_check_cashing(
                         $pdo,
                         $storeId,
                         (int)$user['id'],
                         is_array($rows) ? $rows : [],
                         $impRow
                     );
+                    $rowsImported += (int)$checkResult['rows'];
+                    $importSummary = array_merge($importSummary, $checkResult, [
+                        'module' => 'cambio_cheques',
+                        'report_type' => 'viamericas_check_cashing',
+                    ]);
                 } catch (Throwable $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -418,8 +520,20 @@ if ($method === 'POST') {
         }
 
         $importStatus = ($rowsImported === 0 && $errors) ? 'failed' : 'completed';
-        $pdo->prepare('UPDATE excel_imports SET status = ?, rows_imported = ?, sheet_mapping = ?, errors = ? WHERE id = ? AND store_id = ?')
-            ->execute([$importStatus, $rowsImported, json_encode($data['sheet_mapping']), implode("\n", $errors), $importId, $storeId]);
+        $sheetMapping = is_array($data['sheet_mapping'] ?? null) ? $data['sheet_mapping'] : [];
+        if ($importSummary) {
+            $sheetMapping['_summary'] = $importSummary;
+        }
+        $pdo->prepare('UPDATE excel_imports SET status = ?, rows_imported = ?, sheet_mapping = ?, errors = ?, original_name = COALESCE(NULLIF(original_name, \'\'), ?) WHERE id = ? AND store_id = ?')
+            ->execute([
+                $importStatus,
+                $rowsImported,
+                json_encode($sheetMapping),
+                implode("\n", $errors),
+                (string)($impRow['original_name'] ?? ''),
+                $importId,
+                $storeId,
+            ]);
         if ($importStatus === 'failed') {
             json_error(implode("\n", $errors), 422);
         }
@@ -439,6 +553,8 @@ if ($method === 'POST') {
             'errors'         => $errors,
             'variances'      => $reconVariances,
             'variance_count' => count($reconVariances),
+            'summary'        => $importSummary,
+            'report_id'      => (int)($importSummary['report_id'] ?? 0),
         ]);
     }
 
