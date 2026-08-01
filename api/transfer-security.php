@@ -49,6 +49,11 @@ if ($method === 'POST') {
         $clientId = !empty($data['client_id']) ? (int)$data['client_id'] : null;
         $days = max(1, min(90, (int)($data['days'] ?? 7)));
         $cap = 200;
+        $requestedStore = !empty($data['store_id']) ? (int)$data['store_id'] : null;
+        if ($requestedStore !== null) {
+            auth_require_store_access($requestedStore);
+        }
+        $storeFilter = resolve_store_filter($requestedStore);
 
         $dateFrom = date('Y-m-d', strtotime("-{$days} days"));
         $where = 'date_sent >= ?';
@@ -56,6 +61,10 @@ if ($method === 'POST') {
         if ($clientId !== null) {
             $where .= ' AND client_id = ?';
             $params[] = $clientId;
+        }
+        if ($storeFilter) {
+            $where .= ' AND store_id = ?';
+            $params[] = $storeFilter;
         }
 
         $stmt = $pdo->prepare("SELECT id FROM transfers WHERE {$where} ORDER BY date_sent DESC LIMIT {$cap}");

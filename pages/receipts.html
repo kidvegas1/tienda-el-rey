@@ -44,7 +44,7 @@
             .modal-content .input, .modal-content .btn-primary, .modal-content .btn-secondary { min-height: 2.75rem; }
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -113,6 +113,7 @@
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2 text-xs w-full sm:w-auto">
+                <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
                 <span class="text-text-muted" data-i18n="receipts.approved_total">Gastos aprobados</span>
                 <span class="font-mono font-bold" id="stat-expenses">$0.00</span>
                 <button type="button" id="btn-collapse-all" class="btn-secondary !py-2 !px-3 !text-xs ml-auto sm:ml-2" data-i18n="receipts.collapse_all">Collapse all</button>
@@ -202,12 +203,13 @@
         </form>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
     (async () => {
         if (!(await App.init())) return;
         App.initSidebar();
+            App.initStoreSelector();
         App.initUserMenu();
         App.bindInfoTips();
 
@@ -385,7 +387,7 @@
 
         async function load() {
             try {
-                const res = await App.api('GET', '/api/receipts');
+                const res = await App.api('GET', App.withStoreQuery('/api/receipts'));
                 App.setMoneyMetric(document.getElementById('stat-expenses'), res.expenses || 0);
                 const rows = res.receipts || [];
                 if (!rows.length) {

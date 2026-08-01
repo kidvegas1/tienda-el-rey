@@ -29,7 +29,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css?v=20260723-metrics">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -138,7 +138,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="reports_center.filter.store">Store</label>
-                        <select id="filter-store" class="input !w-auto py-1.5 px-3 text-sm min-w-[140px]">
+                        <select id="store-selector" class="input !w-auto py-1.5 px-3 text-sm min-w-[140px]">
                             <option value="" data-i18n="reports_center.filter.all_stores">All Stores</option>
                         </select>
                     </div>
@@ -662,8 +662,8 @@
         }
     </style>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script type="module">
 
     const RC = {
@@ -677,6 +677,7 @@
             if (!ok) return;
             document.getElementById('user-avatar').textContent = (App.user.name || 'A')[0].toUpperCase();
             App.initSidebar();
+            App.initStoreSelector();
             App.initUserMenu();
             this.bindEvents();
             this.loadData();
@@ -709,13 +710,21 @@
             });
             document.getElementById('btn-clear-filters').addEventListener('click', () => {
                 document.getElementById('filter-company').value = '';
-                document.getElementById('filter-store').value = '';
+                const storeSel = document.getElementById('store-selector');
+                if (storeSel && App.user?.role === 'admin' && storeSel.value !== 'all') {
+                    storeSel.value = 'all';
+                    App.storeFilterMode = 'all';
+                    localStorage.setItem('storeFilterMode', 'all');
+                    window.dispatchEvent(new CustomEvent('store-changed'));
+                    return; // store-changed handler reloads
+                }
                 document.getElementById('filter-sender').value = '';
                 document.getElementById('filter-date-from').value = '';
                 document.getElementById('filter-date-to').value = '';
                 this.currentPage = 1;
                 this.loadData();
             });
+            window.addEventListener('store-changed', () => { this.currentPage = 1; this.loadData(); });
             document.getElementById('btn-export').addEventListener('click', () => this.exportCSV());
             document.getElementById('btn-export-excel').addEventListener('click', () => this.exportExcel());
 
@@ -732,10 +741,10 @@
             params.set('page', this.currentPage);
 
             const company = document.getElementById('filter-company').value;
-            const store = document.getElementById('filter-store').value;
             const sender = document.getElementById('filter-sender').value;
             if (company) params.set('company', company);
-            if (store) params.set('store_id', store);
+            const sq = App.storeQuery?.() || '';
+            if (sq.startsWith('store_id=')) params.set('store_id', sq.slice('store_id='.length));
             if (sender) params.set('sender', sender);
 
             if (this.currentPeriod === 'custom') {
@@ -773,10 +782,8 @@
 
         populateFilters(data) {
             const compSel = document.getElementById('filter-company');
-            const storeSel = document.getElementById('filter-store');
             const curComp = compSel.value;
-            const curStore = storeSel.value;
-
+            // ponytail: store-selector owned by App.initStoreSelector
             if (compSel.options.length <= 1) {
                 (data.available_companies || []).forEach(c => {
                     const opt = document.createElement('option');
@@ -784,15 +791,7 @@
                     compSel.appendChild(opt);
                 });
             }
-            if (storeSel.options.length <= 1) {
-                (data.available_stores || []).forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.id; opt.textContent = s.name;
-                    storeSel.appendChild(opt);
-                });
-            }
             compSel.value = curComp;
-            storeSel.value = curStore;
         },
 
         esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; },
@@ -1271,12 +1270,12 @@
 
             try {
                 const f = this.data?.filters || {};
-                const storeId = document.getElementById('filter-store').value || '';
                 const params = new URLSearchParams({
                     date_from: f.date_from || '',
                     date_to: f.date_to || '',
                 });
-                if (storeId) params.set('store_id', storeId);
+                const sq = App.storeQuery?.() || '';
+                if (sq.startsWith('store_id=')) params.set('store_id', sq.slice('store_id='.length));
 
                 const data = await App.api('GET', '/api/export-workbook?' + params.toString());
                 this.buildExcelWorkbook(data);

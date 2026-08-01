@@ -28,7 +28,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css?v=20260801-store-nav">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -199,8 +199,8 @@
         </form>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
         (async () => {
             const ok = await App.init();
@@ -302,10 +302,10 @@
                 scanLabel.textContent = App.t('security.scanning');
                 scanBtn.disabled = true;
                 try {
-                    const res = await App.api('POST', '/api/transfer-security', {
-                        action: 'scan',
-                        days: 7,
-                    });
+                    const payload = { action: 'scan', days: 7 };
+                    const sq = App.storeQuery?.() || '';
+                    if (sq.startsWith('store_id=')) payload.store_id = parseInt(sq.slice('store_id='.length), 10);
+                    const res = await App.api('POST', '/api/transfer-security', payload);
                     App.toast(App.t('security.toast.scan_done', {
                         scanned: res.scanned,
                         alerts: res.alerts_created,

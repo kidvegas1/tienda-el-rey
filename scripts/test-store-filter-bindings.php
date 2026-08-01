@@ -69,6 +69,13 @@ $storeSql = store_filter_sql('ae.store_id', $storeId);
 $sql = "SELECT 1 FROM accounting_entries ae WHERE 1=1{$storeSql} LIMIT 1";
 assert_ok($pdo, 'accounting list', $sql, [$storeId]);
 
+// Security summary open counts by severity (store-scoped)
+$sql = "SELECT severity, COUNT(*) AS cnt
+        FROM transfer_security_alerts
+        WHERE status = 'open' AND store_id = ?
+        GROUP BY severity";
+assert_ok($pdo, 'security summary store filter', $sql, [$storeId]);
+
 if ($failures > 0) {
     fwrite(STDERR, "{$failures} binding test(s) failed\n");
     exit(1);

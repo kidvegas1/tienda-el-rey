@@ -30,7 +30,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -99,7 +99,7 @@
                     <p class="text-xs text-text-muted" id="page-date"></p>
                 </div>
             </div>
-            <div class="flex items-center gap-3" id="header-actions"></div>
+            <div class="flex items-center gap-3" id="header-actions"><select id="store-selector" class="input py-2 px-3 text-sm w-36 sm:w-44"></select></div>
         </header>
 
         <!-- VIEW 1: Report List -->
@@ -583,8 +583,8 @@
         </div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script src="assets/js/check-cashing-xlsx.js"></script>
     <script type="module">
 
@@ -5479,6 +5479,7 @@
         if (!ok) return;
 
         App.initSidebar();
+            App.initStoreSelector();
         App.initUserMenu();
 
         const avatar = document.getElementById('user-avatar');

@@ -28,7 +28,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -90,7 +90,7 @@
                 <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.analytics.heading">Store Analytics</h2>
             </div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                <select id="store-filter" class="input py-2 px-3 text-sm w-full sm:w-40"></select>
+                <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-40"></select>
                 <select id="year-selector" class="input py-2 px-3 text-sm w-full sm:w-28"></select>
                 <button id="csv-btn" class="btn-primary text-sm w-full sm:w-auto justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -310,14 +310,15 @@
         </main>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
         (async () => {
             const ok = await App.init();
             if (!ok) return;
 
             App.initSidebar();
+            App.initStoreSelector();
             App.initUserMenu();
 
             const avatar = document.getElementById('user-avatar');
@@ -339,21 +340,11 @@
                 return MONTH_KEYS.map((k) => App.t(k));
             }
 
-            function refreshStoreFilter() {
-                const current = storeSel.value;
-                storeSel.innerHTML = `<option value="">${App.t('analytics.all_stores')}</option>` +
-                    App.stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-                storeSel.value = current;
-            }
-
             function companyColor(name) {
                 return COMPANY_COLORS[name] || FALLBACK_COLOR;
             }
 
-            const storeSel = document.getElementById('store-filter');
             const yearSel  = document.getElementById('year-selector');
-
-            refreshStoreFilter();
 
             let analyticsData = null;
             let sortField = 'total_sent';
@@ -361,10 +352,8 @@
 
             async function loadData() {
                 try {
-                    const storeId = storeSel.value;
                     const year = yearSel.value || new Date().getFullYear();
-                    const qs = `year=${year}` + (storeId ? `&store_id=${storeId}` : '');
-                    const data = await App.api('GET', `/api/analytics?${qs}`);
+                    const data = await App.api('GET', App.withStoreQuery(`/api/analytics?year=${year}`));
                     analyticsData = data;
 
                     if (!yearSel.options.length || yearSel.dataset.loaded !== 'true') {
@@ -557,7 +546,8 @@
             async function exportCSV() {
                 try {
                     const year = yearSel.value || new Date().getFullYear();
-                    const storeId = storeSel.value || '';
+                    const sq = App.storeQuery?.() || '';
+                    const storeId = sq.startsWith('store_id=') ? sq.slice('store_id='.length) : '';
                     const res = await fetch('/api/analytics', {
                         method: 'POST',
                         headers: {
@@ -565,7 +555,7 @@
                             'X-CSRF-Token': App.csrf,
                         },
                         credentials: 'same-origin',
-                        body: JSON.stringify({ action: 'export', year: parseInt(year), store_id: storeId ? parseInt(storeId) : null }),
+                        body: JSON.stringify({ action: 'export', year: parseInt(year), store_id: storeId ? parseInt(storeId, 10) : null }),
                     });
                     if (!res.ok) {
                         const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -586,12 +576,10 @@
                 }
             }
 
-            storeSel.addEventListener('change', loadData);
             yearSel.addEventListener('change', loadData);
             loadData();
             window.addEventListener('store-changed', loadData);
             document.addEventListener('language-changed', () => {
-                refreshStoreFilter();
                 if (analyticsData) renderFromCache();
                 else loadData();
                 if (txnData) renderTxnResults(txnData);

@@ -8,7 +8,11 @@ $pdo = db();
 
 if ($method === 'GET') {
     $year = (int)($_GET['year'] ?? date('Y'));
-    $filterStore = !empty($_GET['store_id']) ? (int)$_GET['store_id'] : null;
+    $requested = !empty($_GET['store_id']) ? (int)$_GET['store_id'] : null;
+    if ($requested !== null) {
+        auth_require_store_access($requested);
+    }
+    $filterStore = resolve_store_filter($requested);
     $storeWhere = $filterStore ? ' AND t.store_id = ?' : '';
     $storeParam = $filterStore ? [(int)$filterStore] : [];
 
@@ -73,11 +77,11 @@ if ($method === 'POST') {
 
     if ($act === 'export') {
         $year = (int)($data['year'] ?? date('Y'));
-        if (auth_is_admin()) {
-            $filterStore = !empty($data['store_id']) ? (int)$data['store_id'] : null;
-        } else {
-            $filterStore = resolve_store_id(!empty($data['store_id']) ? (int)$data['store_id'] : null);
+        $requested = !empty($data['store_id']) ? (int)$data['store_id'] : null;
+        if ($requested !== null) {
+            auth_require_store_access($requested);
         }
+        $filterStore = resolve_store_filter($requested);
         $storeWhere = $filterStore ? ' AND t.store_id = ?' : '';
         $params = $filterStore ? [$year, (int)$filterStore] : [$year];
 

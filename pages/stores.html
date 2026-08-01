@@ -28,7 +28,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css?v=20260714-tip2">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -55,6 +55,7 @@
             <a href="statistics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-label" data-i18n="nav.statistics">Statistics</span></a>
             <a href="reports" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg><span class="nav-label" data-i18n="nav.reports">Reports</span></a>
             <a href="analytics" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label" data-i18n="nav.analytics">Analytics</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
             <a href="security" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Security</span></a>
             <a href="reports-center" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span class="nav-label" data-i18n="nav.reports_center">Reports Center</span></a>
             <a href="accounting" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Accounting</span></a>
@@ -90,6 +91,7 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
                 <button type="button" id="btn-toggle-inactive" class="btn-secondary px-4 py-2.5 text-sm w-full sm:w-auto justify-center" data-i18n="stores.show_inactive">Show archived stores</button>
                 <button id="btn-add-store" class="btn-primary flex items-center gap-2 px-4 py-2.5 text-sm w-full sm:w-auto justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -339,8 +341,8 @@
             </div>
         </div>
     </div>
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
         let storesList = [];
         let storeBalances = {};
@@ -952,6 +954,7 @@
             const accountEmail = document.getElementById('account-email');
             if (accountEmail && App.user?.email) accountEmail.textContent = App.user.email;
             App.initSidebar();
+            App.initStoreSelector();
             App.initUserMenu();
             const avatar = document.getElementById('user-avatar');
             if (avatar && App.user && App.user.name) avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();

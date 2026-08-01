@@ -84,7 +84,7 @@
             #page-title + p { display: none; }
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -101,6 +101,7 @@
             <a href="statistics" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 20v-6M12 20V4m6 16v-10"/></svg><span class="nav-label" data-i18n="nav.statistics">Estadísticas</span></a>
             <a href="reports" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2h9l3 3v17H6zM9 13h6M9 17h6"/></svg><span class="nav-label" data-i18n="nav.reports">Reportes</span></a>
             <a href="analytics" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 17 6-6 4 4 8-9"/></svg><span class="nav-label" data-i18n="nav.analytics">Análisis</span></a>
+            <a href="metas" class="sidebar-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="nav-label" data-i18n="nav.metas">Goals</span></a>
             <a href="security" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nav-label" data-i18n="nav.security">Seguridad</span></a>
             <a href="reports-center" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2h9l3 3v17H6zM9 13h6M9 17h6"/></svg><span class="nav-label" data-i18n="nav.reports_center">Centro de reportes</span></a>
             <a href="accounting" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20M10 3v18"/></svg><span class="nav-label" data-i18n="nav.accounting">Contabilidad</span></a>
@@ -302,7 +303,7 @@
         <button type="button" id="scanner-stop-btn" class="btn-secondary w-full justify-center mt-4" data-close-modal="scanner-modal">Cerrar cámara</button>
     </section>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script><script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script><script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
     (() => {
         const state = {
@@ -356,53 +357,12 @@
             btn.classList.toggle('opacity-50', state.viewAllStores);
             btn.classList.toggle('cursor-not-allowed', state.viewAllStores);
         }
-        function initInventoryStoreSelector() {
-            const sel = $('store-selector');
-            if (!sel) return;
-            if (!isAdmin()) {
-                sel.classList.add('hidden');
-                return;
-            }
-            const storageKey = 'inventory_view_all_stores';
-            state.viewAllStores = sessionStorage.getItem(storageKey) === '1';
-            const options = [`<option value="all"${state.viewAllStores ? ' selected' : ''}>${esc(t('inventory.all_stores'))}</option>`];
-            App.stores.forEach((s) => {
-                const selected = !state.viewAllStores && s.id == App.currentStore?.id;
-                options.push(`<option value="${s.id}"${selected ? ' selected' : ''}>${esc(s.name)}</option>`);
-            });
-            sel.innerHTML = options.join('');
-            sel.classList.remove('hidden');
-            sel.addEventListener('change', async (e) => {
-                const val = String(e.target.value || '');
-                if (val === 'all') {
-                    state.viewAllStores = true;
-                    sessionStorage.setItem(storageKey, '1');
-                    syncStoreContext(t('inventory.all_stores'));
-                    syncProductsTableHeader();
-                    syncAddProductButton();
-                    $('barcode-input').value = '';
-                    $('scan-result').classList.add('hidden');
-                    state.product = null;
-                    await loadData();
-                    return;
-                }
-                state.viewAllStores = false;
-                sessionStorage.removeItem(storageKey);
-                try {
-                    await App.api('POST', '/api/auth', { action: 'switch_store', store_id: parseInt(val, 10) });
-                    App.currentStore = App.stores.find(s => String(s.id) === val) || App.currentStore;
-                    App.toast(App.t('store.switched', { name: App.currentStore?.name || '' }), 'success');
-                    syncStoreContext(App.currentStore?.name);
-                    syncProductsTableHeader();
-                    syncAddProductButton();
-                    $('barcode-input').value = '';
-                    $('scan-result').classList.add('hidden');
-                    state.product = null;
-                    await loadData();
-                } catch (err) {
-                    App.toast(err.message, 'danger');
-                }
-            });
+        function syncInventoryScopeFromApp() {
+            // ponytail: inventory scope follows global App.storeFilterMode
+            state.viewAllStores = isAdmin() && App.storeFilterMode === 'all';
+            syncStoreContext(state.viewAllStores ? t('inventory.all_stores') : App.currentStore?.name);
+            syncProductsTableHeader();
+            syncAddProductButton();
         }
         function syncStoreContext(storeName) {
             const name = storeName || App.currentStore?.name || '—';
@@ -1237,8 +1197,8 @@
             const ok = await App.init();
             if (!ok) return;
             App.initSidebar();
-            initInventoryStoreSelector();
-            syncStoreContext(state.viewAllStores ? t('inventory.all_stores') : App.currentStore?.name);
+            App.initStoreSelector();
+            syncInventoryScopeFromApp();
             App.initUserMenu();
             if (App.user?.name) {
                 $('user-avatar').textContent = App.user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -1320,11 +1280,10 @@
                 else if ($('product-modal').classList.contains('open')) closeProductModal();
             });
             window.addEventListener('store-changed', () => {
-                if (state.viewAllStores) return;
                 $('barcode-input').value = '';
                 $('scan-result').classList.add('hidden');
                 state.product = null;
-                syncStoreContext(App.currentStore?.name);
+                syncInventoryScopeFromApp();
                 loadData();
             });
             document.addEventListener('language-changed', loadData);

@@ -28,7 +28,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css?v=20260716e">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-gaps">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -92,7 +92,7 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                <select id="store-filter" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
+                <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
                 <label class="flex items-center gap-2 text-xs text-text-secondary px-2">
                     <input type="checkbox" id="include-inactive" class="rounded border-border">
                     <span data-i18n="employees.show_inactive">Show inactive</span>
@@ -224,8 +224,8 @@
         </form>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
-    <script src="assets/js/app.js?v=20260801-store-nav"></script>
+    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
         let employeesList = [];
         let storesList = [];
@@ -252,11 +252,10 @@
         }
 
         function fillStoreSelects() {
-            const filter = document.getElementById('store-filter');
+            // ponytail: roster scope uses App.store-selector; modal still needs store list
             const modal = document.getElementById('employee-store');
             const opts = storesList.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
-            filter.innerHTML = `<option value="">${esc(t('employees.all_stores'))}</option>` + opts;
-            modal.innerHTML = opts;
+            if (modal) modal.innerHTML = opts;
         }
 
         function openEmployeeModal(emp = null) {
@@ -276,8 +275,12 @@
                 document.getElementById('employee-id').value = '';
                 statusWrap.classList.add('hidden');
                 document.getElementById('employee-modal-title').textContent = t('employees.add');
-                const filterStore = document.getElementById('store-filter').value;
-                if (filterStore) document.getElementById('employee-store').value = filterStore;
+                const sq = App.storeQuery?.() || '';
+                if (sq.startsWith('store_id=')) {
+                    document.getElementById('employee-store').value = sq.slice('store_id='.length);
+                } else if (App.currentStore?.id) {
+                    document.getElementById('employee-store').value = String(App.currentStore.id);
+                }
             }
             App.openModal('employee-modal');
         }
@@ -324,10 +327,10 @@
         async function loadEmployees() {
             const tbody = document.getElementById('employees-tbody');
             tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-text-muted">${esc(t('common.loading'))}</td></tr>`;
-            const storeId = document.getElementById('store-filter').value;
             const includeInactive = document.getElementById('include-inactive').checked;
             const qs = new URLSearchParams();
-            if (storeId) qs.set('store_id', storeId);
+            const sq = App.storeQuery?.() || '';
+            if (sq.startsWith('store_id=')) qs.set('store_id', sq.slice('store_id='.length));
             if (includeInactive) qs.set('include_inactive', '1');
             try {
                 const res = await App.api('GET', '/api/employees?' + qs.toString());
@@ -368,12 +371,12 @@
         async function loadPayroll() {
             const from = document.getElementById('payroll-from').value;
             const to = document.getElementById('payroll-to').value;
-            const storeId = document.getElementById('store-filter').value;
             const tbody = document.getElementById('payroll-tbody');
             if (!from || !to) return;
             tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-text-muted">${esc(t('common.loading'))}</td></tr>`;
             const qs = new URLSearchParams({ action: 'payroll', from, to });
-            if (storeId) qs.set('store_id', storeId);
+            const sq = App.storeQuery?.() || '';
+            if (sq.startsWith('store_id=')) qs.set('store_id', sq.slice('store_id='.length));
             try {
                 const res = await App.api('GET', '/api/employees?' + qs.toString());
                 const rows = res.rows || [];
@@ -406,6 +409,7 @@
                 return;
             }
             App.initSidebar();
+            App.initStoreSelector();
             App.initUserMenu();
             const avatar = document.getElementById('user-avatar');
             if (avatar && App.user?.name) {
@@ -420,7 +424,7 @@
             document.getElementById('payroll-to').value = isoDate(to);
 
             document.getElementById('btn-add-employee').addEventListener('click', () => openEmployeeModal(null));
-            document.getElementById('store-filter').addEventListener('change', async () => {
+            window.addEventListener('store-changed', async () => {
                 await loadEmployees();
                 await loadPayroll();
             });
