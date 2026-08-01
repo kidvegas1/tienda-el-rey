@@ -1132,11 +1132,29 @@ if ($method === 'POST') {
         $targetStore = $storeStmt->fetch();
         if (!$targetStore) json_error('Target store not found', 404);
 
-        // Same duplicate key as import: don't allow two copies of the report at the target store.
-        $dup = $pdo->prepare('SELECT id FROM barri_reports WHERE store_id = ? AND agency_number = ? AND report_date_from = ? AND report_date_to = ? AND id <> ?');
-        $dup->execute([$targetStoreId, $report['agency_number'], $report['report_date_from'], $report['report_date_to'], $reportId]);
-        if ($dup->fetch()) {
-            json_error('The target store already has a report for this agency and date range', 409);
+        // Block only a true duplicate of the same report kind (e.g. another check-cashing
+        // import). Remittance PDFs and check-cashing Excel for the same agency/period
+        // are different report types and may coexist on one store.
+        $dup = $pdo->prepare(
+            'SELECT id, agency_name, report_type FROM barri_reports
+             WHERE store_id = ? AND agency_number = ? AND report_date_from = ? AND report_date_to = ?
+               AND COALESCE(report_type, \'\') = COALESCE(?, \'\') AND id <> ?
+             LIMIT 1'
+        );
+        $dup->execute([
+            $targetStoreId,
+            $report['agency_number'],
+            $report['report_date_from'],
+            $report['report_date_to'],
+            $report['report_type'] ?? '',
+            $reportId,
+        ]);
+        if ($conflict = $dup->fetch()) {
+            json_error(
+                'The target store already has this report type for the same agency and date range'
+                . ' (#' . (int)$conflict['id'] . ' ' . ($conflict['agency_name'] ?? '') . ')',
+                409
+            );
         }
 
         $pdo->beginTransaction();
