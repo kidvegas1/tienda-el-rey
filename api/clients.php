@@ -5,6 +5,19 @@ $pdo = db();
 require_once __DIR__ . '/../includes/settings.php';
 require_once __DIR__ . '/../includes/client-activity.php';
 require_once __DIR__ . '/../includes/transfer-security.php';
+require_once __DIR__ . '/../includes/commission.php';
+
+function clients_activity_mode(?string $raw): string {
+    $mode = strtolower(trim((string)$raw));
+    return in_array($mode, ['both', 'envios', 'checks'], true) ? $mode : 'both';
+}
+
+function clients_check_match_sql(string $clientAlias = 'c', string $btAlias = 'bt'): string {
+    $nameMatch = sql_fold_text("{$btAlias}.customer_name") . ' = ' . sql_fold_text("{$clientAlias}.name");
+    // Prefer explicit client_id. Name-match only when the check is unlinked,
+    // so one check cannot count toward two different clients.
+    return "({$btAlias}.client_id = {$clientAlias}.id OR ({$btAlias}.client_id IS NULL AND {$nameMatch}))";
+}
 
 function fincen_period_options(): array {
     return [
@@ -206,28 +219,104 @@ if ($method === 'GET') {
         }
         $monthUsage = (float)$usage->fetch()['total'];
 
-        if (auth_is_admin()) {
-            $transfers = $pdo->prepare(
-                'SELECT t.*, s.name AS store_name,
-                        bt.id AS barri_txn_id,
-                        bt.reference_number AS report_reference,
-                        br.id AS report_id,
-                        br.original_name AS report_original_name,
-                        br.filename AS report_filename,
-                        br.company AS report_company,
-                        br.report_type AS report_type,
-                        br.report_date_from AS report_date_from,
-                        br.report_date_to AS report_date_to
-                 FROM transfers t
-                 LEFT JOIN stores s ON s.id = t.store_id
-                 LEFT JOIN barri_transactions bt ON bt.transfer_id = t.id
-                 LEFT JOIN barri_reports br ON br.id = bt.report_id
-                 WHERE t.client_id = ?
-                 ORDER BY t.date_sent DESC, t.id DESC
-                 LIMIT 100'
+        $activityMode = clients_activity_mode($_GET['activity'] ?? 'both');
+        $checkTypeSql = commission_check_type_sql('bt.transaction_type');
+        $checkMatchSql = clients_check_match_sql('c', 'bt');
+        $storeBtSql = $storeFilter ? ' AND bt.store_id = ' . (int)$storeId : '';
+        $storeTSql = (!auth_is_admin() || $storeFilter) ? ' AND t.store_id = ' . (int)$storeId : '';
+        if (auth_is_admin() && !$storeFilter) {
+            $storeTSql = '';
+        }
+
+        $envioSql = "SELECT t.id, t.date_sent, t.amount_usd, t.fee, t.tax, t.beneficiary, t.company,
+                            t.transaction_type, t.transaction_code, t.source, t.paying_bank,
+                            t.destination_country, t.destination_city, t.store_id,
+                            s.name AS store_name,
+                            bt.id AS barri_txn_id,
+                            bt.reference_number AS report_reference,
+                            br.id AS report_id,
+                            br.original_name AS report_original_name,
+                            br.filename AS report_filename,
+                            br.company AS report_company,
+                            br.report_type AS report_type,
+                            br.report_date_from AS report_date_from,
+                            br.report_date_to AS report_date_to,
+                            'envio' AS activity_kind
+                     FROM transfers t
+                     LEFT JOIN stores s ON s.id = t.store_id
+                     LEFT JOIN barri_transactions bt ON bt.transfer_id = t.id
+                     LEFT JOIN barri_reports br ON br.id = bt.report_id
+                     WHERE t.client_id = ?{$storeTSql}
+                       AND NOT " . commission_check_type_sql('t.transaction_type');
+
+        $checkSql = "SELECT bt.id, (bt.transaction_date::text || ' ' || COALESCE(bt.transaction_time::text, '00:00:00')) AS date_sent,
+                            ABS(bt.principal) AS amount_usd, bt.fee, bt.tax,
+                            COALESCE(NULLIF(TRIM(bt.description), ''), bt.customer_name) AS beneficiary,
+                            COALESCE(br.company, 'Viamericas') AS company,
+                            bt.transaction_type, bt.reference_number AS transaction_code,
+                            'check_cashing' AS source, NULL AS paying_bank,
+                            NULL AS destination_country, NULL AS destination_city, bt.store_id,
+                            s.name AS store_name,
+                            bt.id AS barri_txn_id,
+                            bt.reference_number AS report_reference,
+                            br.id AS report_id,
+                            br.original_name AS report_original_name,
+                            br.filename AS report_filename,
+                            br.company AS report_company,
+                            br.report_type AS report_type,
+                            br.report_date_from AS report_date_from,
+                            br.report_date_to AS report_date_to,
+                            'check_cashing' AS activity_kind
+                     FROM barri_transactions bt
+                     JOIN clients c ON c.id = ?
+                     LEFT JOIN stores s ON s.id = bt.store_id
+                     LEFT JOIN barri_reports br ON br.id = bt.report_id
+                     WHERE {$checkTypeSql}
+                       AND {$checkMatchSql}
+                       {$storeBtSql}";
+
+        // Postgres supports ::text casts used above; keep portable date expression.
+        if (!db_is_pgsql()) {
+            $checkSql = str_replace(
+                "(bt.transaction_date::text || ' ' || COALESCE(bt.transaction_time::text, '00:00:00'))",
+                "CONCAT(bt.transaction_date, ' ', COALESCE(bt.transaction_time, '00:00:00'))",
+                $checkSql
             );
-            $transfers->execute([$clientId]);
-            $monthExpr = sql_date_format_ym('date_sent');
+        }
+
+        if ($activityMode === 'envios') {
+            $activitySql = "{$envioSql} ORDER BY date_sent DESC, id DESC LIMIT 200";
+            $activityParams = [$clientId];
+        } elseif ($activityMode === 'checks') {
+            $activitySql = "{$checkSql} ORDER BY date_sent DESC, id DESC LIMIT 200";
+            $activityParams = [$clientId];
+        } else {
+            $activitySql = "({$envioSql}) UNION ALL ({$checkSql}) ORDER BY date_sent DESC, id DESC LIMIT 200";
+            $activityParams = [$clientId, $clientId];
+        }
+        $transfers = $pdo->prepare($activitySql);
+        $transfers->execute($activityParams);
+        $transferRows = $transfers->fetchAll();
+
+        $checksAgg = $pdo->prepare(
+            "SELECT COUNT(*) AS checks_count, COALESCE(SUM(ABS(bt.principal)),0) AS checks_volume
+             FROM barri_transactions bt
+             JOIN clients c ON c.id = ?
+             WHERE {$checkTypeSql} AND {$checkMatchSql}{$storeBtSql}"
+        );
+        $checksAgg->execute([$clientId]);
+        $checksStats = $checksAgg->fetch() ?: ['checks_count' => 0, 'checks_volume' => 0];
+
+        $enviosAgg = $pdo->prepare(
+            'SELECT COUNT(*) AS envios_count, COALESCE(SUM(amount_usd),0) AS envios_sent
+             FROM transfers t
+             WHERE t.client_id = ?' . $storeTSql . ' AND NOT ' . commission_check_type_sql('t.transaction_type')
+        );
+        $enviosAgg->execute([$clientId]);
+        $enviosStats = $enviosAgg->fetch() ?: ['envios_count' => 0, 'envios_sent' => 0];
+
+        $monthExpr = sql_date_format_ym('date_sent');
+        if (auth_is_admin() && !$storeFilter) {
             $monthlySummary = $pdo->prepare("SELECT {$monthExpr} as month, COUNT(*) as cnt, SUM(amount_usd) as total FROM transfers WHERE client_id = ? GROUP BY {$monthExpr} ORDER BY month DESC LIMIT 12");
             $monthlySummary->execute([$clientId]);
             $companyBreakdown = $pdo->prepare(
@@ -241,27 +330,6 @@ if ($method === 'GET') {
             );
             $companyBreakdown->execute([$clientId]);
         } else {
-            $transfers = $pdo->prepare(
-                'SELECT t.*, s.name AS store_name,
-                        bt.id AS barri_txn_id,
-                        bt.reference_number AS report_reference,
-                        br.id AS report_id,
-                        br.original_name AS report_original_name,
-                        br.filename AS report_filename,
-                        br.company AS report_company,
-                        br.report_type AS report_type,
-                        br.report_date_from AS report_date_from,
-                        br.report_date_to AS report_date_to
-                 FROM transfers t
-                 LEFT JOIN stores s ON s.id = t.store_id
-                 LEFT JOIN barri_transactions bt ON bt.transfer_id = t.id
-                 LEFT JOIN barri_reports br ON br.id = bt.report_id
-                 WHERE t.client_id = ? AND t.store_id = ?
-                 ORDER BY t.date_sent DESC, t.id DESC
-                 LIMIT 100'
-            );
-            $transfers->execute($storeParams);
-            $monthExpr = sql_date_format_ym('date_sent');
             $monthlySummary = $pdo->prepare("SELECT {$monthExpr} as month, COUNT(*) as cnt, SUM(amount_usd) as total FROM transfers WHERE client_id = ? AND store_id = ? GROUP BY {$monthExpr} ORDER BY month DESC LIMIT 12");
             $monthlySummary->execute($storeParams);
             $companyBreakdown = $pdo->prepare(
@@ -285,7 +353,12 @@ if ($method === 'GET') {
             'is_service_bucket' => $isServiceBucket,
             'month_usage'       => $monthUsage,
             'month_limit'       => (float)$client['monthly_limit'],
-            'transfers'         => $transfers->fetchAll(),
+            'transfers'         => $transferRows,
+            'activity_mode'     => $activityMode,
+            'envios_sent'       => (float)$enviosStats['envios_sent'],
+            'envios_count'      => (int)$enviosStats['envios_count'],
+            'checks_volume'     => (float)$checksStats['checks_volume'],
+            'checks_count'      => (int)$checksStats['checks_count'],
             'company_breakdown' => $companyBreakdown->fetchAll(),
             'monthly_summary'   => $monthlySummary->fetchAll(),
             'receivers'         => array_map(
@@ -297,10 +370,65 @@ if ($method === 'GET') {
         ]);
     }
 
+    if ($action === 'checks_by_name') {
+        $name = trim((string)($_GET['name'] ?? ''));
+        if ($name === '') {
+            json_error('Name is required', 400);
+        }
+        $checkTypeSql = commission_check_type_sql('bt.transaction_type');
+        $storeSql = '';
+        $execParams = [search_fold($name)];
+        if ($storeFilter) {
+            $storeSql = ' AND bt.store_id = ?';
+            $execParams[] = $storeId;
+        }
+        $nameFold = sql_fold_text('bt.customer_name');
+        $dateExpr = db_is_pgsql()
+            ? "(bt.transaction_date::text || ' ' || COALESCE(bt.transaction_time::text, '00:00:00'))"
+            : "CONCAT(bt.transaction_date, ' ', COALESCE(bt.transaction_time, '00:00:00'))";
+        $stmt = $pdo->prepare(
+            "SELECT bt.id, {$dateExpr} AS date_sent, ABS(bt.principal) AS amount_usd, bt.fee, bt.tax,
+                    COALESCE(NULLIF(TRIM(bt.description), ''), bt.customer_name) AS beneficiary,
+                    COALESCE(br.company, 'Viamericas') AS company,
+                    bt.transaction_type, bt.reference_number AS transaction_code,
+                    'check_cashing' AS source, bt.store_id, s.name AS store_name,
+                    bt.id AS barri_txn_id, bt.reference_number AS report_reference,
+                    br.id AS report_id, br.original_name AS report_original_name,
+                    br.filename AS report_filename, br.company AS report_company,
+                    br.report_type AS report_type, br.report_date_from, br.report_date_to,
+                    'check_cashing' AS activity_kind, bt.customer_name
+             FROM barri_transactions bt
+             LEFT JOIN stores s ON s.id = bt.store_id
+             LEFT JOIN barri_reports br ON br.id = bt.report_id
+             WHERE {$checkTypeSql}
+               AND {$nameFold} = ?
+               {$storeSql}
+             ORDER BY bt.transaction_date DESC, bt.id DESC
+             LIMIT 300"
+        );
+        $stmt->execute($execParams);
+        $rows = $stmt->fetchAll();
+        $volume = 0.0;
+        foreach ($rows as $row) {
+            $volume += (float)($row['amount_usd'] ?? 0);
+        }
+        $clientMatch = $pdo->prepare('SELECT id, name, phone, client_code FROM clients WHERE ' . sql_fold_text('name') . ' = ? LIMIT 1');
+        $clientMatch->execute([search_fold($name)]);
+        json_response([
+            'name' => $name,
+            'client' => $clientMatch->fetch() ?: null,
+            'checks_count' => count($rows),
+            'checks_volume' => $volume,
+            'transfers' => $rows,
+            'activity_mode' => 'checks',
+        ]);
+    }
+
     // List clients with search and sorting
     $search = trim((string)($_GET['search'] ?? ''));
     $sort = $_GET['sort'] ?? 'name';
     $filter = $_GET['filter'] ?? '';
+    $activityMode = clients_activity_mode($_GET['activity'] ?? 'both');
     $page = max(1, (int)($_GET['page'] ?? 1));
     $limit = 50;
     $offset = ($page - 1) * $limit;
@@ -310,53 +438,194 @@ if ($method === 'GET') {
     $periodConfig = fincen_period_config($_GET['fincen_period'] ?? null);
     $periodSql = $periodConfig['sql'];
 
-    $sortMap = [
-        'name'       => 'c.name ASC',
-        'top_sender' => 'total_sent DESC',
-        'month_usage'=> 'period_usage DESC',
-        'recent'     => 'last_transfer DESC',
-        'limit'      => 'c.monthly_limit DESC',
-        'fincen'     => 'period_usage DESC',
-    ];
+    $storeSql = $storeFilter ? clients_store_transfer_sql($storeId) : '';
+    $storeBtSql = $storeFilter ? ' AND bt.store_id = ' . (int)$storeId : '';
+    $checkTypeSql = commission_check_type_sql('bt.transaction_type');
+    $checkMatchSql = clients_check_match_sql('c', 'bt');
+    $enviosTypeSql = 'NOT ' . commission_check_type_sql('transaction_type');
+
+    $enviosSentSql = "(SELECT COALESCE(SUM(amount_usd),0) FROM transfers WHERE client_id = c.id{$storeSql} AND {$enviosTypeSql})";
+    $enviosCountSql = "(SELECT COUNT(*) FROM transfers WHERE client_id = c.id{$storeSql} AND {$enviosTypeSql})";
+    $checksVolumeSql = "(SELECT COALESCE(SUM(ABS(bt.principal)),0) FROM barri_transactions bt WHERE {$checkTypeSql} AND {$checkMatchSql}{$storeBtSql})";
+    $checksCountSql = "(SELECT COUNT(*) FROM barri_transactions bt WHERE {$checkTypeSql} AND {$checkMatchSql}{$storeBtSql})";
+    $combinedSentSql = "({$enviosSentSql} + {$checksVolumeSql})";
+
     if ($filter === 'fincen') {
         $sort = 'fincen';
     }
+
+    $topSenderSort = match ($activityMode) {
+        'envios' => 'envios_sent DESC, c.name ASC',
+        'checks' => 'checks_volume DESC, c.name ASC',
+        default  => 'combined_sent DESC, c.name ASC',
+    };
+    $sortMap = [
+        'name'       => 'c.name ASC',
+        'top_sender' => $topSenderSort,
+        'month_usage'=> 'period_usage DESC',
+        'recent'     => 'last_transfer DESC NULLS LAST',
+        'limit'      => 'c.monthly_limit DESC',
+        'fincen'     => 'period_usage DESC',
+    ];
+    if (!db_is_pgsql()) {
+        $sortMap['recent'] = 'last_transfer DESC';
+    }
     $orderBy = $sortMap[$sort] ?? 'c.name ASC';
 
-    $storeSql = $storeFilter ? clients_store_transfer_sql($storeId) : '';
+    // Checks-only roster: aggregate check cashers (including people not yet in clients).
+    if ($activityMode === 'checks') {
+        $nameFoldBt = sql_fold_text('bt.customer_name');
+        $nameFoldC = sql_fold_text('c.name');
+        $likeOp = sql_like_op();
+        $where = ["TRIM(COALESCE(bt.customer_name, '')) <> ''", $checkTypeSql];
+        $params = [];
+        if ($storeFilter) {
+            $where[] = 'bt.store_id = ?';
+            $params[] = $storeId;
+        }
+        if ($search !== '') {
+            $tokens = preg_split('/\s+/u', search_fold($search), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            $tokens = array_values(array_filter($tokens, static fn($t) => mb_strlen($t) >= 1));
+            if ($tokens === []) {
+                $tokens = [search_fold($search)];
+            }
+            $tokenClauses = [];
+            foreach ($tokens as $token) {
+                $like = '%' . $token . '%';
+                $tokenClauses[] = "({$nameFoldBt} {$likeOp} ?)";
+                $params[] = $like;
+            }
+            if ($tokenClauses) {
+                $where[] = '(' . implode(' AND ', $tokenClauses) . ')';
+            }
+        }
+        $whereSql = 'WHERE ' . implode(' AND ', $where);
+        $aggFrom = "FROM barri_transactions bt {$whereSql}";
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM (SELECT {$nameFoldBt} AS name_key {$aggFrom} GROUP BY {$nameFoldBt}) x");
+        $countStmt->execute($params);
+        $total = (int)$countStmt->fetchColumn();
 
-    $baseSelect = "SELECT c.*,
+        $orderChecks = match ($sort) {
+            'name' => 'display_name ASC',
+            'recent' => db_is_pgsql()
+                ? 'last_transfer DESC NULLS LAST, display_name ASC'
+                : 'last_transfer DESC, display_name ASC',
+            'limit' => 'monthly_limit DESC NULLS LAST, display_name ASC',
+            // period_usage is always 0 in checks-only; use check volume for volume sorts.
+            'top_sender', 'month_usage', 'fincen' => 'checks_volume DESC, display_name ASC',
+            default => 'checks_volume DESC, display_name ASC',
+        };
+        if (!db_is_pgsql()) {
+            $orderChecks = str_replace(' NULLS LAST', '', $orderChecks);
+        }
+        $listSql = "SELECT
+                COALESCE(c.id, 0) AS id,
+                COALESCE(c.name, MAX(bt.customer_name)) AS name,
+                COALESCE(c.name, MAX(bt.customer_name)) AS display_name,
+                c.phone, c.client_code, c.monthly_limit, c.income_verified, c.sender_id_path, c.income_doc_path,
+                0::float AS period_usage,
+                0::float AS month_usage,
+                0::float AS envios_sent,
+                0 AS envios_count,
+                COALESCE(SUM(ABS(bt.principal)),0) AS checks_volume,
+                COUNT(*) AS checks_count,
+                COALESCE(SUM(ABS(bt.principal)),0) AS total_sent,
+                COUNT(*) AS transfer_count,
+                COALESCE(SUM(ABS(bt.principal)),0) AS combined_sent,
+                MAX(bt.transaction_date) AS last_transfer,
+                'check_casher' AS row_kind
+            {$aggFrom}
+            LEFT JOIN clients c ON {$nameFoldC} = {$nameFoldBt}
+            GROUP BY {$nameFoldBt}, c.id, c.name, c.phone, c.client_code, c.monthly_limit, c.income_verified, c.sender_id_path, c.income_doc_path
+            ORDER BY {$orderChecks}
+            LIMIT ? OFFSET ?";
+        if (!db_is_pgsql()) {
+            $listSql = str_replace('0::float', '0', $listSql);
+        }
+        $stmt = $pdo->prepare($listSql);
+        $stmt->execute(array_merge($params, [$limit, $offset]));
+        $rows = $stmt->fetchAll();
+        foreach ($rows as &$row) {
+            $row['envios_sent'] = 0.0;
+            $row['envios_count'] = 0;
+            $row['checks_volume'] = (float)$row['checks_volume'];
+            $row['checks_count'] = (int)$row['checks_count'];
+            $row['combined_sent'] = (float)$row['combined_sent'];
+            $row['is_check_only'] = empty($row['id']);
+        }
+        unset($row);
+
+        json_response([
+            'clients'          => $rows,
+            'total'            => $total,
+            'page'             => $page,
+            'pages'            => (int)ceil(max(1, $total) / $limit),
+            'filter'           => $filter,
+            'activity'         => $activityMode,
+            'fincen_threshold'      => $fincenThreshold,
+            'fincen_global_limit'   => $fincenThreshold,
+            'fincen_period'         => $periodConfig['key'],
+            'fincen_period_label'   => $periodConfig['label'],
+            'fincen_period_range'   => $periodConfig['range_label'],
+            'fincen_period_from'    => $periodConfig['date_from'],
+            'fincen_period_to'      => $periodConfig['date_to'],
+            'fincen_period_options' => array_map(
+                fn(string $key) => ['value' => $key, 'label' => fincen_period_options()[$key]['label']],
+                array_keys(fincen_period_options())
+            ),
+            'scope' => $storeFilter ? 'store' : 'all',
+        ]);
+    }
+
+    $clientSelectCols = "c.id, c.name, c.phone, c.client_code, c.monthly_limit, c.income_verified, c.sender_id_path, c.income_doc_path,
         (SELECT COALESCE(SUM(amount_usd),0) FROM transfers WHERE client_id = c.id{$storeSql} AND {$periodSql}) as period_usage,
         (SELECT COALESCE(SUM(amount_usd),0) FROM transfers WHERE client_id = c.id{$storeSql} AND date_sent >= " . sql_month_start(0) . ") as month_usage,
-        (SELECT COALESCE(SUM(amount_usd),0) FROM transfers WHERE client_id = c.id{$storeSql}) as total_sent,
-        (SELECT COUNT(*) FROM transfers WHERE client_id = c.id{$storeSql}) as transfer_count,
-        (SELECT MAX(date_sent) FROM transfers WHERE client_id = c.id{$storeSql}) as last_transfer
-        FROM clients c";
+        {$enviosSentSql} as envios_sent,
+        {$enviosCountSql} as envios_count,
+        {$checksVolumeSql} as checks_volume,
+        {$checksCountSql} as checks_count,
+        {$combinedSentSql} as combined_sent,
+        {$enviosSentSql} as total_sent,
+        {$enviosCountSql} as transfer_count,
+        (SELECT MAX(date_sent) FROM transfers WHERE client_id = c.id{$storeSql}) as last_transfer,
+        'client' as row_kind";
 
-    if ($storeFilter) {
-        $where = [clients_list_store_where($storeId)];
-    } elseif ($search !== '') {
-        // Searching: include clients even if they have no transfers yet
-        $where = ['1=1'];
+    if ($activityMode === 'envios') {
+        if ($storeFilter) {
+            $where = [clients_list_store_where($storeId)];
+        } elseif ($search !== '') {
+            $where = ['1=1'];
+        } else {
+            $where = ['EXISTS (SELECT 1 FROM transfers t_scope WHERE t_scope.client_id = c.id)'];
+        }
     } else {
-        $where = ['EXISTS (SELECT 1 FROM transfers t_scope WHERE t_scope.client_id = c.id)'];
+        // both: clients with remittances and/or matched check cashing
+        $hasEnvios = 'EXISTS (SELECT 1 FROM transfers t_scope WHERE t_scope.client_id = c.id'
+            . ($storeFilter ? ' AND t_scope.store_id = ' . (int)$storeId : '') . ')';
+        $hasChecks = "EXISTS (SELECT 1 FROM barri_transactions bt WHERE {$checkTypeSql} AND {$checkMatchSql}{$storeBtSql})";
+        if ($search !== '') {
+            $where = ['1=1'];
+        } else {
+            $where = ["({$hasEnvios} OR {$hasChecks})"];
+        }
     }
     // Never list synthetic Money Order bucket clients in FinCEN / client roster
     $where[] = 'NOT ' . clients_is_service_bucket_sql('c');
     $params = [];
 
+    $searchTokens = [];
     if ($search !== '') {
-        $tokens = preg_split('/\s+/u', search_fold($search), -1, PREG_SPLIT_NO_EMPTY) ?: [];
-        $tokens = array_values(array_filter($tokens, static fn($t) => mb_strlen($t) >= 1));
-        if ($tokens === []) {
-            $tokens = [search_fold($search)];
+        $searchTokens = preg_split('/\s+/u', search_fold($search), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $searchTokens = array_values(array_filter($searchTokens, static fn($t) => mb_strlen($t) >= 1));
+        if ($searchTokens === []) {
+            $searchTokens = [search_fold($search)];
         }
         $nameFold = sql_fold_text('c.name');
         $codeFold = sql_fold_text('COALESCE(c.client_code, \'\')');
         $phoneFold = sql_fold_text('COALESCE(c.phone, \'\')');
         $likeOp = sql_like_op();
         $tokenClauses = [];
-        foreach ($tokens as $token) {
+        foreach ($searchTokens as $token) {
             $like = '%' . $token . '%';
             // Each word must appear somewhere in name/phone/code (AND across tokens)
             $tokenClauses[] = "({$nameFold} {$likeOp} ? OR {$phoneFold} {$likeOp} ? OR {$codeFold} {$likeOp} ?)";
@@ -374,20 +643,119 @@ if ($method === 'GET') {
 
     $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM clients c {$whereSql}");
-    $countStmt->execute($params);
-    $total = (int)$countStmt->fetchColumn();
+    // "Both" includes unmatched check cashers so the roster shows everyone.
+    if ($activityMode === 'both' && $filter !== 'fincen') {
+        $nameFoldBt = sql_fold_text('bt.customer_name');
+        $nameFoldC = sql_fold_text('c.name');
+        $likeOp = sql_like_op();
+        // Orphans = unlinked checks with no name match. Exclude bt.client_id so
+        // checks already attributed to a client (via client_id) are not listed twice.
+        $orphanWhere = [
+            "TRIM(COALESCE(bt.customer_name, '')) <> ''",
+            $checkTypeSql,
+            'bt.client_id IS NULL',
+            'c.id IS NULL',
+        ];
+        $orphanParams = [];
+        if ($storeFilter) {
+            $orphanWhere[] = 'bt.store_id = ?';
+            $orphanParams[] = $storeId;
+        }
+        if ($searchTokens) {
+            $tokenClauses = [];
+            foreach ($searchTokens as $token) {
+                $like = '%' . $token . '%';
+                $tokenClauses[] = "({$nameFoldBt} {$likeOp} ?)";
+                $orphanParams[] = $like;
+            }
+            $orphanWhere[] = '(' . implode(' AND ', $tokenClauses) . ')';
+        }
+        $orphanWhereSql = 'WHERE ' . implode(' AND ', $orphanWhere);
+        $zeroFloat = db_is_pgsql() ? '0::float' : '0';
+        $clientPart = "SELECT {$clientSelectCols} FROM clients c {$whereSql}";
+        $orphanPart = "SELECT
+                0 AS id,
+                MAX(bt.customer_name) AS name,
+                NULL AS phone,
+                NULL AS client_code,
+                {$zeroFloat} AS monthly_limit,
+                " . (db_is_pgsql() ? 'false' : '0') . " AS income_verified,
+                NULL AS sender_id_path,
+                NULL AS income_doc_path,
+                {$zeroFloat} AS period_usage,
+                {$zeroFloat} AS month_usage,
+                {$zeroFloat} AS envios_sent,
+                0 AS envios_count,
+                COALESCE(SUM(ABS(bt.principal)),0) AS checks_volume,
+                COUNT(*) AS checks_count,
+                COALESCE(SUM(ABS(bt.principal)),0) AS combined_sent,
+                {$zeroFloat} AS total_sent,
+                0 AS transfer_count,
+                MAX(bt.transaction_date) AS last_transfer,
+                'check_casher' AS row_kind
+            FROM barri_transactions bt
+            LEFT JOIN clients c ON {$nameFoldC} = {$nameFoldBt}
+            {$orphanWhereSql}
+            GROUP BY {$nameFoldBt}";
 
-    $listParams = array_merge($params, [$limit, $offset]);
-    $stmt = $pdo->prepare("{$baseSelect} {$whereSql} ORDER BY {$orderBy} LIMIT ? OFFSET ?");
-    $stmt->execute($listParams);
+        $unionOrder = match ($sort) {
+            'name' => 'name ASC',
+            'top_sender' => 'combined_sent DESC, name ASC',
+            'month_usage', 'fincen' => 'period_usage DESC, name ASC',
+            'recent' => db_is_pgsql() ? 'last_transfer DESC NULLS LAST, name ASC' : 'last_transfer DESC, name ASC',
+            'limit' => 'monthly_limit DESC, name ASC',
+            default => 'name ASC',
+        };
+
+        $countStmt = $pdo->prepare(
+            "SELECT (
+                (SELECT COUNT(*) FROM clients c {$whereSql})
+                + (SELECT COUNT(*) FROM (SELECT {$nameFoldBt} FROM barri_transactions bt LEFT JOIN clients c ON {$nameFoldC} = {$nameFoldBt} {$orphanWhereSql} GROUP BY {$nameFoldBt}) o)
+            )"
+        );
+        $countStmt->execute(array_merge($params, $orphanParams));
+        $total = (int)$countStmt->fetchColumn();
+
+        $listSql = "SELECT * FROM (
+                ({$clientPart})
+                UNION ALL
+                ({$orphanPart})
+            ) roster
+            ORDER BY {$unionOrder}
+            LIMIT ? OFFSET ?";
+        $stmt = $pdo->prepare($listSql);
+        $stmt->execute(array_merge($params, $orphanParams, [$limit, $offset]));
+        $clients = $stmt->fetchAll();
+    } else {
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM clients c {$whereSql}");
+        $countStmt->execute($params);
+        $total = (int)$countStmt->fetchColumn();
+
+        $listParams = array_merge($params, [$limit, $offset]);
+        $stmt = $pdo->prepare("SELECT {$clientSelectCols} FROM clients c {$whereSql} ORDER BY {$orderBy} LIMIT ? OFFSET ?");
+        $stmt->execute($listParams);
+        $clients = $stmt->fetchAll();
+    }
+
+    foreach ($clients as &$clientRow) {
+        $clientRow['envios_sent'] = (float)($clientRow['envios_sent'] ?? 0);
+        $clientRow['envios_count'] = (int)($clientRow['envios_count'] ?? 0);
+        $clientRow['checks_volume'] = (float)($clientRow['checks_volume'] ?? 0);
+        $clientRow['checks_count'] = (int)($clientRow['checks_count'] ?? 0);
+        $clientRow['combined_sent'] = (float)($clientRow['combined_sent'] ?? 0);
+        $clientRow['total_sent'] = $clientRow['combined_sent'];
+        $clientRow['transfer_count'] = $clientRow['envios_count'] + $clientRow['checks_count'];
+        $clientRow['is_check_only'] = empty($clientRow['id']) || (($clientRow['row_kind'] ?? '') === 'check_casher');
+    }
+    unset($clientRow);
 
     json_response([
-        'clients'          => $stmt->fetchAll(),
+        'clients'          => $clients,
         'total'            => $total,
         'page'             => $page,
         'pages'            => (int)ceil(max(1, $total) / $limit),
         'filter'           => $filter,
+        'activity'         => $activityMode,
         'fincen_threshold'      => $fincenThreshold,
         'fincen_global_limit'   => $fincenThreshold,
         'fincen_period'         => $periodConfig['key'],

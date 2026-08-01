@@ -321,6 +321,12 @@ body {
 .finance-side-row:hover { background: oklch(0.94 0.06 300 / 0.45); }
 .finance-side-text { color: oklch(0.42 0.16 300); font-weight: 600; }
 
+/* Check cashing / cambio de cheques — distinct from remittances */
+.badge-check-cashing { background: oklch(0.92 0.08 155 / 0.22); color: oklch(0.38 0.12 155); border: 1px solid oklch(0.72 0.10 155 / 0.4); }
+.check-cashing-row { background: oklch(0.96 0.05 155 / 0.42); }
+.check-cashing-row:hover { background: oklch(0.94 0.07 155 / 0.55); }
+.check-cashing-text { color: oklch(0.38 0.12 155); font-weight: 600; }
+
 /* ── Smart metric cards (Reports Center, dashboards) ── */
 .metric-card {
     min-height: 5.25rem;

@@ -28,7 +28,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css?v=20260714c">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-checks">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -89,6 +89,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     <span id="fincen-filter-label" data-i18n="clients.fincen">FinCEN</span>
                 </button>
+                <select id="activity-select" class="input py-2 px-3 text-sm w-48" data-i18n-title="clients.activity_filter_title" title="Show remittances, check cashing, or both">
+                    <option value="both" data-i18n="clients.activity.both">Show: Both</option>
+                    <option value="envios" data-i18n="clients.activity.envios">Show: Envíos only</option>
+                    <option value="checks" data-i18n="clients.activity.checks">Show: Cambios de cheque only</option>
+                </select>
                 <select id="sort-select" class="input py-2 px-3 text-sm w-44">
                     <option value="name" data-i18n="clients.sort.name">Sort: Name A-Z</option>
                     <option value="top_sender" data-i18n="clients.sort.top_sender">Sort: Top Sender</option>
@@ -122,8 +127,10 @@
                                 <th data-i18n="common.name">Name</th>
                                 <th data-i18n="common.phone">Phone</th>
                                 <th id="usage-column-label" data-i18n="clients.col.period_usage">Period Usage</th>
-                                <th data-i18n="clients.col.total_sent">Total Sent</th>
-                                <th data-i18n="clients.col.transfers">Transfers</th>
+                                <th data-i18n="clients.col.envios">Envíos</th>
+                                <th data-i18n="clients.col.checks">Cambios de cheque</th>
+                                <th data-i18n="clients.col.total_sent">Total</th>
+                                <th data-i18n="clients.col.transfers">Count</th>
                                 <th class="align-top min-w-[130px]">
                                     <div class="flex flex-col gap-1.5" onclick="event.stopPropagation()">
                                         <span data-i18n="clients.col.fincen_limit">FinCEN Limit</span>
@@ -154,7 +161,7 @@
                             </tr>
                         </thead>
                         <tbody id="clients-tbody">
-                            <tr><td colspan="8" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
+                            <tr><td colspan="10" class="text-center text-text-muted py-8" data-i18n="common.loading">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -186,8 +193,10 @@
                         </div>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between"><span class="text-text-muted" data-i18n="common.phone">Phone</span><span id="client-phone"></span></div>
-                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.total_sent">Total Sent</span><span class="font-mono tabular-nums" id="client-total-sent"></span></div>
-                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.transfers">Transfers</span><span class="font-mono tabular-nums" id="client-transfer-count"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.envios">Envíos</span><span class="font-mono tabular-nums" id="client-envios-sent"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.checks">Cambios de cheque</span><span class="font-mono tabular-nums check-cashing-text" id="client-checks-volume"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.total_sent">Total</span><span class="font-mono tabular-nums" id="client-total-sent"></span></div>
+                            <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.col.transfers">Count</span><span class="font-mono tabular-nums" id="client-transfer-count"></span></div>
                             <div class="flex justify-between"><span class="text-text-muted" data-i18n="clients.detail.income_verified">Income Verified</span><span id="client-verified"></span></div>
                             <div id="client-income-doc-row" class="hidden flex justify-between"><span class="text-text-muted" data-i18n="clients.detail.income_doc">Income Doc</span><a id="client-income-doc-link" href="#" target="_blank" class="text-accent text-xs hover:underline" data-i18n="clients.detail.view_document">View Document</a></div>
                         </div>
@@ -214,12 +223,19 @@
                             <div class="space-y-2" id="company-breakdown"></div>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between gap-3 flex-wrap">
                             <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider" data-i18n="clients.transfer_history">Transfer History</h3>
-                            <button id="add-transfer-btn" class="btn-primary text-xs py-1.5 px-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                <span data-i18n="clients.add_transfer">Add Transfer</span>
-                            </button>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <select id="detail-activity-select" class="input py-1.5 px-2 text-xs w-44">
+                                    <option value="both" data-i18n="clients.activity.both">Show: Both</option>
+                                    <option value="envios" data-i18n="clients.activity.envios">Show: Envíos only</option>
+                                    <option value="checks" data-i18n="clients.activity.checks">Show: Cambios de cheque only</option>
+                                </select>
+                                <button id="add-transfer-btn" class="btn-primary text-xs py-1.5 px-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span data-i18n="clients.add_transfer">Add Transfer</span>
+                                </button>
+                            </div>
                         </div>
                         <div id="transfers-list" class="space-y-2 max-h-[min(70vh,40rem)] overflow-y-auto pr-1"></div>
 
@@ -483,7 +499,7 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260714f"></script>
+    <script src="assets/js/i18n.js?v=20260801-checks"></script>
     <script src="assets/js/app.js?v=20260714e"></script>
     <script>
         function escHtml(s) {
@@ -528,23 +544,35 @@
             return { company, sourceText, reportHtml, dest, reportRef };
         }
 
+        function isCheckCashingTxn(t) {
+            const kind = String(t.activity_kind || '').toLowerCase();
+            if (kind === 'check_cashing') return true;
+            const typeRaw = String(t.transaction_type || '').toLowerCase().replace(/[\s-]+/g, '_');
+            return typeRaw.includes('cambio') && typeRaw.includes('cheque')
+                || ['cambio_cheque', 'cambio_cheques', 'cambio_de_cheques', 'check_cashing', 'cheque_escaneado'].includes(typeRaw);
+        }
+
         function renderTransferCard(t) {
             const m = transferMeta(t);
             const bank = (t.paying_bank || '').trim();
             const fee = parseFloat(t.fee || 0);
             const typeRaw = String(t.transaction_type || '').toLowerCase().replace(/\s+/g, '_');
             const isMo = typeRaw === 'money_order';
-            const typeBadge = isMo
-                ? `<span class="badge badge-side-finances text-[10px]">${i18nLabel('reports.type.money_order', 'Money Order')}</span>`
-                : '';
+            const isCheck = isCheckCashingTxn(t);
+            const typeBadge = isCheck
+                ? `<span class="badge badge-check-cashing text-[10px]">${i18nLabel('clients.activity.checks_short', 'Cambio de cheque')}</span>`
+                : (isMo
+                    ? `<span class="badge badge-side-finances text-[10px]">${i18nLabel('reports.type.money_order', 'Money Order')}</span>`
+                    : `<span class="badge badge-info text-[10px]">${i18nLabel('clients.activity.envios_short', 'Envío')}</span>`);
             const refLine = m.reportRef
                 ? `<p class="font-mono text-xs text-text-secondary mt-0.5">${i18nLabel('clients.txn.meta_ref', 'Ref')}: <span class="font-semibold text-text-primary">${escHtml(m.reportRef)}</span></p>`
                 : '';
             const feeLine = fee > 0
                 ? `<p class="text-[11px] text-text-muted font-mono">${i18nLabel('clients.txn.meta_fee', 'Fee')}: ${App.money(fee)}</p>`
                 : '';
+            const rowClass = isCheck ? 'check-cashing-row' : (isMo ? 'finance-side-row' : 'bg-bg-surface');
             return `
-            <article class="rounded-xl border border-border bg-bg-surface p-3.5 sm:p-4 hover:border-accent/30 transition-colors ${isMo ? 'finance-side-row' : ''}">
+            <article class="rounded-xl border border-border p-3.5 sm:p-4 hover:border-accent/30 transition-colors ${rowClass}">
                 <div class="flex flex-wrap items-start justify-between gap-2 gap-y-1">
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -555,7 +583,7 @@
                         ${refLine}
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="font-mono tabular-nums font-semibold text-base">${App.money(t.amount_usd)}</p>
+                        <p class="font-mono tabular-nums font-semibold text-base ${isCheck ? 'check-cashing-text' : ''}">${App.money(t.amount_usd)}</p>
                         ${feeLine}
                         <span class="badge badge-info text-[10px] uppercase mt-1">${escHtml(m.company)}</span>
                     </div>
@@ -563,15 +591,15 @@
                 <dl class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div>
                         <dt class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_source', 'Fuente')}</dt>
-                        <dd class="text-text-secondary">${escHtml(m.sourceText)}</dd>
+                        <dd class="text-text-secondary">${escHtml(isCheck ? i18nLabel('clients.origin.check_cashing', 'Check cashing') : m.sourceText)}</dd>
                     </div>
                     <div class="min-w-0">
                         <dt class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_report', 'Reporte')}</dt>
                         <dd class="break-words">${m.reportHtml}</dd>
                     </div>
                     <div class="sm:col-span-2">
-                        <dt class="text-[10px] uppercase tracking-wider text-text-muted">${i18nLabel('clients.txn.meta_destination', 'Destino')}</dt>
-                        <dd class="text-text-secondary break-words">${escHtml(m.dest || i18nLabel('empty.none', '—'))}${bank ? ` · ${escHtml(bank)}` : ''}</dd>
+                        <dt class="text-[10px] uppercase tracking-wider text-text-muted">${isCheck ? i18nLabel('clients.txn.meta_issuer', 'Issuer') : i18nLabel('clients.txn.meta_destination', 'Destino')}</dt>
+                        <dd class="text-text-secondary break-words">${escHtml(isCheck ? (t.beneficiary || i18nLabel('empty.none', '—')) : (m.dest || i18nLabel('empty.none', '—')))}${!isCheck && bank ? ` · ${escHtml(bank)}` : ''}</dd>
                     </div>
                 </dl>
             </article>`;
@@ -635,6 +663,7 @@
         }
 
         let currentClientId = null;
+        let currentCheckCasherName = null;
         let currentPage = 1;
         let fincenFilterActive = false;
         let globalFincenLimit = 2500;
@@ -658,15 +687,14 @@
 
             applyClientsAttrI18n();
 
-            // Deep-link from Reports Center / bookmarks: /clients?client_id=123 or ?id=123
-            const deepLinkId = parseInt(
-                new URLSearchParams(window.location.search).get('client_id')
-                || new URLSearchParams(window.location.search).get('id')
-                || '',
-                10
-            );
+            // Deep-link: /clients?client_id=123, ?id=123, or ?check_name=...
+            const bootParams = new URLSearchParams(window.location.search);
+            const deepLinkId = parseInt(bootParams.get('client_id') || bootParams.get('id') || '', 10);
+            const deepCheckName = (bootParams.get('check_name') || '').trim();
             if (Number.isFinite(deepLinkId) && deepLinkId > 0) {
                 await openClient(deepLinkId, { fromDeepLink: true });
+            } else if (deepCheckName) {
+                await openCheckCasher(deepCheckName, { skipHistory: true });
             } else {
                 loadClients();
             }
@@ -674,24 +702,42 @@
             window.addEventListener('popstate', () => {
                 const params = new URLSearchParams(window.location.search);
                 const id = parseInt(params.get('client_id') || params.get('id') || '', 10);
+                const checkName = (params.get('check_name') || '').trim();
                 if (Number.isFinite(id) && id > 0) {
                     openClient(id, { skipHistory: true });
-                } else if (currentClientId) {
+                } else if (checkName) {
+                    openCheckCasher(checkName, { skipHistory: true });
+                } else if (currentClientId || currentCheckCasherName) {
                     document.getElementById('client-detail').classList.add('hidden');
                     document.getElementById('client-list-view').classList.remove('hidden');
                     currentClientId = null;
+                    currentCheckCasherName = null;
                     loadClients();
                 }
             });
 
             document.addEventListener('language-changed', () => {
                 applyClientsAttrI18n();
+                updateTopSenderSortLabel();
                 if (currentClientId) loadClientDetail(currentClientId);
+                else if (currentCheckCasherName) openCheckCasher(currentCheckCasherName, { skipHistory: true });
                 else loadClients();
             });
 
             document.getElementById('search-input').addEventListener('input', App.debounce(() => { currentPage = 1; loadClients(); }, 400));
+            document.getElementById('activity-select').addEventListener('change', () => {
+                currentPage = 1;
+                const detailSel = document.getElementById('detail-activity-select');
+                if (detailSel) detailSel.value = document.getElementById('activity-select').value;
+                updateTopSenderSortLabel();
+                loadClients();
+            });
             document.getElementById('sort-select').addEventListener('change', () => { currentPage = 1; loadClients(); });
+            document.getElementById('detail-activity-select')?.addEventListener('change', () => {
+                if (currentClientId) loadClientDetail(currentClientId);
+                else if (currentCheckCasherName) openCheckCasher(currentCheckCasherName, { skipHistory: true });
+            });
+            updateTopSenderSortLabel();
 
             document.getElementById('fincen-filter-btn').addEventListener('click', () => {
                 fincenFilterActive = !fincenFilterActive;
@@ -739,9 +785,11 @@
                 document.getElementById('client-detail').classList.add('hidden');
                 document.getElementById('client-list-view').classList.remove('hidden');
                 currentClientId = null;
+                currentCheckCasherName = null;
                 const url = new URL(window.location.href);
                 url.searchParams.delete('client_id');
                 url.searchParams.delete('id');
+                url.searchParams.delete('check_name');
                 history.pushState({}, '', url.pathname + (url.search || '') + url.hash);
                 loadClients();
             });
@@ -895,25 +943,51 @@
             if (el) el.textContent = label || App.t('clients.col.period_usage');
         }
 
+        function updateTopSenderSortLabel() {
+            const opt = document.querySelector('#sort-select option[value="top_sender"]');
+            if (!opt) return;
+            const activity = document.getElementById('activity-select')?.value || 'both';
+            const key = activity === 'envios'
+                ? 'clients.sort.top_sender_envios'
+                : (activity === 'checks' ? 'clients.sort.top_sender_checks' : 'clients.sort.top_sender_both');
+            const label = App.t(key);
+            opt.textContent = label !== key ? label : App.t('clients.sort.top_sender');
+        }
+
         function clientRowHtml(c, threshold) {
             const periodUsage = parseFloat(c.period_usage ?? c.month_usage) || 0;
             const periodLimit = threshold;
             const pct = periodLimit > 0 ? Math.min(100, (periodUsage / periodLimit) * 100) : 0;
             const barClass = pct >= 90 ? 'progress-fill-danger' : pct >= 70 ? 'progress-fill-warning' : 'progress-fill';
-            const totalSent = parseFloat(c.total_sent) || 0;
-            const txnCount = parseInt(c.transfer_count) || 0;
+            const enviosSent = parseFloat(c.envios_sent ?? 0) || 0;
+            const enviosCount = parseInt(c.envios_count ?? 0, 10) || 0;
+            const checksVolume = parseFloat(c.checks_volume ?? 0) || 0;
+            const checksCount = parseInt(c.checks_count ?? 0, 10) || 0;
+            const combined = parseFloat(c.combined_sent ?? (enviosSent + checksVolume)) || 0;
+            const txnCount = enviosCount + checksCount || parseInt(c.transfer_count, 10) || 0;
             const isFincen = periodUsage >= threshold;
             const atLimit = pct >= 90 && !isFincen;
+            const hasChecks = checksCount > 0 || checksVolume > 0;
+            const isCheckOnly = !!c.is_check_only || (!Number(c.id) && hasChecks);
+            const activityFilter = document.getElementById('activity-select')?.value || 'both';
+            // Highlight full row for check-cashing activity when viewing checks or both.
+            const highlightChecks = activityFilter !== 'envios' && hasChecks;
+            const rowClass = [
+                'cursor-pointer client-row',
+                isFincen ? 'bg-danger/[0.03]' : '',
+                highlightChecks ? 'check-cashing-row' : '',
+            ].filter(Boolean).join(' ');
 
             return `
-            <tr class="cursor-pointer ${isFincen ? 'bg-danger/[0.03]' : ''}" data-client-id="${c.id}" onclick="openClient(${c.id})">
+            <tr class="${rowClass}" data-client-id="${c.id || 0}" data-check-only="${isCheckOnly ? '1' : '0'}" data-name="${escHtml(c.name || '')}">
                 <td>
                     <div>
-                        <p class="font-medium">${c.name}</p>
-                        <p class="text-[10px] font-mono text-text-muted">${c.client_code || ''}</p>
+                        <p class="font-medium">${escHtml(c.name || '')}</p>
+                        <p class="text-[10px] font-mono text-text-muted">${escHtml(c.client_code || '')}</p>
+                        ${hasChecks ? `<span class="badge badge-check-cashing text-[10px] mt-1">${App.t('clients.activity.checks_short')}</span>` : ''}
                     </div>
                 </td>
-                <td class="text-sm">${c.phone || App.t('empty.none')}</td>
+                <td class="text-sm">${escHtml(c.phone || App.t('empty.none'))}</td>
                 <td>
                     <div class="w-28">
                         <div class="flex justify-between text-xs mb-1">
@@ -923,9 +997,18 @@
                         <div class="progress-bar"><div class="${barClass}" style="width:${pct}%"></div></div>
                     </div>
                 </td>
-                <td class="font-mono tabular-nums text-sm ${isFincen && fincenPeriod === 'lifetime' ? 'text-danger font-bold' : ''}">${App.money(totalSent)}</td>
+                <td class="font-mono tabular-nums text-sm">
+                    <div>${App.money(enviosSent)}</div>
+                    <div class="text-[10px] text-text-muted">${enviosCount} ${App.t('clients.activity.envios_short')}</div>
+                </td>
+                <td class="font-mono tabular-nums text-sm check-cashing-text">
+                    <div>${App.money(checksVolume)}</div>
+                    <div class="text-[10px]">${checksCount} ${App.t('clients.activity.checks_short')}</div>
+                </td>
+                <td class="font-mono tabular-nums text-sm ${isFincen && fincenPeriod === 'lifetime' ? 'text-danger font-bold' : ''}">${App.money(combined)}</td>
                 <td class="font-mono tabular-nums text-sm text-text-secondary">${txnCount}</td>
                 <td onclick="event.stopPropagation()">
+                    ${isCheckOnly ? `<span class="text-xs text-text-muted">${App.t('empty.none')}</span>` : `
                     <div class="flex items-center gap-1">
                         <span class="text-text-muted text-xs">$</span>
                         <input type="number"
@@ -938,14 +1021,16 @@
                             onclick="event.stopPropagation()"
                             onkeydown="event.stopPropagation()"
                             onchange="updateClientLimit(${c.id}, this)">
-                    </div>
+                    </div>`}
                 </td>
                 <td>
-                    ${c.income_verified ? `<span class="badge badge-success">${App.t('clients.badge.verified')}</span>` : `<span class="badge badge-warning">${App.t('clients.badge.standard')}</span>`}
+                    ${isCheckOnly
+                        ? `<span class="badge badge-check-cashing">${App.t('clients.badge.check_casher')}</span>`
+                        : (c.income_verified ? `<span class="badge badge-success">${App.t('clients.badge.verified')}</span>` : `<span class="badge badge-warning">${App.t('clients.badge.standard')}</span>`)}
                     ${isFincen ? `<span class="badge badge-danger ml-1">${App.t('clients.badge.fincen')}</span>` : ''}
                     ${atLimit ? `<span class="badge badge-warning ml-1">${App.t('clients.badge.at_limit')}</span>` : ''}
                 </td>
-                <td onclick="event.stopPropagation()"><button class="btn-secondary text-xs py-1 px-2.5" onclick="openClient(${c.id})">${App.t('common.view')}</button></td>
+                <td onclick="event.stopPropagation()"><button type="button" class="btn-secondary text-xs py-1 px-2.5 client-row-view">${App.t('common.view')}</button></td>
             </tr>`;
         }
 
@@ -978,12 +1063,23 @@
                         period: fincenPeriodLabel,
                     })
                     : App.t('clients.empty.no_clients');
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-text-muted py-8">${emptyMsg}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center text-text-muted py-8">${emptyMsg}</td></tr>`;
                 pag.innerHTML = `<span class="text-sm text-text-muted">${App.t('clients.pagination.zero_clients')}</span><div></div>`;
                 return;
             }
 
             tbody.innerHTML = clients.map((c) => clientRowHtml(c, threshold)).join('');
+            tbody.querySelectorAll('.client-row').forEach((row) => {
+                const open = () => {
+                    if (row.dataset.checkOnly === '1') openCheckCasher(row.dataset.name || '');
+                    else openClient(Number(row.dataset.clientId));
+                };
+                row.addEventListener('click', open);
+                row.querySelector('.client-row-view')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    open();
+                });
+            });
 
             const countStr = Number(res.total).toLocaleString();
             const mainLabel = fincenFilterActive
@@ -1063,13 +1159,15 @@
         async function loadClients(options = {}) {
             const search = document.getElementById('search-input').value;
             const sort = document.getElementById('sort-select').value;
+            const activity = document.getElementById('activity-select')?.value || 'both';
             const liveThreshold = getLiveGlobalLimit();
             const livePeriod = getLiveFincenPeriod();
             const filterParam = fincenFilterActive ? '&filter=fincen' : '';
             const thresholdParam = `&fincen_threshold=${encodeURIComponent(liveThreshold)}`;
             const periodParam = `&fincen_period=${encodeURIComponent(livePeriod)}`;
+            const activityParam = `&activity=${encodeURIComponent(activity)}`;
             try {
-                const res = await App.api('GET', `/api/clients?search=${encodeURIComponent(search)}&sort=${sort}&page=${currentPage}${filterParam}${thresholdParam}${periodParam}`);
+                const res = await App.api('GET', `/api/clients?search=${encodeURIComponent(search)}&sort=${sort}&page=${currentPage}${filterParam}${thresholdParam}${periodParam}${activityParam}`);
                 const threshold = syncFincenControlsFromResponse(res, liveThreshold);
 
                 res.clients = (res.clients || []).map((c) => ({
@@ -1154,12 +1252,14 @@
 
         async function openClient(id, options = {}) {
             currentClientId = id;
+            currentCheckCasherName = null;
             document.getElementById('client-list-view').classList.add('hidden');
             document.getElementById('client-detail').classList.remove('hidden');
             if (!options.skipHistory) {
                 const url = new URL(window.location.href);
                 url.searchParams.set('client_id', String(id));
                 url.searchParams.delete('id');
+                url.searchParams.delete('check_name');
                 const next = url.pathname + '?' + url.searchParams.toString() + url.hash;
                 if (options.fromDeepLink) history.replaceState({ clientId: id }, '', next);
                 else history.pushState({ clientId: id }, '', next);
@@ -1167,10 +1267,61 @@
             await loadClientDetail(id);
         }
 
+        async function openCheckCasher(name, options = {}) {
+            const clean = String(name || '').trim();
+            if (!clean) return;
+            currentClientId = null;
+            currentCheckCasherName = clean;
+            document.getElementById('client-list-view').classList.add('hidden');
+            document.getElementById('client-detail').classList.remove('hidden');
+            if (!options.skipHistory) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('check_name', clean);
+                url.searchParams.delete('client_id');
+                url.searchParams.delete('id');
+                history.pushState({ checkName: clean }, '', url.pathname + '?' + url.searchParams.toString() + url.hash);
+            }
+            try {
+                const activity = document.getElementById('detail-activity-select')?.value || 'checks';
+                const res = await App.api('GET', `/api/clients?action=checks_by_name&name=${encodeURIComponent(clean)}&activity=${encodeURIComponent(activity)}`);
+                if (res.client?.id) {
+                    await openClient(res.client.id, { skipHistory: true });
+                    return;
+                }
+                document.getElementById('client-name').textContent = res.name || clean;
+                document.getElementById('client-code').textContent = App.t('clients.badge.check_casher');
+                document.getElementById('client-phone').textContent = App.t('empty.none');
+                document.getElementById('client-verified').innerHTML = `<span class="badge badge-check-cashing">${App.t('clients.activity.checks_short')}</span>`;
+                document.getElementById('client-envios-sent').textContent = App.money(0);
+                document.getElementById('client-checks-volume').textContent = App.money(res.checks_volume || 0);
+                document.getElementById('client-total-sent').textContent = App.money(res.checks_volume || 0);
+                document.getElementById('client-transfer-count').textContent = String(res.checks_count || 0);
+                document.getElementById('client-avatar').textContent = clean.split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('client-usage-text').textContent = App.money(0);
+                document.getElementById('client-progress').style.width = '0%';
+                document.getElementById('client-remaining').textContent = '';
+                document.getElementById('service-bucket-banner')?.classList.add('hidden');
+                document.getElementById('company-breakdown').innerHTML = `<p class="text-sm text-text-muted">${App.t('clients.empty.no_company_data')}</p>`;
+                document.getElementById('monthly-summary').innerHTML = '';
+                const list = document.getElementById('transfers-list');
+                list.innerHTML = (res.transfers || []).length
+                    ? res.transfers.map(t => renderTransferCard(t)).join('')
+                    : `<div class="card text-center text-text-muted py-6">${App.t('clients.empty.no_transfers')}</div>`;
+                const detailSel = document.getElementById('detail-activity-select');
+                if (detailSel && detailSel.value !== 'checks') detailSel.value = 'checks';
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
         async function loadClientDetail(id) {
             try {
-                const res = await App.api('GET', `/api/clients?action=detail&id=${id}`);
+                const activity = document.getElementById('detail-activity-select')?.value
+                    || document.getElementById('activity-select')?.value
+                    || 'both';
+                const res = await App.api('GET', `/api/clients?action=detail&id=${id}&activity=${encodeURIComponent(activity)}`);
                 const c = res.client;
+                document.getElementById('detail-activity-select').value = activity;
 
                 document.getElementById('client-name').textContent = c.name;
                 document.getElementById('client-code').textContent = c.client_code || App.t('clients.no_code');
@@ -1188,8 +1339,12 @@
                 }
 
                 // Total sent & transfer count
-                const totalSent = res.transfers.reduce((s, t) => s + parseFloat(t.amount_usd || 0), 0);
-                const txnCount = res.transfers.length;
+                const enviosSent = parseFloat(res.envios_sent || 0);
+                const checksVolume = parseFloat(res.checks_volume || 0);
+                const totalSent = enviosSent + checksVolume;
+                const txnCount = (parseInt(res.envios_count || 0, 10) || 0) + (parseInt(res.checks_count || 0, 10) || 0);
+                document.getElementById('client-envios-sent').textContent = App.money(enviosSent);
+                document.getElementById('client-checks-volume').textContent = App.money(checksVolume);
                 document.getElementById('client-total-sent').textContent = App.money(totalSent);
                 document.getElementById('client-total-sent').className = `font-mono tabular-nums ${totalSent >= 10000 ? 'text-danger font-bold' : ''}`;
                 document.getElementById('client-transfer-count').textContent = txnCount;

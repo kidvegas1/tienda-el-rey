@@ -50,6 +50,18 @@ function commission_is_check_cashing_type(string $type): bool {
     return str_contains($normalized, 'cambio') && str_contains($normalized, 'cheque');
 }
 
+/** SQL predicate: column holds a check-cashing transaction type. */
+function commission_check_type_sql(string $column): string {
+    $norm = "REPLACE(REPLACE(LOWER(TRIM(COALESCE({$column}, ''))), ' ', '_'), '-', '_')";
+    return "({$norm} IN ('cambio_cheque','cambio_cheques','cambio_de_cheques','check_cashing','cheque_escaneado')"
+        . " OR ({$norm} LIKE '%cambio%' AND {$norm} LIKE '%cheque%'))";
+}
+
+/** SQL predicate: remittance / envío (explicitly not check cashing). */
+function commission_envio_type_sql(string $column): string {
+    return 'NOT ' . commission_check_type_sql($column);
+}
+
 /**
  * Check-cashing volume only. Money transfers and generic ledger volume are excluded.
  * Every returned amount represents one check and is priced independently.
