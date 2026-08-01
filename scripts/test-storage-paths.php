@@ -36,6 +36,10 @@ $assertTrue(
     storage_upload_content_type($tmp, 'cambios.xls') === 'application/vnd.ms-excel',
     'xls uploads use the legacy spreadsheet MIME type'
 );
+$assertTrue(
+    storage_upload_content_type($tmp, 'organization') === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'zip-based spreadsheets without extension use the official XLSX MIME type'
+);
 @unlink($tmp);
 
 echo $failures === 0

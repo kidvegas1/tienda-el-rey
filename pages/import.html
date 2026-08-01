@@ -571,13 +571,13 @@
             const progressText = document.getElementById('import-progress-text');
 
             try {
-                progressText.textContent = App.t('import.progress.uploading');
+                progressText.textContent = App.t('import.progress.preparing');
                 progressBar.style.width = '10%';
 
-                const fd = new FormData();
-                fd.append('file', selectedFile);
-                fd.append('action', 'upload');
-                const uploadRes = await App.apiForm('/api/import', fd);
+                const uploadRes = await App.api('POST', '/api/import', {
+                    action: 'prepare_import',
+                    original_name: selectedFile.name,
+                });
 
                 progressBar.style.width = '40%';
                 progressText.textContent = App.t('import.progress.processing');

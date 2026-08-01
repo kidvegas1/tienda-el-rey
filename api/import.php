@@ -157,6 +157,21 @@ if ($method === 'POST') {
     $data = get_json_body();
     $act = $data['action'] ?? '';
 
+    if ($act === 'prepare_import') {
+        validate_required($data, ['original_name']);
+        $originalName = sanitize((string)$data['original_name']);
+        if ($originalName === '') {
+            json_error('Original file name is required');
+        }
+        $stmt = $pdo->prepare('INSERT INTO excel_imports (store_id, user_id, filename, original_name, status) VALUES (?,?,?,?,?)');
+        $stmt->execute([$storeId, $user['id'], '', $originalName, 'pending']);
+        json_response([
+            'success'   => true,
+            'import_id' => sql_last_insert_id($pdo, 'excel_imports'),
+            'filename'  => $originalName,
+        ], 201);
+    }
+
     if ($act === 'confirm_import') {
         validate_required($data, ['import_id', 'sheet_mapping']);
         $importId = (int)$data['import_id'];

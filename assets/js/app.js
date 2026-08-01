@@ -281,6 +281,9 @@ const App = {
         const res = await fetch(url, opts);
         const data = await res.json();
         if (!res.ok) {
+            if (res.status === 401) {
+                throw new Error(this.t('toast.session_expired'));
+            }
             throw new Error(data.error || `HTTP ${res.status}`);
         }
         return data;
@@ -309,6 +312,9 @@ const App = {
             }
         }
         if (!res.ok) {
+            if (res.status === 401) {
+                throw new Error(this.t('toast.session_expired'));
+            }
             throw new Error(data.error || raw.slice(0, 200) || `HTTP ${res.status}`);
         }
         return data;

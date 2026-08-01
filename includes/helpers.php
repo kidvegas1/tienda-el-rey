@@ -128,8 +128,7 @@ function upload_file(array $file, string $subdir = ''): string|false {
         try {
             return storage_upload($file['tmp_name'], $bucket, $objectPath, (string)($file['name'] ?? ''));
         } catch (Throwable $e) {
-            error_log('[storage] upload failed: ' . $e->getMessage());
-            return false;
+            error_log('[storage] upload failed, using local disk fallback: ' . $e->getMessage());
         }
     }
 

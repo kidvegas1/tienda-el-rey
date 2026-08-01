@@ -69,7 +69,25 @@ function storage_path_in_subdir(string $storedPath, string $subdir): bool {
  * application/zip. Supabase validates Content-Type against the bucket's
  * allowed MIME types and requires the official spreadsheet type.
  */
+function storage_is_spreadsheet_file(string $localPath, string $originalName = ''): bool {
+    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    if (in_array($ext, ['xlsx', 'xls'], true)) {
+        return true;
+    }
+    $head = @file_get_contents($localPath, false, null, 0, 4);
+    if ($head === "PK\x03\x04") {
+        return true;
+    }
+    return $head === "\xD0\xCF\x11\xE0";
+}
+
 function storage_upload_content_type(string $localPath, string $originalName = ''): string {
+    if (storage_is_spreadsheet_file($localPath, $originalName)) {
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        return $ext === 'xls'
+            ? 'application/vnd.ms-excel'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    }
     $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
     return match ($ext) {
         'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -105,6 +123,11 @@ function storage_upload(
     ]);
 
     if ($response['code'] < 200 || $response['code'] >= 300) {
+        $detail = trim($response['body']);
+        if ($detail !== '') {
+            $detail = substr(preg_replace('/\s+/', ' ', $detail) ?? $detail, 0, 240);
+            error_log('[storage] upload rejected: HTTP ' . $response['code'] . ' ' . $detail);
+        }
         throw new RuntimeException('Supabase Storage upload failed (HTTP ' . $response['code'] . ')');
     }
 
