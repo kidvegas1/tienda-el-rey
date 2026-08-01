@@ -434,7 +434,7 @@ if ($method === 'GET') {
     $offset = ($page - 1) * $limit;
     $fincenThreshold = isset($_GET['fincen_threshold'])
         ? max(0, (float)$_GET['fincen_threshold'])
-        : app_setting_float('fincen_global_limit', 3000);
+        : fincen_global_limit();
     $periodConfig = fincen_period_config($_GET['fincen_period'] ?? null);
     $periodSql = $periodConfig['sql'];
 
@@ -835,7 +835,7 @@ if ($method === 'POST') {
             sanitize($data['client_code'] ?? ''),
             sanitize($data['name']),
             sanitize($data['phone'] ?? ''),
-            (float)($data['monthly_limit'] ?? 3000),
+            (float)($data['monthly_limit'] ?? fincen_default_limit()),
             sanitize($data['notes'] ?? ''),
         ]);
         json_response(['success' => true, 'client_id' => sql_last_insert_id($pdo, 'clients')], 201);
@@ -850,7 +850,7 @@ if ($method === 'POST') {
             sanitize($data['client_code'] ?? ''),
             sanitize($data['name']),
             sanitize($data['phone'] ?? ''),
-            (float)($data['monthly_limit'] ?? 3000),
+            (float)($data['monthly_limit'] ?? fincen_default_limit()),
             db_bool((bool)($data['income_verified'] ?? false)),
             sanitize($data['notes'] ?? ''),
             (int)$data['id'],

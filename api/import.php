@@ -356,7 +356,7 @@ if ($method === 'POST') {
                         if (!$check->fetch()) {
                             $code = sanitize($row[' '] ?? $row['client_code'] ?? '');
                             $phone = sanitize($row['TELEFONO'] ?? $row['phone'] ?? '');
-                            $pdo->prepare('INSERT INTO clients (client_code, name, phone, monthly_limit) VALUES (?,?,?,3000)')
+                            $pdo->prepare('INSERT INTO clients (client_code, name, phone, monthly_limit) VALUES (?,?,?,5000)')
                                 ->execute([$code, $name, $phone]);
                         }
                         $rowsImported++;
@@ -462,7 +462,7 @@ if ($method === 'POST') {
                             if ($clientRow) {
                                 $clientId = (int)$clientRow['id'];
                             } else {
-                                $pdo->prepare('INSERT INTO clients (client_code, name, phone, monthly_limit) VALUES (?,?,?,3000)')
+                                $pdo->prepare('INSERT INTO clients (client_code, name, phone, monthly_limit) VALUES (?,?,?,5000)')
                                     ->execute(['', $sender, '']);
                                 $clientId = (int)sql_last_insert_id($pdo, 'clients');
                             }

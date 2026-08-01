@@ -24,6 +24,16 @@ function app_setting_float(string $key, float $default = 0.0): float {
     return is_numeric($value) ? (float)$value : $default;
 }
 
+/** Default FinCEN global monthly limit (USD). */
+function fincen_default_limit(): float {
+    return 5000.0;
+}
+
+/** Stored FinCEN global limit, falling back to the current standard. */
+function fincen_global_limit(): float {
+    return app_setting_float('fincen_global_limit', fincen_default_limit());
+}
+
 function app_setting_set(string $key, string $value): void {
     $pdo = db();
     $stmt = $pdo->prepare(sql_upsert('app_settings', ['setting_key', 'setting_value'], ['setting_value'], ['setting_key']));

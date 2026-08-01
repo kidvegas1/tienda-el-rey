@@ -131,7 +131,7 @@ $otherServices = $moStmt->fetch() ?: ['count' => 0, 'principal' => 0, 'fees' => 
 
 // ── Patterns / FinCEN ──
 $patterns = txn_analytics_patterns($pdo, $storeId, $monthFrom, $monthTo);
-$fincenLimit = app_setting_float('fincen_global_limit', 3000.0);
+$fincenLimit = fincen_global_limit();
 
 $senderWhere = 't.date_sent BETWEEN ? AND ?'
     . ($storeId ? ' AND t.store_id = ?' : '')

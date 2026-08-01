@@ -138,7 +138,7 @@ if ($method === 'GET') {
         $stmt->execute($params);
         $topSenders = $stmt->fetchAll();
 
-        $fincenLimit = app_setting_float('fincen_global_limit', 3000.0);
+        $fincenLimit = fincen_global_limit();
         $fincenCount = 0;
         foreach ($topSenders as $s) {
             if ((float)$s['total_sent'] >= $fincenLimit) {

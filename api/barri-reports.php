@@ -484,7 +484,7 @@ function barri_import_report(PDO $pdo, array $user, array $data, array $options 
         $transferIns = $pdo->prepare('INSERT INTO transfers (client_id, store_id, transaction_code, beneficiary, date_sent, amount_usd, fee, tax, company, transaction_type, source) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
         $markPushed = $pdo->prepare('UPDATE barri_transactions SET pushed_to_transfers = ' . sql_bool(true) . ', transfer_id = ? WHERE id = ?');
         $clientLookup = $pdo->prepare('SELECT id, name FROM clients WHERE LOWER(name) = LOWER(?) LIMIT 2');
-        $clientInsert = $pdo->prepare('INSERT INTO clients (name, phone, monthly_limit, notes) VALUES (?,?,3000,?)');
+        $clientInsert = $pdo->prepare('INSERT INTO clients (name, phone, monthly_limit, notes) VALUES (?,?,5000,?)');
 
         // Cache lookups — large Estado reports repeat many sender names.
         $clientCache = [];
@@ -1052,7 +1052,7 @@ if ($method === 'POST') {
         $txnRow = $txn->fetch();
         if (!$txnRow) json_error('Transaction not found', 404);
 
-        $pdo->prepare('INSERT INTO clients (name, phone, monthly_limit) VALUES (?,?,3000)')
+        $pdo->prepare('INSERT INTO clients (name, phone, monthly_limit) VALUES (?,?,5000)')
             ->execute([sanitize($txnRow['customer_name']), sanitize($data['phone'] ?? '')]);
         $newClientId = sql_last_insert_id($pdo, 'clients');
 

@@ -143,16 +143,17 @@
                                             <option value="lifetime" data-i18n="clients.fincen_period.lifetime">Lifetime Total</option>
                                         </select>
                                         <p id="fincen-period-range" class="text-[10px] text-text-muted leading-tight font-mono"></p>
-                                        <div class="flex items-center gap-0.5">
+                                        <div class="flex items-center gap-1 flex-wrap">
                                             <span class="text-text-muted text-xs">$</span>
                                             <input type="number"
                                                 id="global-fincen-limit"
                                                 class="input font-mono text-xs py-1 px-2 w-[5.5rem] border-danger/30 focus:border-danger"
                                                 min="0"
                                                 step="100"
-                                                value="2500"
+                                                value="5000"
                                                 data-i18n-title="clients.global_fincen_limit_title"
                                                 title="Global FinCEN limit for the selected period">
+                                            <button type="button" id="save-fincen-limit-btn" class="btn-primary text-[10px] py-1 px-2.5 whitespace-nowrap" data-i18n="clients.save_fincen_limit">Save</button>
                                         </div>
                                     </div>
                                 </th>
@@ -337,7 +338,7 @@
                 <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.phone">Phone</label><input type="text" name="phone" class="input" data-i18n-placeholder="clients.modal.phone_placeholder" placeholder="Phone number"></div>
             </div>
             <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.full_name">Full Name</label><input type="text" name="name" class="input" required></div>
-            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.monthly_limit">Monthly Limit ($)</label><input type="number" name="monthly_limit" class="input font-mono" step="0.01" value="3000"></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.monthly_limit">Monthly Limit ($)</label><input type="number" name="monthly_limit" class="input font-mono" step="0.01" value="5000"></div>
             <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label><textarea name="notes" class="input" rows="2"></textarea></div>
             <div class="flex gap-3 pt-2">
                 <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('client-modal')" data-i18n="action.cancel">Cancel</button>
@@ -499,7 +500,7 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-checks"></script>
+    <script src="assets/js/i18n.js?v=20260801-fincen5k"></script>
     <script src="assets/js/app.js?v=20260714e"></script>
     <script>
         function escHtml(s) {
@@ -666,14 +667,13 @@
         let currentCheckCasherName = null;
         let currentPage = 1;
         let fincenFilterActive = false;
-        let globalFincenLimit = 2500;
-        let globalLimitSaveState = 2500;
+        let globalFincenLimit = 5000;
+        let globalLimitSaveState = 5000;
         let fincenPeriod = 'month';
         let fincenPeriodLabel = '';
         let fincenPeriodRange = '';
         let fincenPeriodSaveState = 'month';
         let lastClientsResponse = null;
-        let persistGlobalLimitTimer = null;
         let reloadClientsTimer = null;
 
         (async () => {
@@ -750,7 +750,15 @@
             });
 
             document.getElementById('global-fincen-limit').addEventListener('input', onGlobalFincenLimitInput);
-            document.getElementById('global-fincen-limit').addEventListener('change', onGlobalFincenLimitInput);
+            document.getElementById('global-fincen-limit').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    persistGlobalFincenLimit({ fromSaveButton: true });
+                }
+            });
+            document.getElementById('save-fincen-limit-btn')?.addEventListener('click', () => {
+                persistGlobalFincenLimit({ fromSaveButton: true });
+            });
             document.getElementById('fincen-period-select').addEventListener('change', onFincenPeriodChange);
 
             document.getElementById('add-client-btn').addEventListener('click', () => {
@@ -771,7 +779,7 @@
                         client_code: fd.get('client_code'),
                         name: fd.get('name'),
                         phone: fd.get('phone'),
-                        monthly_limit: parseFloat(fd.get('monthly_limit')) || 3000,
+                        monthly_limit: parseFloat(fd.get('monthly_limit')) || 5000,
                         notes: fd.get('notes'),
                     });
                     App.closeModal('client-modal');
@@ -1115,21 +1123,29 @@
         function onGlobalFincenLimitInput() {
             ensureFincenFilterActive();
             applyLiveGlobalFincenLimit();
-            scheduleFincenReloadAndPersist();
+            markFincenDirty(true);
+            scheduleFincenReload();
         }
 
         function onFincenPeriodChange() {
             ensureFincenFilterActive();
             fincenPeriod = getLiveFincenPeriod();
             currentPage = 1;
-            scheduleFincenReloadAndPersist();
+            markFincenDirty(true);
+            scheduleFincenReload();
         }
 
-        function scheduleFincenReloadAndPersist() {
+        function markFincenDirty(dirty) {
+            const btn = document.getElementById('save-fincen-limit-btn');
+            if (!btn) return;
+            btn.classList.toggle('ring-2', dirty);
+            btn.classList.toggle('ring-danger/40', dirty);
+            btn.dataset.dirty = dirty ? '1' : '0';
+        }
+
+        function scheduleFincenReload() {
             clearTimeout(reloadClientsTimer);
             reloadClientsTimer = setTimeout(() => loadClients({ silent: true }), 300);
-            clearTimeout(persistGlobalLimitTimer);
-            persistGlobalLimitTimer = setTimeout(persistGlobalFincenLimit, 700);
         }
 
         function syncFincenControlsFromResponse(res, liveThreshold) {
@@ -1185,8 +1201,9 @@
 
         const limitSaveState = new Map();
 
-        async function persistGlobalFincenLimit() {
+        async function persistGlobalFincenLimit(options = {}) {
             const input = document.getElementById('global-fincen-limit');
+            const btn = document.getElementById('save-fincen-limit-btn');
             const newLimit = parseFloat(input.value);
             if (!Number.isFinite(newLimit) || newLimit < 0) {
                 App.toastKey('clients.toast.valid_fincen_limit', 'danger');
@@ -1195,10 +1212,14 @@
                 return;
             }
             const livePeriod = getLiveFincenPeriod();
-            if (newLimit === globalLimitSaveState && livePeriod === fincenPeriodSaveState) return;
+            if (!options.fromSaveButton && newLimit === globalLimitSaveState && livePeriod === fincenPeriodSaveState) return;
             if (input.dataset.saving === '1') return;
 
             input.dataset.saving = '1';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = App.t('common.saving') !== 'common.saving' ? App.t('common.saving') : 'Saving…';
+            }
             try {
                 await App.api('POST', '/api/clients', {
                     action: 'update_fincen_global_limit',
@@ -1209,16 +1230,20 @@
                 globalLimitSaveState = newLimit;
                 fincenPeriod = livePeriod;
                 fincenPeriodSaveState = livePeriod;
-                if (fincenFilterActive) {
-                    currentPage = 1;
-                    await loadClients();
-                }
+                markFincenDirty(false);
+                App.toastKey('clients.toast.fincen_saved', 'success', { amount: App.money(newLimit) });
+                currentPage = 1;
+                await loadClients();
             } catch (err) {
                 App.toast(err.message, 'danger');
                 input.value = globalLimitSaveState;
                 applyLiveGlobalFincenLimit();
             } finally {
                 delete input.dataset.saving;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = App.t('clients.save_fincen_limit');
+                }
             }
         }
 

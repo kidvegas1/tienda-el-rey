@@ -456,7 +456,7 @@
     <script>
     const Dash = {
         data: null,
-        fincenLimit: 3000,
+        fincenLimit: 5000,
         esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; },
         t(k, p) { return App.t(k, p); },
         money(v) { return App.moneyMetric(v, { compact: 'auto' }); },
@@ -709,7 +709,7 @@
             try {
                 const d = await App.api('GET', '/api/dashboard');
                 this.data = d;
-                this.fincenLimit = parseFloat(d.compliance?.fincen_limit || d.fincen_limit) || 3000;
+                this.fincenLimit = parseFloat(d.compliance?.fincen_limit || d.fincen_limit) || 5000;
                 this.renderWelcome(d);
                 const scope = document.getElementById('scope-pill');
                 if (scope) {
