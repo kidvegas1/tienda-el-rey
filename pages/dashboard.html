@@ -7,7 +7,7 @@
     <link rel="icon" href="/assets/images/el-rey-mark.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=Fraunces:opsz,wght@9..144,500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
         @theme {
@@ -25,10 +25,11 @@
             --color-text-muted: oklch(0.54 0.025 55);
             --color-border: oklch(0.87 0.025 225);
             --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-display: "Fraunces", "Outfit", ui-serif, Georgia, serif;
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-dash">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -85,223 +86,689 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="lg:ml-[280px] min-h-dvh">
-        <!-- Top Bar -->
-        <header class="sticky top-0 z-30 glass-strong px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+    <div class="lg:ml-[280px] min-h-dvh dash-shell">
+        <header class="sticky top-0 z-30 dash-topbar px-5 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-bg-elevated text-text-secondary shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                 </button>
-                <div>
-                    <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.dashboard.heading">Dashboard</h2>
-                    <p class="text-xs text-text-muted" id="page-date"></p>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="text-lg sm:text-xl font-bold tracking-tight" id="page-title" data-i18n="page.dashboard.heading">Panel</h2>
+                        <span class="dash-live-pill" id="scope-pill"><span class="dash-live-dot"></span><span data-i18n="dash.scope_global">Vista global</span></span>
+                    </div>
+                    <p class="text-xs text-text-muted truncate" id="page-date"></p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <select id="store-selector" class="input py-2 px-3 text-sm w-40"></select>
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="reports-center" class="btn-secondary text-xs py-2 px-3 hidden sm:inline-flex" data-i18n="dash.open_reports">Reports Center</a>
+                <select id="store-selector" class="input py-2 px-3 text-sm w-36 sm:w-44"></select>
             </div>
         </header>
 
-        <!-- Dashboard Content -->
-        <main class="p-6 lg:p-8 space-y-6">
-            <section id="employee-welcome" class="card hidden">
-                <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="dash.signed_in_as">Signed in as</p>
-                        <p class="text-lg font-bold mt-1" id="welcome-employee-name"></p>
-                        <p class="text-sm text-text-secondary mt-1" id="welcome-employee-meta"></p>
+        <main class="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6">
+            <section id="employee-welcome" class="dash-welcome hidden dash-reveal"></section>
+
+            <!-- Hero command strip -->
+            <section class="dash-hero dash-reveal">
+                <div class="dash-hero-inner">
+                    <div class="min-w-0">
+                        <p class="dash-eyebrow" data-i18n="dash.command_center">Business command center</p>
+                        <h3 class="dash-hero-title" data-i18n="dash.hero_title">Everything that moves money — one glance</h3>
+                        <p class="dash-hero-sub" id="hero-period"></p>
                     </div>
-                    <div id="welcome-clock-status" class="text-sm text-text-secondary"></div>
+                    <div class="dash-hero-metrics">
+                        <div>
+                            <p class="dash-kicker" data-i18n="dash.month_principal">Month principal</p>
+                            <p class="dash-hero-value" id="hero-principal">—</p>
+                        </div>
+                        <div>
+                            <p class="dash-kicker" data-i18n="dash.today_volume">Today</p>
+                            <p class="dash-hero-value dash-hero-value--sm" id="hero-today">—</p>
+                        </div>
+                        <div>
+                            <p class="dash-kicker" data-i18n="dash.open_alerts">Open alerts</p>
+                            <p class="dash-hero-value dash-hero-value--sm" id="hero-alerts">0</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- Stat Cards -->
-            <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="stat-cards">
-                <div class="card card-hover">
-                    <div class="flex items-start justify-between">
+            <!-- KPI mosaic -->
+            <section class="dash-kpi-grid" id="kpi-grid" aria-label="KPIs"></section>
+
+            <!-- Charts + alerts -->
+            <section class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+                <div class="xl:col-span-7 dash-panel dash-reveal">
+                    <div class="dash-panel-head">
                         <div>
-                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="dash.caja_today">Cash Register Today</p>
-                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="stat-caja">$0.00</p>
+                            <h3 class="dash-panel-title" data-i18n="dash.chart.activity">Activity this month</h3>
+                            <p class="dash-panel-sub" id="chart-daily-sub"></p>
                         </div>
-                        <div class="stat-icon stat-icon-accent">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                        </div>
+                        <div class="dash-mini-stats" id="chart-daily-stats"></div>
                     </div>
-                    <p class="text-xs text-text-muted mt-2"><span id="stat-caja-sessions">0</span> <span data-i18n="dash.sessions_open">sessions open</span></p>
+                    <div id="chart-daily" class="dash-activity"></div>
                 </div>
-                <div class="card card-hover">
-                    <div class="flex items-start justify-between">
+                <div class="xl:col-span-5 dash-panel dash-reveal dash-panel--alerts">
+                    <div class="dash-panel-head">
                         <div>
-                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="dash.transfers_month">Transfers This Month</p>
-                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="stat-transfers">$0.00</p>
+                            <h3 class="dash-panel-title" data-i18n="dash.alerts_title">Alerts & patterns</h3>
+                            <p class="dash-panel-sub" data-i18n="dash.alerts_sub">Security and high-frequency activity</p>
                         </div>
-                        <div class="stat-icon stat-icon-success">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-                        </div>
+                        <a href="security" class="text-xs font-semibold text-accent hover:underline" data-i18n="dash.view_security">Security</a>
                     </div>
-                    <p class="text-xs text-text-muted mt-2"><span id="stat-transfer-count">0</span> <span data-i18n="dash.transfers_count">transfers</span></p>
-                </div>
-                <div class="card card-hover">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="dash.total_clients">Total Clients</p>
-                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="stat-clients">0</p>
-                        </div>
-                        <div class="stat-icon stat-icon-warning">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        </div>
-                    </div>
-                    <p class="text-xs text-text-muted mt-2" data-i18n="dash.clients_active">Active client database</p>
-                </div>
-                <div class="card card-hover">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="dash.clocked_in">Clocked In</p>
-                            <p class="text-2xl font-bold font-mono tabular-nums mt-1" id="stat-clocked">0</p>
-                        </div>
-                        <div class="stat-icon stat-icon-accent">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
-                    </div>
-                    <p class="text-xs text-text-muted mt-2" data-i18n="dash.on_shift">Employees on shift</p>
+                    <div id="alerts-rail" class="dash-alerts"></div>
                 </div>
             </section>
 
-            <!-- Quick Links -->
-            <section class="card">
-                <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4" data-i18n="dash.quick_links">Quick Links</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <a href="caja" class="flex items-center gap-3 p-3 rounded-xl bg-bg-elevated hover:bg-[oklch(0.95_0.01_55)] transition-colors">
-                        <div class="stat-icon stat-icon-accent shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <section class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div class="dash-panel dash-reveal">
+                    <div class="dash-panel-head">
+                        <div>
+                            <h3 class="dash-panel-title" data-i18n="dash.chart.companies">By company</h3>
+                            <p class="dash-panel-sub" data-i18n="dash.chart.companies_sub">Principal share this month</p>
                         </div>
-                        <span class="text-sm font-medium" data-i18n="nav.caja">Cash Register</span>
-                    </a>
-                    <a href="clients" class="flex items-center gap-3 p-3 rounded-xl bg-bg-elevated hover:bg-[oklch(0.95_0.01_55)] transition-colors">
-                        <div class="stat-icon stat-icon-warning shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div id="company-breakdown" class="dash-share-list"></div>
+                </div>
+                <div class="dash-panel dash-reveal">
+                    <div class="dash-panel-head">
+                        <div>
+                            <h3 class="dash-panel-title" data-i18n="dash.chart.types">By product type</h3>
+                            <p class="dash-panel-sub" data-i18n="dash.chart.types_sub">Envíos, giros, cheques</p>
                         </div>
-                        <span class="text-sm font-medium" data-i18n="nav.clients">Clients</span>
-                    </a>
-                    <a href="schedule" class="flex items-center gap-3 p-3 rounded-xl bg-bg-elevated hover:bg-[oklch(0.95_0.01_55)] transition-colors">
-                        <div class="stat-icon stat-icon-accent shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div id="type-breakdown" class="dash-share-list"></div>
+                </div>
+                <div class="dash-panel dash-reveal" id="store-panel">
+                    <div class="dash-panel-head">
+                        <div>
+                            <h3 class="dash-panel-title" data-i18n="dash.chart.stores">By store</h3>
+                            <p class="dash-panel-sub" data-i18n="dash.chart.stores_sub">Volume across locations</p>
                         </div>
-                        <span class="text-sm font-medium" data-i18n="nav.schedule">Schedule & Clock-In</span>
-                    </a>
+                    </div>
+                    <div id="store-breakdown" class="dash-share-list"></div>
                 </div>
             </section>
 
-            <!-- Libro interno Summary -->
-            <section>
-                <div class="card">
-                    <h3 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4" data-i18n="dash.ledger_balance">Internal Ledger Balance</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 rounded-xl bg-[oklch(0.65_0.2_25_/_0.08)] border border-[oklch(0.65_0.2_25_/_0.15)]">
-                            <p class="text-xs text-danger font-semibold mb-1" data-i18n="dash.owed_to_store">Por pagar a El Rey</p>
-                            <p class="text-xl font-bold font-mono tabular-nums text-danger" id="ledger-owed">$0.00</p>
+            <section class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+                <div class="xl:col-span-4 dash-panel dash-reveal">
+                    <div class="dash-panel-head">
+                        <h3 class="dash-panel-title" data-i18n="dash.ledger_balance">Internal Ledger Balance</h3>
+                        <a href="libro-interno" class="text-xs font-semibold text-accent hover:underline" data-i18n="common.view">View</a>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="dash-ledger dash-ledger--owed">
+                            <p data-i18n="dash.owed_to_store">Por pagar a El Rey</p>
+                            <strong id="ledger-owed">—</strong>
                         </div>
-                        <div class="p-4 rounded-xl bg-[oklch(0.75_0.18_155_/_0.08)] border border-[oklch(0.75_0.18_155_/_0.15)]">
-                            <p class="text-xs text-success font-semibold mb-1" data-i18n="dash.store_owes">El Rey debe</p>
-                            <p class="text-xl font-bold font-mono tabular-nums text-success" id="ledger-store-owes">$0.00</p>
+                        <div class="dash-ledger dash-ledger--owes">
+                            <p data-i18n="dash.store_owes">El Rey debe</p>
+                            <strong id="ledger-store-owes">—</strong>
                         </div>
                     </div>
-                    <div class="mt-4 p-3 rounded-xl bg-bg-elevated">
-                        <p class="text-xs text-text-muted" data-i18n="dash.net_balance">Net Balance</p>
-                        <p class="text-lg font-bold font-mono tabular-nums" id="ledger-net">$0.00</p>
+                    <div class="dash-ledger-net mt-3">
+                        <span data-i18n="dash.net_balance">Net Balance</span>
+                        <strong id="ledger-net">—</strong>
                     </div>
+                </div>
+                <div class="xl:col-span-5 dash-panel dash-reveal">
+                    <div class="dash-panel-head">
+                        <div>
+                            <h3 class="dash-panel-title" data-i18n="dash.top_senders">Top senders</h3>
+                            <p class="dash-panel-sub" data-i18n="dash.top_senders_sub">Highest month volume</p>
+                        </div>
+                        <a href="clients?sort=top_sender" class="text-xs font-semibold text-accent hover:underline" data-i18n="common.view">View</a>
+                    </div>
+                    <div id="top-senders" class="dash-senders"></div>
+                </div>
+                <div class="xl:col-span-3 dash-panel dash-reveal">
+                    <div class="dash-panel-head">
+                        <h3 class="dash-panel-title" data-i18n="dash.quick_links">Quick Links</h3>
+                    </div>
+                    <div class="dash-actions" id="quick-actions"></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <script src="assets/js/i18n.js"></script>
-    <script src="assets/js/app.js"></script>
+    <style>
+        .dash-shell {
+            background:
+                radial-gradient(90% 60% at 0% 0%, oklch(0.93 0.04 55 / 0.55), transparent 55%),
+                radial-gradient(70% 50% at 100% 10%, oklch(0.93 0.03 230 / 0.7), transparent 50%),
+                oklch(0.97 0.018 230);
+        }
+        .dash-topbar {
+            background: oklch(0.99 0.01 230 / 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid oklch(0.90 0.02 55 / 0.55);
+        }
+        .dash-live-pill {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.2rem 0.55rem; border-radius: 9999px;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+            background: oklch(0.94 0.03 155 / 0.55); color: oklch(0.38 0.1 155);
+            border: 1px solid oklch(0.78 0.08 155 / 0.35);
+        }
+        .dash-live-dot {
+            width: 0.4rem; height: 0.4rem; border-radius: 9999px;
+            background: oklch(0.55 0.16 155);
+            box-shadow: 0 0 0 0 oklch(0.55 0.16 155 / 0.55);
+            animation: dashPulse 1.8s ease-out infinite;
+        }
+        @keyframes dashPulse {
+            0% { box-shadow: 0 0 0 0 oklch(0.55 0.16 155 / 0.45); }
+            70% { box-shadow: 0 0 0 8px oklch(0.55 0.16 155 / 0); }
+            100% { box-shadow: 0 0 0 0 oklch(0.55 0.16 155 / 0); }
+        }
+        .dash-reveal { animation: dashIn 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+        .dash-reveal:nth-child(1){animation-delay:.02s}
+        .dash-reveal:nth-child(2){animation-delay:.06s}
+        .dash-reveal:nth-child(3){animation-delay:.1s}
+        @keyframes dashIn { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform:none;} }
+
+        .dash-hero {
+            border-radius: 1.5rem; padding: 1px;
+            background: linear-gradient(135deg, oklch(0.72 0.08 55 / 0.55), oklch(0.85 0.04 230 / 0.2), oklch(0.7 0.1 155 / 0.35));
+            box-shadow: 0 18px 50px oklch(0.45 0.05 55 / 0.08);
+        }
+        .dash-hero-inner {
+            border-radius: calc(1.5rem - 1px);
+            padding: 1.25rem 1.35rem;
+            background:
+                radial-gradient(120% 90% at 100% 0%, oklch(0.55 0.09 55 / 0.16), transparent 50%),
+                linear-gradient(160deg, oklch(0.24 0.035 55), oklch(0.30 0.04 45));
+            color: oklch(0.97 0.01 90);
+            display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.25rem;
+        }
+        .dash-eyebrow {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+            color: oklch(0.82 0.04 80 / 0.85); margin-bottom: 0.45rem;
+        }
+        .dash-hero-title {
+            font-family: var(--font-display); font-weight: 700;
+            font-size: clamp(1.35rem, 2.6vw, 1.85rem); letter-spacing: -0.02em; line-height: 1.15;
+            max-width: 22ch;
+        }
+        .dash-hero-sub { margin-top: 0.45rem; font-size: 0.8rem; color: oklch(0.85 0.02 80 / 0.75); }
+        .dash-hero-metrics { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: flex-end; }
+        .dash-kicker { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: oklch(0.8 0.03 80 / 0.7); font-weight: 600; }
+        .dash-hero-value { font-family: var(--font-mono); font-weight: 700; font-size: clamp(1.35rem, 2.4vw, 1.75rem); font-variant-numeric: tabular-nums; margin-top: 0.2rem; }
+        .dash-hero-value--sm { font-size: clamp(1.1rem, 2vw, 1.35rem); }
+
+        .dash-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 0.75rem;
+        }
+        @media (min-width: 640px) { .dash-kpi-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0.9rem; } }
+        @media (min-width: 1024px) { .dash-kpi-grid { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+        @media (min-width: 1280px) { .dash-kpi-grid { grid-template-columns: repeat(6, minmax(0,1fr)); } }
+
+        .dash-kpi {
+            position: relative; overflow: hidden;
+            border-radius: 1.1rem; padding: 0.9rem 0.95rem;
+            background: oklch(1 0 0 / 0.86);
+            border: 1px solid oklch(0.91 0.02 55 / 0.8);
+            box-shadow: 0 8px 24px oklch(0.45 0.04 55 / 0.05);
+            min-height: 6.1rem;
+            display: flex; flex-direction: column; justify-content: space-between;
+            animation: dashIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
+        }
+        .dash-kpi:hover { transform: translateY(-2px); box-shadow: 0 14px 32px oklch(0.45 0.05 55 / 0.1); }
+        .dash-kpi::after {
+            content: ''; position: absolute; inset: auto -20% -40% auto; width: 5.5rem; height: 5.5rem;
+            border-radius: 9999px; opacity: 0.14; background: var(--kpi-glow, oklch(0.6 0.1 55));
+            filter: blur(2px);
+        }
+        .dash-kpi-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: oklch(0.54 0.025 55); position: relative; z-index: 1; }
+        .dash-kpi-value { font-family: var(--font-mono); font-weight: 700; font-variant-numeric: tabular-nums; font-size: clamp(1rem, 1.8vw, 1.25rem); color: oklch(0.27 0.04 55); position: relative; z-index: 1; margin-top: 0.35rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dash-kpi-meta { font-size: 0.68rem; color: oklch(0.54 0.025 55); position: relative; z-index: 1; margin-top: 0.35rem; }
+        .dash-kpi.is-danger .dash-kpi-value { color: oklch(0.50 0.18 25); }
+        .dash-kpi.is-success .dash-kpi-value { color: oklch(0.42 0.12 155); }
+        .dash-kpi.is-warning .dash-kpi-value { color: oklch(0.50 0.14 75); }
+        .dash-kpi.is-check .dash-kpi-value { color: oklch(0.38 0.12 155); }
+
+        .dash-panel {
+            border-radius: 1.25rem; padding: 1.1rem 1.15rem;
+            background: oklch(1 0 0 / 0.9);
+            border: 1px solid oklch(0.91 0.02 55 / 0.75);
+            box-shadow: 0 12px 36px oklch(0.45 0.04 55 / 0.06);
+            display: flex; flex-direction: column; min-height: 18rem;
+        }
+        .dash-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:0.75rem; margin-bottom: 0.9rem; }
+        .dash-panel-title { font-size: 0.9rem; font-weight: 700; letter-spacing: -0.01em; }
+        .dash-panel-sub { font-size: 0.7rem; color: oklch(0.54 0.025 55); margin-top: 0.15rem; }
+        .dash-mini-stats { display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:flex-end; }
+        .dash-chip {
+            display:flex; flex-direction:column; align-items:flex-end;
+            padding: 0.3rem 0.5rem; border-radius: 0.65rem;
+            background: oklch(0.97 0.015 230); border: 1px solid oklch(0.92 0.015 55);
+            min-width: 4.2rem;
+        }
+        .dash-chip span:first-child { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em; color: oklch(0.54 0.025 55); font-weight: 700; }
+        .dash-chip span:last-child { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; }
+
+        .dash-activity { flex:1; min-height: 14rem; position: relative; }
+        .dash-activity svg { width:100%; height:100%; min-height:13.5rem; overflow:visible; }
+        .dash-activity .rc-grid line { stroke: oklch(0.90 0.015 55); stroke-dasharray: 3 4; }
+        .dash-activity .rc-area { opacity:0; animation: dashArea 0.9s cubic-bezier(0.22,1,0.36,1) forwards; }
+        .dash-activity .rc-line { fill:none; stroke: oklch(0.48 0.09 55); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; animation: dashLine 1.1s cubic-bezier(0.22,1,0.36,1) .08s forwards; }
+        .dash-activity .rc-dot { fill: oklch(0.48 0.09 55); stroke:#fff; stroke-width:2; opacity:0; animation: dashDot .35s ease-out forwards; }
+        .dash-activity .rc-peak { fill: oklch(0.55 0.16 145); }
+        .dash-activity text { fill: oklch(0.54 0.025 55); font-size:10px; font-family: var(--font-mono); }
+        .dash-tip {
+            position:absolute; pointer-events:none; z-index:5; min-width:8.5rem; padding:0.5rem 0.65rem;
+            border-radius:0.75rem; background: oklch(0.22 0.03 55 / 0.92); color:#fff; font-size:0.7rem;
+            opacity:0; transform: translate(-50%, calc(-100% - 8px)) scale(.96); transition: opacity .15s, transform .15s;
+            box-shadow: 0 10px 28px oklch(0.2 0.03 55 / 0.25);
+        }
+        .dash-tip.show { opacity:1; transform: translate(-50%, calc(-100% - 8px)) scale(1); }
+        .dash-tip strong { display:block; font-family: var(--font-mono); font-size:0.82rem; margin-top:0.12rem; }
+        @keyframes dashArea { to { opacity: .9; } }
+        @keyframes dashLine { to { stroke-dashoffset: 0; } }
+        @keyframes dashDot { to { opacity: 1; } }
+
+        .dash-share-list { display:flex; flex-direction:column; gap:0.7rem; flex:1; }
+        .dash-share {
+            display:grid; grid-template-columns: minmax(0,1fr) auto; gap:0.25rem 0.65rem; align-items:center;
+            padding:0.65rem 0.75rem; border-radius:0.9rem;
+            background: oklch(0.975 0.012 230 / 0.9); border:1px solid oklch(0.93 0.015 55 / 0.8);
+            animation: dashIn .45s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .dash-share-name { display:flex; align-items:center; gap:0.45rem; min-width:0; font-size:0.84rem; font-weight:600; }
+        .dash-share-name span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .dash-swatch { width:0.65rem; height:0.65rem; border-radius:0.22rem; flex-shrink:0; }
+        .dash-share-pct { font-family: var(--font-mono); font-size:0.75rem; font-weight:700; color: oklch(0.42 0.06 55); }
+        .dash-share-money { font-family: var(--font-mono); font-weight:700; font-size:0.9rem; white-space:nowrap; }
+        .dash-share-count { font-size:0.68rem; color: oklch(0.54 0.025 55); justify-self:end; }
+        .dash-track { grid-column:1 / -1; height:0.75rem; border-radius:9999px; background: oklch(0.93 0.015 55); overflow:hidden; }
+        .dash-fill { height:100%; width:0; border-radius:9999px; background: linear-gradient(90deg, var(--bar-from), var(--bar-to)); animation: dashBar .85s cubic-bezier(0.22,1,0.36,1) forwards; animation-delay: var(--delay,0ms); }
+        @keyframes dashBar { to { width: var(--w,0%); } }
+        .dash-empty { flex:1; display:grid; place-items:center; text-align:center; color: oklch(0.54 0.025 55); font-size:0.85rem; padding:1.5rem; }
+
+        .dash-alerts { display:flex; flex-direction:column; gap:0.55rem; flex:1; max-height: 22rem; overflow:auto; }
+        .dash-alert {
+            display:flex; gap:0.7rem; align-items:flex-start;
+            padding:0.7rem 0.75rem; border-radius:0.85rem;
+            background: oklch(0.975 0.012 230); border:1px solid oklch(0.92 0.02 55);
+            animation: dashIn .4s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .dash-alert.is-high { border-color: oklch(0.7 0.12 25 / 0.45); background: oklch(0.97 0.03 25 / 0.45); }
+        .dash-alert.is-medium { border-color: oklch(0.78 0.1 85 / 0.45); background: oklch(0.98 0.03 85 / 0.4); }
+        .dash-alert.is-pattern { border-color: oklch(0.78 0.08 230 / 0.4); background: oklch(0.97 0.02 230 / 0.55); }
+        .dash-alert-body { min-width:0; flex:1; }
+        .dash-alert-body p { font-size:0.8rem; font-weight:600; }
+        .dash-alert-body span { display:block; font-size:0.68rem; color: oklch(0.5 0.03 55); margin-top:0.15rem; }
+
+        .dash-ledger { padding:0.85rem; border-radius:0.9rem; }
+        .dash-ledger p { font-size:0.68rem; font-weight:700; margin-bottom:0.3rem; }
+        .dash-ledger strong { font-family: var(--font-mono); font-size:1.05rem; font-weight:700; }
+        .dash-ledger--owed { background: oklch(0.65 0.2 25 / 0.08); border:1px solid oklch(0.65 0.2 25 / 0.15); color: oklch(0.5 0.18 25); }
+        .dash-ledger--owes { background: oklch(0.75 0.18 155 / 0.08); border:1px solid oklch(0.75 0.18 155 / 0.15); color: oklch(0.42 0.12 155); }
+        .dash-ledger-net {
+            display:flex; align-items:center; justify-content:space-between; gap:0.75rem;
+            padding:0.75rem 0.85rem; border-radius:0.9rem; background: oklch(0.96 0.015 230);
+        }
+        .dash-ledger-net span { font-size:0.72rem; color: oklch(0.54 0.025 55); font-weight:600; }
+        .dash-ledger-net strong { font-family: var(--font-mono); font-size:1.05rem; font-weight:700; }
+
+        .dash-senders { display:flex; flex-direction:column; gap:0.45rem; }
+        .dash-sender {
+            display:flex; align-items:center; justify-content:space-between; gap:0.75rem;
+            padding:0.55rem 0.65rem; border-radius:0.8rem; background: oklch(0.975 0.012 230);
+            border:1px solid oklch(0.93 0.015 55); animation: dashIn .4s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .dash-sender a { font-size:0.82rem; font-weight:600; color: oklch(0.48 0.09 55); }
+        .dash-sender a:hover { text-decoration: underline; }
+        .dash-sender .meta { font-size:0.65rem; color: oklch(0.54 0.025 55); }
+        .dash-sender .amt { font-family: var(--font-mono); font-weight:700; font-size:0.82rem; text-align:right; }
+        .dash-sender .amt.is-fincen { color: oklch(0.5 0.18 25); }
+
+        .dash-actions { display:flex; flex-direction:column; gap:0.45rem; }
+        .dash-action {
+            display:flex; align-items:center; gap:0.65rem; padding:0.7rem 0.75rem;
+            border-radius:0.85rem; background: oklch(0.975 0.012 230); border:1px solid oklch(0.93 0.015 55);
+            font-size:0.82rem; font-weight:600; transition: transform .25s cubic-bezier(0.22,1,0.36,1), border-color .2s;
+        }
+        .dash-action:hover { transform: translateX(3px); border-color: oklch(0.78 0.06 55 / 0.55); }
+        .dash-action i {
+            width:1.85rem; height:1.85rem; border-radius:0.6rem; display:grid; place-items:center;
+            background: oklch(0.94 0.03 55 / 0.7); color: oklch(0.45 0.08 55); flex-shrink:0;
+        }
+        .dash-welcome {
+            border-radius: 1.1rem; padding: 0.95rem 1.1rem;
+            background: oklch(1 0 0 / 0.85); border: 1px solid oklch(0.91 0.02 55);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .dash-reveal, .dash-kpi, .dash-share, .dash-alert, .dash-sender,
+            .dash-activity .rc-area, .dash-activity .rc-line, .dash-activity .rc-dot, .dash-fill, .dash-live-dot {
+                animation: none !important; opacity: 1 !important; stroke-dashoffset: 0 !important; width: var(--w,0%) !important; transform: none !important;
+            }
+        }
+    </style>
+
+    <script src="assets/js/i18n.js?v=20260801-dash"></script>
+    <script src="assets/js/app.js?v=20260723-metrics"></script>
     <script>
-        (async () => {
+    const Dash = {
+        data: null,
+        fincenLimit: 3000,
+        esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; },
+        t(k, p) { return App.t(k, p); },
+        money(v) { return App.moneyMetric(v, { compact: 'auto' }); },
+        moneyFull(v) { return App.moneyFull(v); },
+        colors: [
+            { from: 'oklch(0.58 0.10 55)', to: 'oklch(0.45 0.09 50)' },
+            { from: 'oklch(0.68 0.14 155)', to: 'oklch(0.50 0.12 155)' },
+            { from: 'oklch(0.75 0.13 85)', to: 'oklch(0.58 0.12 70)' },
+            { from: 'oklch(0.62 0.16 25)', to: 'oklch(0.50 0.15 25)' },
+            { from: 'oklch(0.58 0.12 230)', to: 'oklch(0.45 0.10 230)' },
+            { from: 'oklch(0.60 0.12 300)', to: 'oklch(0.46 0.12 300)' },
+        ],
+        typeColor(raw) {
+            const key = String(raw || '').toLowerCase().replace(/[\s-]+/g, '_');
+            if ((key.includes('cambio') && key.includes('cheque')) || key.includes('check_cash')) return this.colors[1];
+            if (key.includes('money_order')) return this.colors[5];
+            if (key.includes('giro')) return this.colors[2];
+            return this.colors[0];
+        },
+        axisMoney(val) {
+            const n = Math.abs(Number(val) || 0);
+            if (n >= 1e6) return `$${(val/1e6).toFixed(1)}M`;
+            if (n >= 1000) return `$${(val/1000).toFixed(n >= 10000 ? 0 : 1)}K`;
+            return this.money(val);
+        },
+        formatPageDate() {
+            const el = document.getElementById('page-date');
+            if (!el) return;
+            el.textContent = new Date().toLocaleDateString(App.lang === 'es' ? 'es-ES' : 'en-US', {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+            });
+        },
+        kpiCard({ label, value, meta, tone, glow, delay }) {
+            return `<article class="dash-kpi ${tone || ''}" style="--kpi-glow:${glow || 'oklch(0.6 0.1 55)'};animation-delay:${delay || '0ms'}">
+                <p class="dash-kpi-label">${this.esc(label)}</p>
+                <p class="dash-kpi-value" title="${this.esc(value.full || value.display)}">${this.esc(value.display)}</p>
+                <p class="dash-kpi-meta">${this.esc(meta || '')}</p>
+            </article>`;
+        },
+        mv(val, opts) {
+            return { display: this.money(val), full: this.moneyFull(val) };
+        },
+        cv(val) {
+            const locale = App.lang === 'es' ? 'es-US' : 'en-US';
+            const display = Number(val || 0).toLocaleString(locale);
+            return { display, full: display };
+        },
+        renderKpis(d) {
+            const m = d.month || {};
+            const o = d.ops || {};
+            const tday = d.today || {};
+            const c = d.compliance || {};
+            const cards = [
+                { label: this.t('dash.month_principal'), value: this.mv(m.principal), meta: this.t('dash.meta_txns', { count: m.txns || 0 }), glow: 'oklch(0.6 0.1 55)' },
+                { label: this.t('dash.month_fees'), value: this.mv(m.fees), meta: this.t('dash.meta_fee_rate', { pct: m.fee_rate_pct || 0 }), glow: 'oklch(0.75 0.12 85)', tone: 'is-warning' },
+                { label: this.t('dash.month_tax'), value: this.mv(m.tax), meta: this.t('dash.meta_grand', { amount: this.money(m.grand_total) }), glow: 'oklch(0.65 0.12 40)' },
+                { label: this.t('dash.checks_volume'), value: this.mv(m.checks_volume), meta: this.t('dash.meta_checks', { count: m.checks_count || 0, commission: this.money(m.checks_commission) }), glow: 'oklch(0.65 0.14 155)', tone: 'is-check' },
+                { label: this.t('dash.unique_senders'), value: this.cv(m.unique_senders), meta: this.t('dash.meta_txns_sender', { n: m.txns_per_sender || 0 }), glow: 'oklch(0.6 0.1 230)' },
+                { label: this.t('dash.avg_ticket'), value: this.mv(m.avg_ticket), meta: this.t('dash.today_volume') + ': ' + this.money(tday.principal), glow: 'oklch(0.58 0.1 50)' },
+                { label: this.t('dash.fincen_flagged'), value: this.cv(c.fincen_flagged), meta: this.t('dash.meta_fincen', { amount: this.money(c.fincen_limit) }), glow: 'oklch(0.6 0.16 25)', tone: 'is-danger' },
+                { label: this.t('dash.over_limit'), value: this.cv(c.over_limit_clients), meta: this.t('dash.meta_high_freq', { count: c.high_frequency_days || 0 }), glow: 'oklch(0.62 0.15 25)', tone: 'is-danger' },
+                { label: this.t('dash.security_open'), value: this.cv((c.security_alerts || {}).total || 0), meta: this.t('dash.meta_severity', { high: (c.security_alerts||{}).high||0, medium: (c.security_alerts||{}).medium||0 }), glow: 'oklch(0.55 0.14 25)', tone: ((c.security_alerts||{}).high||0) > 0 ? 'is-danger' : '' },
+                { label: this.t('dash.caja_today'), value: this.mv(o.caja_total_today), meta: this.t('dash.meta_sessions', { count: o.caja_sessions_today || 0 }), glow: 'oklch(0.58 0.1 55)' },
+                { label: this.t('dash.total_clients'), value: this.cv(o.total_clients), meta: this.t('dash.clients_active'), glow: 'oklch(0.7 0.12 85)', tone: 'is-warning' },
+                { label: this.t('dash.clocked_in'), value: this.cv(o.clocked_in_today), meta: this.t('dash.on_shift'), glow: 'oklch(0.6 0.12 155)', tone: 'is-success' },
+            ];
+            document.getElementById('kpi-grid').innerHTML = cards.map((card, i) => this.kpiCard({ ...card, delay: `${i * 35}ms` })).join('');
+        },
+        renderShare(el, rows) {
+            if (!rows.length) {
+                el.innerHTML = `<div class="dash-empty">${this.esc(this.t('dash.empty.chart'))}</div>`;
+                return;
+            }
+            const mags = rows.map(r => Math.abs(r.value));
+            const max = Math.max(...mags, 1);
+            const sum = mags.reduce((a,b)=>a+b,0) || 1;
+            el.innerHTML = rows.map((r, i) => {
+                const mag = Math.abs(r.value);
+                const bar = Math.max(5, (mag / max) * 100);
+                const pct = Math.round((mag / sum) * 1000) / 10;
+                const c = r.colors || this.colors[i % this.colors.length];
+                const delay = `${i * 60}ms`;
+                return `<article class="dash-share" style="animation-delay:${delay}">
+                    <div class="dash-share-name"><span class="dash-swatch" style="background:linear-gradient(135deg,${c.from},${c.to})"></span><span>${this.esc(r.label)}</span></div>
+                    <div class="dash-share-pct">${pct}%</div>
+                    <div class="dash-share-money" title="${this.esc(this.moneyFull(r.value))}">${this.esc(this.money(r.value))}</div>
+                    <div class="dash-share-count">${this.esc(this.t('dash.txns_short', { count: r.count || 0 }))}</div>
+                    <div class="dash-track"><div class="dash-fill" style="--w:${bar}%;--delay:${delay};--bar-from:${c.from};--bar-to:${c.to}"></div></div>
+                </article>`;
+            }).join('');
+        },
+        renderActivity(days) {
+            const el = document.getElementById('chart-daily');
+            const sub = document.getElementById('chart-daily-sub');
+            const stats = document.getElementById('chart-daily-stats');
+            if (!days || !days.length) {
+                el.innerHTML = `<div class="dash-empty">${this.esc(this.t('dash.empty.chart'))}</div>`;
+                if (sub) sub.textContent = '';
+                if (stats) stats.innerHTML = '';
+                return;
+            }
+            const points = days.map(d => ({ day: String(d.day||'').slice(0,10), total: parseFloat(d.total)||0, count: parseInt(d.count,10)||0 }));
+            if (sub) sub.textContent = this.t('dash.chart.activity_sub', { days: points.length });
+            const totals = points.map(p => p.total);
+            const peakIdx = totals.reduce((b,v,i)=> v > totals[b] ? i : b, 0);
+            const peak = points[peakIdx];
+            const avg = totals.reduce((a,b)=>a+b,0) / points.length;
+            const sumCount = points.reduce((a,p)=>a+p.count,0);
+            if (stats) {
+                stats.innerHTML = `
+                    <div class="dash-chip"><span>${this.esc(this.t('dash.stat_peak'))}</span><span>${this.esc(this.axisMoney(peak.total))}</span></div>
+                    <div class="dash-chip"><span>${this.esc(this.t('dash.stat_avg'))}</span><span>${this.esc(this.axisMoney(avg))}</span></div>
+                    <div class="dash-chip"><span>${this.esc(this.t('dash.stat_txns'))}</span><span>${sumCount.toLocaleString()}</span></div>`;
+            }
+            const W=420,H=210, pad={t:16,r:12,b:28,l:46};
+            const plotW=W-pad.l-pad.r, plotH=H-pad.t-pad.b;
+            const niceMax = Math.max(...totals,1)*1.08;
+            const xAt = i => pad.l + (points.length===1 ? plotW/2 : (i/(points.length-1))*plotW);
+            const yAt = v => pad.t + plotH - (v/niceMax)*plotH;
+            const coords = points.map((p,i)=>({x:xAt(i), y:yAt(p.total), ...p}));
+            const lineD = coords.map((c,i)=>`${i?'L':'M'}${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' ');
+            const areaD = `${lineD} L${coords.at(-1).x.toFixed(2)},${(pad.t+plotH).toFixed(2)} L${coords[0].x.toFixed(2)},${(pad.t+plotH).toFixed(2)} Z`;
+            const yTicks = [0,.5,1].map(t=>{
+                const v=niceMax*t, y=yAt(v);
+                return `<g class="rc-grid"><line x1="${pad.l}" x2="${W-pad.r}" y1="${y}" y2="${y}"></line><text x="${pad.l-6}" y="${y+3}" text-anchor="end">${this.esc(this.axisMoney(v))}</text></g>`;
+            }).join('');
+            const step = Math.max(1, Math.ceil(points.length/5));
+            const xLabels = coords.map((c,i)=>{
+                if (i!==0 && i!==coords.length-1 && i%step!==0) return '';
+                return `<text x="${c.x}" y="${H-8}" text-anchor="middle">${this.esc(c.day.slice(5))}</text>`;
+            }).join('');
+            const dots = coords.map((c,i)=>{
+                const peakCls = i===peakIdx ? ' rc-peak' : '';
+                return `<circle class="rc-dot${peakCls}" cx="${c.x}" cy="${c.y}" r="${i===peakIdx?4.5:3}" style="animation-delay:${120+i*16}ms"></circle>`;
+            }).join('');
+            const half = Math.max(8, plotW/Math.max(points.length,1));
+            const hits = coords.map(c => `<rect class="dash-hit" data-day="${this.esc(c.day)}" data-amount="${this.esc(App.money(c.total))}" data-count="${c.count}" x="${(c.x-half/2).toFixed(2)}" y="${pad.t}" width="${half.toFixed(2)}" height="${plotH}" fill="transparent" style="cursor:crosshair"></rect>`).join('');
+            const gid = 'dashFill'+Date.now();
+            el.innerHTML = `<div class="dash-tip" id="dash-tip"></div>
+                <svg viewBox="0 0 ${W} ${H}" role="img">
+                    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="oklch(0.62 0.11 55)" stop-opacity="0.45"/>
+                        <stop offset="100%" stop-color="oklch(0.62 0.11 55)" stop-opacity="0.02"/>
+                    </linearGradient></defs>
+                    ${yTicks}
+                    <path class="rc-area" d="${areaD}" fill="url(#${gid})"></path>
+                    <path class="rc-line" pathLength="1" d="${lineD}"></path>
+                    ${dots}${xLabels}${hits}
+                </svg>`;
+            const tip = el.querySelector('#dash-tip');
+            el.querySelectorAll('.dash-hit').forEach(hit => {
+                hit.addEventListener('mousemove', (e) => {
+                    tip.innerHTML = `<div>${this.esc(hit.dataset.day||'')}</div><strong>${this.esc(hit.dataset.amount||'')}</strong><div>${this.esc(this.t('dash.txns_short',{count:hit.dataset.count||0}))}</div>`;
+                    tip.classList.add('show');
+                    const b = el.getBoundingClientRect();
+                    tip.style.left = `${e.clientX-b.left}px`;
+                    tip.style.top = `${e.clientY-b.top}px`;
+                });
+                hit.addEventListener('mouseleave', () => tip.classList.remove('show'));
+            });
+        },
+        renderAlerts(d) {
+            const el = document.getElementById('alerts-rail');
+            const sec = d.alerts?.security || [];
+            const pat = d.alerts?.patterns || [];
+            const items = [];
+            sec.forEach(a => {
+                const sev = String(a.severity||'low').toLowerCase();
+                items.push({
+                    cls: sev === 'high' ? 'is-high' : (sev === 'medium' ? 'is-medium' : ''),
+                    title: a.title || a.alert_type || this.t('dash.alert_security'),
+                    detail: [a.client_name, a.details, a.store_name].filter(Boolean).join(' · '),
+                    when: a.detected_at || a.created_at,
+                    href: a.client_id ? `clients?client_id=${a.client_id}` : 'security',
+                    badge: this.t('dash.severity.' + sev),
+                });
+            });
+            pat.forEach(p => {
+                items.push({
+                    cls: 'is-pattern',
+                    title: p.client_name || this.t('dash.alert_pattern'),
+                    detail: this.t('dash.pattern_detail', { count: p.day_count || 0, date: p.txn_date || '' }),
+                    when: p.txn_date,
+                    href: p.client_id ? `clients?client_id=${p.client_id}` : 'reports-center',
+                    badge: this.t('dash.badge_pattern'),
+                });
+            });
+            if (!items.length) {
+                el.innerHTML = `<div class="dash-empty">${this.esc(this.t('dash.empty.alerts'))}</div>`;
+                return;
+            }
+            el.innerHTML = items.slice(0, 10).map((it, i) => `
+                <a href="${it.href}" class="dash-alert ${it.cls}" style="animation-delay:${i*40}ms">
+                    <span class="badge ${it.cls==='is-high'?'badge-danger':(it.cls==='is-medium'?'badge-warning':'badge-info')} text-[10px] shrink-0">${this.esc(it.badge)}</span>
+                    <div class="dash-alert-body">
+                        <p>${this.esc(it.title)}</p>
+                        <span>${this.esc(it.detail || '')}</span>
+                        <span>${this.esc(it.when ? App.formatDate(it.when) : '')}</span>
+                    </div>
+                </a>`).join('');
+        },
+        renderSenders(rows, limit) {
+            const el = document.getElementById('top-senders');
+            if (!rows || !rows.length) {
+                el.innerHTML = `<div class="dash-empty">${this.esc(this.t('dash.empty.senders'))}</div>`;
+                return;
+            }
+            el.innerHTML = rows.slice(0, 6).map((s, i) => {
+                const total = parseFloat(s.total_sent)||0;
+                const fincen = total >= this.fincenLimit;
+                return `<div class="dash-sender" style="animation-delay:${i*40}ms">
+                    <div class="min-w-0">
+                        <a href="clients?client_id=${encodeURIComponent(s.id)}">${this.esc(s.name||'')}</a>
+                        <div class="meta">${s.transfer_count||0} · ${this.esc(s.last_transfer ? String(s.last_transfer).slice(0,10) : '')}</div>
+                    </div>
+                    <div class="amt ${fincen?'is-fincen':''}">${this.esc(this.money(total))}${fincen?` <span class="badge badge-danger text-[9px]">FinCEN</span>`:''}</div>
+                </div>`;
+            }).join('');
+        },
+        renderActions() {
+            const links = [
+                { href:'caja', label:this.t('nav.caja') },
+                { href:'clients', label:this.t('nav.clients') },
+                { href:'reports-center', label:this.t('nav.reports_center') },
+                { href:'security', label:this.t('nav.security') },
+                { href:'finances', label:this.t('nav.finances') },
+                { href:'import', label:this.t('nav.import') },
+            ];
+            document.getElementById('quick-actions').innerHTML = links.map(l => `
+                <a class="dash-action" href="${l.href}"><i><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></i>${this.esc(l.label)}</a>`).join('');
+        },
+        renderWelcome(d) {
+            const welcome = document.getElementById('employee-welcome');
+            if (!d.employee) { welcome.classList.add('hidden'); welcome.innerHTML=''; return; }
+            welcome.classList.remove('hidden');
+            let clock = this.t('dash.not_clocked_in');
+            if (d.my_clock_in) {
+                const key = d.my_clock_in.status === 'clocked_in' ? 'dash.clocked_in_today' : 'dash.clocked_out_today';
+                clock = `${this.t(key)} · ${App.formatDateTime(d.my_clock_in.clock_in_time)}`;
+            }
+            const roleKey = `role.${App.user?.role||''}`;
+            const role = this.t(roleKey) !== roleKey ? this.t(roleKey) : (App.user?.role || '');
+            welcome.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3">
+                <div><p class="text-xs font-semibold text-text-muted uppercase tracking-wider">${this.esc(this.t('dash.signed_in_as'))}</p>
+                <p class="text-lg font-bold mt-1">${this.esc(d.employee.name||'')}</p>
+                <p class="text-sm text-text-secondary mt-1">${this.esc([role, d.employee.phone].filter(Boolean).join(' · '))}</p></div>
+                <div class="text-sm text-text-secondary">${this.esc(clock)}</div></div>`;
+        },
+        async load() {
+            try {
+                const d = await App.api('GET', '/api/dashboard');
+                this.data = d;
+                this.fincenLimit = parseFloat(d.compliance?.fincen_limit || d.fincen_limit) || 3000;
+                this.renderWelcome(d);
+                const scope = document.getElementById('scope-pill');
+                if (scope) {
+                    scope.innerHTML = `<span class="dash-live-dot"></span><span>${this.esc(d.scope === 'store' ? this.t('dash.scope_store') : this.t('dash.scope_global'))}</span>`;
+                }
+                const period = d.period || {};
+                document.getElementById('hero-period').textContent = this.t('dash.hero_period', { from: period.from || '', to: period.to || '' });
+                App.setMoneyMetric(document.getElementById('hero-principal'), d.month?.principal || 0);
+                App.setMoneyMetric(document.getElementById('hero-today'), d.today?.principal || 0);
+                App.setCountMetric(document.getElementById('hero-alerts'), d.compliance?.security_alerts?.total || 0);
+                this.renderKpis(d);
+                this.renderActivity(d.charts?.daily || []);
+                this.renderShare(document.getElementById('company-breakdown'), (d.charts?.companies||[]).map((c,i)=>({
+                    label: c.company || '—', value: parseFloat(c.total_principal)||0, count: c.count||0, colors: this.colors[i%this.colors.length]
+                })));
+                this.renderShare(document.getElementById('type-breakdown'), (d.charts?.types||[]).map(t=>({
+                    label: String(t.txn_type||'unknown').replace(/_/g,' '), value: parseFloat(t.total_principal)||0, count: t.count||0, colors: this.typeColor(t.txn_type)
+                })));
+                const stores = d.charts?.stores || [];
+                const storePanel = document.getElementById('store-panel');
+                if (!stores.length && d.scope === 'store') {
+                    storePanel.classList.add('hidden');
+                } else {
+                    storePanel.classList.remove('hidden');
+                    this.renderShare(document.getElementById('store-breakdown'), stores.map((s,i)=>({
+                        label: s.store_name || '—', value: parseFloat(s.total)||0, count: s.count||0, colors: this.colors[i%this.colors.length]
+                    })));
+                }
+                this.renderAlerts(d);
+                this.renderSenders(d.top_senders || []);
+                this.renderActions();
+                const led = d.ledger || {};
+                App.setMoneyMetric(document.getElementById('ledger-owed'), led.owed_to_store || 0);
+                App.setMoneyMetric(document.getElementById('ledger-store-owes'), led.store_owes || 0);
+                const net = Number(led.net || 0);
+                const netEl = document.getElementById('ledger-net');
+                App.setMoneyMetric(netEl, Math.abs(net));
+                netEl.classList.toggle('text-success', net > 0);
+                netEl.classList.toggle('text-danger', net < 0);
+            } catch (err) {
+                console.error(err);
+                App.toast(err.message || App.t('toast.error_generic'), 'danger');
+            }
+        },
+        async init() {
             const ok = await App.init();
             if (!ok) return;
-
             App.initSidebar();
             App.initStoreSelector();
             App.initUserMenu();
-
             const avatar = document.getElementById('user-avatar');
-            if (avatar && App.user?.name) {
-                avatar.textContent = App.user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-            }
-
-            const t = (k, vars) => App.t(k, vars);
-
-            function formatPageDate() {
-                const el = document.getElementById('page-date');
-                if (!el) return;
-                const lang = App.lang || 'en';
-                el.textContent = new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', {
-                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-                });
-            }
-            formatPageDate();
-
-            async function loadDashboard() {
-                try {
-                    const d = await App.api('GET', '/api/dashboard');
-
-                    const welcome = document.getElementById('employee-welcome');
-                    if (d.employee) {
-                        welcome.classList.remove('hidden');
-                        document.getElementById('welcome-employee-name').textContent = d.employee.name;
-                        const meta = [];
-                        if (App.user?.role) {
-                            const roleKey = `role.${App.user.role}`;
-                            meta.push(t(roleKey) !== roleKey ? t(roleKey) : App.user.role);
-                        }
-                        if (d.employee.phone) meta.push(d.employee.phone);
-                        document.getElementById('welcome-employee-meta').textContent = meta.join(' · ');
-                        const clockEl = document.getElementById('welcome-clock-status');
-                        if (d.my_clock_in) {
-                            const statusKey = d.my_clock_in.status === 'clocked_in' ? 'dash.clocked_in_today' : 'dash.clocked_out_today';
-                            clockEl.textContent = `${t(statusKey)} · ${App.formatDateTime(d.my_clock_in.clock_in_time)}`;
-                        } else {
-                            clockEl.textContent = t('dash.not_clocked_in');
-                        }
-                    } else if (welcome) {
-                        welcome.classList.add('hidden');
-                    }
-
-                    document.getElementById('stat-caja').textContent = App.money(d.caja_total_today);
-                    document.getElementById('stat-caja-sessions').textContent = d.caja_sessions_today;
-                    document.getElementById('stat-transfers').textContent = App.money(d.month_transfer_usd);
-                    document.getElementById('stat-transfer-count').textContent = d.month_transfers;
-                    document.getElementById('stat-clients').textContent = d.total_clients.toLocaleString(App.lang === 'es' ? 'es-ES' : 'en-US');
-                    document.getElementById('stat-clocked').textContent = d.clocked_in_today;
-                    document.getElementById('ledger-owed').textContent = App.money(d.ledger_owed_to_store);
-                    document.getElementById('ledger-store-owes').textContent = App.money(d.ledger_store_owes);
-                    const net = d.ledger_owed_to_store - d.ledger_store_owes;
-                    const netEl = document.getElementById('ledger-net');
-                    netEl.textContent = App.money(Math.abs(net));
-                    netEl.className = `text-lg font-bold font-mono tabular-nums ${net > 0 ? 'text-success' : net < 0 ? 'text-danger' : ''}`;
-                } catch (err) {
-                    console.error('Dashboard load error:', err);
-                    App.toast(err.message || App.t('toast.error_generic'), 'danger');
-                    ['stat-caja', 'stat-transfers', 'stat-clients', 'stat-clocked', 'ledger-owed', 'ledger-store-owes', 'ledger-net'].forEach((id) => {
-                        const el = document.getElementById(id);
-                        if (el) el.textContent = '—';
-                    });
-                    ['stat-caja-sessions', 'stat-transfer-count'].forEach((id) => {
-                        const el = document.getElementById(id);
-                        if (el) el.textContent = '—';
-                    });
-                }
-            }
-
-            loadDashboard();
-            window.addEventListener('store-changed', loadDashboard);
-            document.addEventListener('language-changed', () => {
-                formatPageDate();
-                loadDashboard();
-            });
-        })();
+            if (avatar && App.user?.name) avatar.textContent = App.user.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+            this.formatPageDate();
+            await this.load();
+            window.addEventListener('store-changed', () => this.load());
+            document.addEventListener('language-changed', () => { this.formatPageDate(); this.load(); });
+        }
+    };
+    Dash.init();
     </script>
 </body>
 </html>
