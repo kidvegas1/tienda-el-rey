@@ -3,7 +3,16 @@ const App = {
     user: null,
     stores: [],
     currentStore: null,
+    /** Admin scope: 'all' = Todas las tiendas, 'store' = selected store */
+    storeFilterMode: 'all',
     lang: 'es',
+
+    // Canonical left-nav order (keep every page identical).
+    NAV_ORDER: [
+        'dashboard', 'caja', 'clients', 'company-verification', 'libro-interno', 'schedule',
+        'employees', 'statistics', 'reports', 'analytics', 'metas', 'security', 'reports-center',
+        'accounting', 'finances', 'receipts', 'inventory', 'sales-log', 'import', 'stores',
+    ],
 
     t(key, vars = {}) {
         const safeVars = vars && typeof vars === 'object' ? vars : {};
@@ -31,6 +40,10 @@ const App = {
         document.documentElement.lang = next;
         this.applyI18n();
         this.updateUserMenu();
+        document.querySelectorAll('select#store-selector option[value="all"], select#store-selector-sidebar option[value="all"]').forEach((opt) => {
+            opt.textContent = this.t('store.all_stores');
+        });
+        this.bindInfoTips(document.getElementById('sidebar') || document);
         window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang: next } }));
         this.toast(next === 'es' ? this.t('lang.switch_to_es') : this.t('lang.switch_to_en'), 'info');
     },
@@ -58,6 +71,7 @@ const App = {
             if (key) el.alt = this.t(key);
         });
 
+        const canTip = this.user?.role === 'admin' || this.user?.role === 'manager';
         document.querySelectorAll('.sidebar-link').forEach((link) => {
             const href = link.getAttribute('href');
             const key = window.APP_NAV_I18N?.[href];
@@ -74,6 +88,18 @@ const App = {
                 link.appendChild(label);
             }
             label.textContent = this.t(key);
+            if (canTip) {
+                const descKey = `${key}.desc`;
+                const desc = this.t(descKey);
+                const tip = desc !== descKey ? desc : this.t(key);
+                link.setAttribute('data-hover-tip', tip);
+                link.removeAttribute('title');
+                link.removeAttribute('data-i18n-title');
+            } else {
+                link.removeAttribute('data-hover-tip');
+                link.removeAttribute('title');
+                link.removeAttribute('data-i18n-title');
+            }
         });
 
         const page = this.pageRouteKey();
@@ -137,6 +163,19 @@ const App = {
         this._mobileCardsObserver = obs;
     },
 
+    storeQuery() {
+        if (this.user?.role !== 'admin') return '';
+        if (this.storeFilterMode === 'all') return '';
+        const id = this.currentStore?.id;
+        return id ? `store_id=${encodeURIComponent(id)}` : '';
+    },
+
+    withStoreQuery(url) {
+        const q = this.storeQuery();
+        if (!q) return url;
+        return url + (String(url).includes('?') ? '&' : '?') + q;
+    },
+
     // ponytail: shared info-tip hover (CSS already in app.css)
     bindInfoTips(root = document) {
         const hide = () => {
@@ -145,17 +184,15 @@ const App = {
                 this._floatingTip = null;
             }
         };
-        const show = (btn) => {
+        const place = (el, text) => {
             hide();
-            const key = btn.getAttribute('data-tip-key') || '';
-            const text = key ? this.t(key) : '';
-            if (!text || text === key) return;
+            if (!text) return;
             const tip = document.createElement('div');
             tip.className = 'info-tip-float';
             tip.setAttribute('role', 'tooltip');
             tip.textContent = text;
             document.body.appendChild(tip);
-            const rect = btn.getBoundingClientRect();
+            const rect = el.getBoundingClientRect();
             const tipRect = tip.getBoundingClientRect();
             let left = Math.min(Math.max(8, rect.right - tipRect.width), window.innerWidth - tipRect.width - 8);
             let top = rect.bottom + 8;
@@ -166,17 +203,35 @@ const App = {
             tip.style.top = top + 'px';
             this._floatingTip = tip;
         };
+        const show = (btn) => {
+            const raw = btn.getAttribute('data-tip-text') || '';
+            const key = btn.getAttribute('data-tip-key') || '';
+            const text = raw || (key ? this.t(key) : '');
+            if (!text || text === key) return;
+            place(btn, text);
+        };
         root.querySelectorAll('[data-info-tip]').forEach((btn) => {
             if (btn.dataset.tipBound) return;
             btn.dataset.tipBound = '1';
-            if (!btn.querySelector('svg')) {
+            if (!btn.querySelector('svg') && btn.classList.contains('info-tip')) {
                 btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
             }
             btn.addEventListener('mouseenter', () => show(btn));
             btn.addEventListener('mouseleave', hide);
             btn.addEventListener('focus', () => show(btn));
             btn.addEventListener('blur', hide);
-            btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+            if (btn.classList.contains('info-tip')) {
+                btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+            }
+        });
+        // Full-card / row hover tips (KPI mosaic, etc.)
+        root.querySelectorAll('[data-hover-tip]').forEach((el) => {
+            if (el.dataset.hoverTipBound) return;
+            el.dataset.hoverTipBound = '1';
+            el.addEventListener('mouseenter', () => place(el, el.getAttribute('data-hover-tip') || ''));
+            el.addEventListener('mouseleave', hide);
+            el.addEventListener('focus', () => place(el, el.getAttribute('data-hover-tip') || ''));
+            el.addEventListener('blur', hide);
         });
     },
 
@@ -251,10 +306,15 @@ const App = {
         this.stores = res.stores;
         const sessionStoreId = Number(res.user.store_id) || 0;
         this.currentStore = res.stores.find(s => s.id == sessionStoreId) || res.stores[0];
+        const savedMode = localStorage.getItem('storeFilterMode');
+        this.storeFilterMode = this.user?.role === 'admin'
+            ? (savedMode === 'store' ? 'store' : 'all')
+            : 'store';
         if (
             this.user?.role === 'admin'
             && this.currentStore
             && sessionStoreId <= 0
+            && this.storeFilterMode === 'store'
         ) {
             const switched = await this.api('POST', '/api/auth', {
                 action: 'switch_store',
@@ -356,6 +416,35 @@ const App = {
         return c;
     },
 
+    syncSidebarNav() {
+        const nav = document.querySelector('#sidebar nav');
+        if (!nav) return;
+        const byHref = new Map();
+        nav.querySelectorAll('a.sidebar-link').forEach((a) => {
+            const href = a.getAttribute('href');
+            if (href) byHref.set(href, a);
+        });
+        // Ensure missing canonical items exist (e.g. inventory/stores lacked metas).
+        const fallbackIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`;
+        this.NAV_ORDER.forEach((href) => {
+            if (byHref.has(href)) return;
+            const a = document.createElement('a');
+            a.href = href;
+            a.className = 'sidebar-link';
+            a.innerHTML = `${fallbackIcon}<span class="nav-label"></span>`;
+            byHref.set(href, a);
+        });
+        const ordered = new Set(this.NAV_ORDER);
+        this.NAV_ORDER.forEach((href) => {
+            const link = byHref.get(href);
+            if (link) nav.appendChild(link);
+        });
+        // Keep any non-canonical links (legacy pages) after the standard set.
+        byHref.forEach((link, href) => {
+            if (!ordered.has(href)) nav.appendChild(link);
+        });
+    },
+
     initSidebar() {
         const toggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -376,6 +465,7 @@ const App = {
                 overlay.classList.remove('open');
             });
         }
+        this.syncSidebarNav();
         const current = location.pathname.split('/').pop() || 'dashboard';
         document.querySelectorAll('.sidebar-link').forEach(link => {
             const href = link.getAttribute('href');
@@ -385,6 +475,8 @@ const App = {
             link.style.display = '';
         });
         this.applyRoleNav();
+        this.applyI18n();
+        this.bindInfoTips(sidebar || document);
     },
 
     /** Hide admin-only nav entries and redirect if role cannot open the page. */
@@ -413,10 +505,19 @@ const App = {
         const sels = document.querySelectorAll('select#store-selector, select#store-selector-sidebar');
         if (!sels.length) return;
         const isAdmin = this.user?.role === 'admin';
+        const allLabel = this.t('store.all_stores');
         sels.forEach(sel => {
-            sel.innerHTML = this.stores.map(s =>
-                `<option value="${s.id}" ${s.id == this.currentStore?.id ? 'selected' : ''}>${s.name}</option>`
+            const storeOpts = this.stores.map(s =>
+                `<option value="${s.id}">${s.name}</option>`
             ).join('');
+            sel.innerHTML = isAdmin
+                ? `<option value="all">${allLabel}</option>${storeOpts}`
+                : storeOpts;
+            if (isAdmin && this.storeFilterMode === 'all') {
+                sel.value = 'all';
+            } else if (this.currentStore?.id) {
+                sel.value = String(this.currentStore.id);
+            }
         });
         if (!isAdmin) {
             sels.forEach(sel => {
@@ -427,11 +528,26 @@ const App = {
             return;
         }
         sels.forEach(sel => {
+            if (sel.dataset.storeBound) return;
+            sel.dataset.storeBound = '1';
             sel.addEventListener('change', async (e) => {
                 try {
-                    await this.api('POST', '/api/auth', { action: 'switch_store', store_id: parseInt(e.target.value) });
-                    this.currentStore = this.stores.find(s => s.id == e.target.value);
-                    this.toast(this.t('store.switched', { name: this.currentStore.name }), 'success');
+                    const val = e.target.value;
+                    if (val === 'all') {
+                        this.storeFilterMode = 'all';
+                        localStorage.setItem('storeFilterMode', 'all');
+                        sels.forEach(s => { s.value = 'all'; });
+                        this.toast(this.t('store.switched', { name: allLabel }), 'success');
+                        window.dispatchEvent(new CustomEvent('store-changed'));
+                        return;
+                    }
+                    const storeId = parseInt(val, 10);
+                    await this.api('POST', '/api/auth', { action: 'switch_store', store_id: storeId });
+                    this.storeFilterMode = 'store';
+                    localStorage.setItem('storeFilterMode', 'store');
+                    this.currentStore = this.stores.find(s => s.id == storeId);
+                    sels.forEach(s => { s.value = String(storeId); });
+                    this.toast(this.t('store.switched', { name: this.currentStore?.name || '' }), 'success');
                     window.dispatchEvent(new CustomEvent('store-changed'));
                 } catch (err) {
                     this.toast(err.message, 'danger');

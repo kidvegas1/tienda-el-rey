@@ -29,7 +29,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css?v=20260801-dash">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-store-nav">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -451,8 +451,8 @@
         }
     </style>
 
-    <script src="assets/js/i18n.js?v=20260801-dash"></script>
-    <script src="assets/js/app.js?v=20260723-metrics"></script>
+    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
+    <script src="assets/js/app.js?v=20260801-store-nav"></script>
     <script>
     const Dash = {
         data: null,
@@ -490,7 +490,8 @@
             });
         },
         kpiCard({ label, value, meta, tone, glow, delay }) {
-            return `<article class="dash-kpi ${tone || ''}" style="--kpi-glow:${glow || 'oklch(0.6 0.1 55)'};animation-delay:${delay || '0ms'}">
+            const tip = [label, value.full || value.display, meta].filter(Boolean).join('\n');
+            return `<article class="dash-kpi ${tone || ''}" style="--kpi-glow:${glow || 'oklch(0.6 0.1 55)'};animation-delay:${delay || '0ms'}" data-hover-tip="${this.esc(tip)}" tabindex="0">
                 <p class="dash-kpi-label">${this.esc(label)}</p>
                 <p class="dash-kpi-value" title="${this.esc(value.full || value.display)}">${this.esc(value.display)}</p>
                 <p class="dash-kpi-meta">${this.esc(meta || '')}</p>
@@ -523,7 +524,9 @@
                 { label: this.t('dash.total_clients'), value: this.cv(o.total_clients), meta: this.t('dash.clients_active'), glow: 'oklch(0.7 0.12 85)', tone: 'is-warning' },
                 { label: this.t('dash.clocked_in'), value: this.cv(o.clocked_in_today), meta: this.t('dash.on_shift'), glow: 'oklch(0.6 0.12 155)', tone: 'is-success' },
             ];
-            document.getElementById('kpi-grid').innerHTML = cards.map((card, i) => this.kpiCard({ ...card, delay: `${i * 35}ms` })).join('');
+            const grid = document.getElementById('kpi-grid');
+            grid.innerHTML = cards.map((card, i) => this.kpiCard({ ...card, delay: `${i * 35}ms` })).join('');
+            App.bindInfoTips(grid);
         },
         renderShare(el, rows) {
             if (!rows.length) {
@@ -707,7 +710,7 @@
         },
         async load() {
             try {
-                const d = await App.api('GET', '/api/dashboard');
+                const d = await App.api('GET', App.withStoreQuery('/api/dashboard'));
                 this.data = d;
                 this.fincenLimit = parseFloat(d.compliance?.fincen_limit || d.fincen_limit) || 5000;
                 this.renderWelcome(d);

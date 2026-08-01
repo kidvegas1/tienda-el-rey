@@ -28,7 +28,7 @@
             --font-mono: "JetBrains Mono", ui-monospace, monospace;
         }
     </style>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css?v=20260801-store-nav">
 </head>
 <body class="bg-bg-base text-text-primary font-sans">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -41,7 +41,7 @@
                 </div>
                 <div>
                     <h1 class="text-sm font-bold text-text-primary">Tienda Hispana El Rey</h1>
-                    <p class="text-xs text-text-secondary" data-i18n="nav.security">Transfer Security</p>
+                    <select id="store-selector-sidebar" class="text-xs bg-transparent text-text-secondary border-none outline-none cursor-pointer -ml-0.5 hidden lg:block"></select>
                 </div>
             </div>
         </div>
@@ -90,6 +90,7 @@
                 <h2 class="text-xl font-bold tracking-tight" id="page-title" data-i18n="page.security.heading">Transfer Security</h2>
             </div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <select id="store-selector" class="input py-2 px-3 text-sm w-full sm:w-44"></select>
                 <select id="status-filter" class="input py-2 px-3 text-sm w-full sm:w-36">
                     <option value="open">Open</option>
                     <option value="all">All</option>
@@ -198,14 +199,15 @@
         </form>
     </div>
 
-    <script src="assets/js/i18n.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
+    <script src="assets/js/app.js?v=20260801-store-nav"></script>
     <script>
         (async () => {
             const ok = await App.init();
             if (!ok) return;
 
             App.initSidebar();
+            App.initStoreSelector();
             App.initUserMenu();
 
             const avatar = document.getElementById('user-avatar');
@@ -233,7 +235,7 @@
 
             async function loadSummary() {
                 try {
-                    const data = await App.api('GET', '/api/transfer-security?action=summary');
+                    const data = await App.api('GET', App.withStoreQuery('/api/transfer-security?action=summary'));
                     document.getElementById('card-open').textContent = data.open_total ?? 0;
                     document.getElementById('card-high').textContent = data.by_severity?.high ?? 0;
                     document.getElementById('card-medium').textContent = data.by_severity?.medium ?? 0;
@@ -252,7 +254,8 @@
                 try {
                     const status = statusSel.value;
                     let qs = `status=${encodeURIComponent(status)}`;
-                    if (App.currentStore?.id) qs += `&store_id=${App.currentStore.id}`;
+                    const sq = App.storeQuery?.() || '';
+                    if (sq) qs += `&${sq}`;
                     const data = await App.api('GET', `/api/transfer-security?${qs}`);
                     renderAlerts(data.alerts || []);
                 } catch (err) {

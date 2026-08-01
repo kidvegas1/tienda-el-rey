@@ -461,6 +461,13 @@ body {
   box-shadow: 0 12px 32px oklch(0 0 0 / 0.16);
   pointer-events: none;
 }
+@media (max-width: 640px) {
+  .info-tip-float {
+    max-width: calc(100vw - 1rem);
+    font-size: 0.72rem;
+  }
+  .dash-kpi[data-hover-tip] { cursor: help; }
+}
 
 /* ── Mobile sidebar + responsive shell ── */
 @media (max-width: 1023px) {

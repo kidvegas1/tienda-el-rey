@@ -11,11 +11,17 @@ if ($method === 'GET') {
     $action = $_GET['action'] ?? 'list';
 
     if ($action === 'summary') {
-        $counts = transfer_security_open_count_by_severity($pdo);
+        $storeId = !empty($_GET['store_id']) ? (int)$_GET['store_id'] : null;
+        if ($storeId !== null) {
+            auth_require_store_access($storeId);
+        }
+        $storeFilter = resolve_store_filter($storeId);
+        $counts = transfer_security_open_count_by_severity($pdo, $storeFilter);
         $totalOpen = array_sum($counts);
         json_response([
             'open_total'    => $totalOpen,
             'by_severity'   => $counts,
+            'scope'         => $storeFilter ? 'store' : 'all',
         ]);
     }
 

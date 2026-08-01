@@ -175,8 +175,8 @@
         </main>
     </div>
 
-    <script src="assets/js/i18n.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/i18n.js?v=20260801-store-nav"></script>
+    <script src="assets/js/app.js?v=20260801-store-nav"></script>
     <script>
         const COMPANY_COLORS = {
             'Barri':      { bg: 'oklch(0.48 0.09 55)',  label: 'bg-[oklch(0.75_0.16_55)]' },
@@ -219,7 +219,7 @@
             async function loadData() {
                 const year = yearSel.value;
                 try {
-                    const data = await App.api('GET', `/api/statistics?year=${year}`);
+                    const data = await App.api('GET', App.withStoreQuery(`/api/statistics?year=${year}`));
 
                     if (data.years?.length) {
                         const existing = new Set([...yearSel.options].map(o => o.value));

@@ -344,19 +344,27 @@ function transfer_security_resolve(PDO $pdo, int $alertId, int $userId, string $
  *
  * @return array{low:int,medium:int,high:int}
  */
-function transfer_security_open_count_by_severity(PDO $pdo): array
+function transfer_security_open_count_by_severity(PDO $pdo, ?int $storeId = null): array
 {
     $counts = ['low' => 0, 'medium' => 0, 'high' => 0];
     if (!transfer_security_table_exists($pdo)) {
         return $counts;
     }
 
-    $stmt = $pdo->query(
-        "SELECT severity, COUNT(*) AS cnt
-         FROM transfer_security_alerts
-         WHERE status = 'open'
-         GROUP BY severity"
-    );
+    // ponytail: optional store scope for admin filter
+    $sql = "SELECT severity, COUNT(*) AS cnt
+            FROM transfer_security_alerts
+            WHERE status = 'open'";
+    $params = [];
+    if ($storeId !== null && $storeId > 0) {
+        $sql .= ' AND store_id = ?';
+        $params[] = $storeId;
+    }
+    $sql .= ' GROUP BY severity';
+    $stmt = $params ? $pdo->prepare($sql) : $pdo->query($sql);
+    if ($params) {
+        $stmt->execute($params);
+    }
     foreach ($stmt->fetchAll() ?: [] as $row) {
         $sev = $row['severity'] ?? '';
         if (isset($counts[$sev])) {
