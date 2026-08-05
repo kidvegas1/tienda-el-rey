@@ -650,14 +650,17 @@
                     showResult(local);
                     return;
                 }
-                if (/not found|no encontrado|404/i.test(err.message)) {
-                    if (state.mode === 'sale') {
+                // Sale mode: only existing stock. Stock-in / add: always offer create form on miss/error.
+                if (state.mode === 'sale') {
+                    if (/not found|no encontrado|404/i.test(err.message || '')) {
                         showSaleNotFound(barcode);
                         App.toast(t('inventory.sale_not_in_stock'), 'warning');
                     } else {
-                        openProductModal(null, barcode);
+                        App.toast(err.message, 'danger');
                     }
-                } else App.toast(err.message, 'danger');
+                    return;
+                }
+                openProductModal(null, barcode);
             }
         }
         async function confirmOperation() {

@@ -94,7 +94,8 @@ function inventory_find_by_barcode(PDO $pdo, int $storeId, string $barcode): ?ar
         return null;
     }
 
-    $stmt = $pdo->prepare('SELECT * FROM inventory WHERE store_id = ? AND barcode IS NOT NULL AND barcode != ""');
+    // Postgres rejects MySQL-style "" empty-string literals — use ''.
+    $stmt = $pdo->prepare("SELECT * FROM inventory WHERE store_id = ? AND barcode IS NOT NULL AND TRIM(barcode) <> ''");
     $stmt->execute([$storeId]);
     while ($row = $stmt->fetch()) {
         $storedVariants = inventory_barcode_variants((string)($row['barcode'] ?? ''));
