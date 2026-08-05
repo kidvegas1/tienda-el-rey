@@ -110,9 +110,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><circle cx="10" cy="13" r="2"/><path d="M14 17c0-1.1-.9-2-2-2h-4a2 2 0 0 0-2 2"/></svg>
                     <span data-i18n="clients.records_by_name">Records by Name</span>
                 </button>
-                <button id="face-match-btn" class="btn-secondary" type="button" data-i18n-title="clients.face.match_title" title="Identify client by face">
+                <button id="face-match-btn" class="btn-secondary" type="button" data-i18n-title="clients.face.match_title" title="Scan client Face ID">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 3H5a2 2 0 0 0-2 2v4"/><path d="M15 3h4a2 2 0 0 1 2 2v4"/><path d="M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M15 21h4a2 2 0 0 0 2-2v-4"/><circle cx="12" cy="11" r="3"/><path d="M7 20c1.5-2 3.2-3 5-3s3.5 1 5 3"/></svg>
-                    <span data-i18n="clients.face.match">Live Match</span>
+                    <span data-i18n="clients.face.match">Scan Client</span>
                 </button>
                 <button id="add-client-btn" class="btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -262,8 +262,8 @@
                                     <div class="space-y-2">
                                         <p id="face-enrolled-meta" class="text-xs text-text-muted"></p>
                                         <div class="flex flex-wrap gap-2">
-                                            <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-retake-btn" data-i18n="clients.face.cta_camera">Face ID Image</button>
-                                            <button type="button" class="btn-secondary text-xs py-1 px-2.5" id="face-upload-btn" data-i18n="clients.face.cta_upload">Upload Face ID Image</button>
+                                            <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-retake-btn" data-i18n="clients.face.cta_add">Add Face ID Photo</button>
+                                            <button type="button" class="btn-secondary text-xs py-1 px-2.5" id="face-upload-btn" data-i18n="clients.face.cta_upload">Upload Face ID Photo</button>
                                             <button type="button" class="btn-secondary text-xs py-1 px-2.5 text-danger" id="face-clear-btn" data-i18n="clients.face.clear">Remove Face ID</button>
                                         </div>
                                     </div>
@@ -272,11 +272,11 @@
                             <div id="face-photo-missing" class="hidden">
                                 <div class="flex items-center gap-3 p-3 rounded-xl bg-bg-elevated border border-border mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-text-muted shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                    <span class="text-sm text-text-secondary" data-i18n="clients.face.missing">No Face ID image — add one for live face recognition</span>
+                                    <span class="text-sm text-text-secondary" data-i18n="clients.face.missing">No Face ID photo yet — add one for Scan Client</span>
                                 </div>
                                 <div class="flex flex-wrap gap-2">
-                                    <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-capture-btn" data-i18n="clients.face.cta_camera">Face ID Image</button>
-                                    <button type="button" class="btn-secondary text-xs py-1.5 px-3" id="face-upload-missing-btn" data-i18n="clients.face.cta_upload">Upload Face ID Image</button>
+                                    <button type="button" class="btn-primary text-sm py-2 px-4" id="face-capture-btn" data-i18n="clients.face.cta_add">Add Face ID Photo</button>
+                                    <button type="button" class="btn-secondary text-xs py-1.5 px-3" id="face-upload-missing-btn" data-i18n="clients.face.cta_upload">Upload Face ID Photo</button>
                                 </div>
                             </div>
                             <input type="file" id="face-file-input" accept="image/jpeg,image/png,image/webp" class="hidden">
@@ -387,8 +387,8 @@
                 <div class="flex items-center justify-between gap-2 flex-wrap">
                     <label class="text-xs font-semibold text-text-secondary uppercase tracking-wider" data-i18n="clients.face.optional_photo">Face ID Image (optional)</label>
                     <div class="flex gap-2">
-                        <button type="button" class="btn-primary text-xs py-1 px-2" id="client-modal-face-btn" data-i18n="clients.face.cta_camera">Face ID Image</button>
-                        <button type="button" class="btn-secondary text-xs py-1 px-2" id="client-modal-face-upload-btn" data-i18n="clients.face.cta_upload">Upload</button>
+                        <button type="button" class="btn-primary text-xs py-1 px-2" id="client-modal-face-btn" data-i18n="clients.face.cta_add">Add Face ID Photo</button>
+                        <button type="button" class="btn-secondary text-xs py-1 px-2" id="client-modal-face-upload-btn" data-i18n="clients.face.cta_upload">Upload Face ID Photo</button>
                     </div>
                 </div>
                 <label class="flex items-start gap-2 text-xs text-text-secondary">
@@ -418,10 +418,29 @@
             <img id="face-snapshot" class="hidden absolute inset-0 w-full h-full object-cover" alt="">
         </div>
         <p class="text-sm mb-3 min-h-[1.25rem]" id="face-status"></p>
-        <div id="face-match-result" class="hidden mb-3 p-3 rounded-xl bg-bg-elevated border border-border">
+        <div id="face-match-result" class="hidden mb-3 p-3 rounded-xl bg-bg-elevated border border-border space-y-2">
             <p class="text-sm font-semibold" id="face-match-name"></p>
             <p class="text-xs text-text-muted" id="face-match-score"></p>
-            <button type="button" class="btn-primary text-xs py-1.5 px-3 mt-2" id="face-match-open-btn" data-i18n="clients.face.open_client">Open Client</button>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-match-open-btn" data-i18n="clients.face.open_client">Open Client</button>
+                <button type="button" class="btn-secondary text-xs py-1.5 px-3 hidden" id="face-match-save-hit-btn" data-i18n="clients.face.save_to_match">Add Face ID to This Client</button>
+            </div>
+        </div>
+        <div id="face-scan-actions" class="hidden mb-3 p-3 rounded-xl border border-border space-y-2">
+            <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider" data-i18n="clients.face.scan_actions_title">After scan</p>
+            <p class="text-xs text-text-muted" data-i18n="clients.face.scan_actions_hint">Capture a Face ID photo, then save it to an existing client or register a new one.</p>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-scan-register-btn" data-i18n="clients.face.register_new">Register as New Client</button>
+                <button type="button" class="btn-secondary text-xs py-1.5 px-3" id="face-scan-attach-btn" data-i18n="clients.face.attach_existing">Add Photo to Existing Client</button>
+            </div>
+            <div id="face-scan-attach-panel" class="hidden space-y-2 pt-1">
+                <input type="search" id="face-scan-attach-search" class="input text-sm" data-i18n-placeholder="clients.face.attach_search_placeholder" placeholder="Search client by name or code…">
+                <div id="face-scan-attach-results" class="max-h-40 overflow-y-auto space-y-1"></div>
+            </div>
+            <label class="flex items-start gap-2 text-xs text-text-secondary">
+                <input type="checkbox" id="face-scan-consent" class="mt-0.5">
+                <span data-i18n="clients.face.consent">Client consents to store a Face ID image for identification at the counter</span>
+            </label>
         </div>
         <label id="face-consent-row" class="flex items-start gap-2 text-xs text-text-secondary mb-3">
             <input type="checkbox" id="face-consent" class="mt-0.5">
@@ -431,7 +450,7 @@
             <button type="button" class="btn-secondary flex-1" id="face-modal-cancel" data-i18n="action.cancel">Cancel</button>
             <button type="button" class="btn-secondary flex-1 hidden" id="face-modal-recapture" data-i18n="clients.face.retake">Retake Photo</button>
             <button type="button" class="btn-primary flex-1 justify-center" id="face-modal-capture" data-i18n="clients.face.capture">Capture</button>
-            <button type="button" class="btn-primary flex-1 justify-center hidden" id="face-modal-save" data-i18n="clients.face.save">Save Photo</button>
+            <button type="button" class="btn-primary flex-1 justify-center hidden" id="face-modal-save" data-i18n="clients.face.save">Save Face ID</button>
         </div>
     </div>
 
@@ -612,9 +631,9 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260805-faceid2"></script>
+    <script src="assets/js/i18n.js?v=20260805-faceid3"></script>
     <script src="assets/js/app.js?v=20260801-gaps"></script>
-    <script src="assets/js/face-id.js?v=20260805-faceid2"></script>
+    <script src="assets/js/face-id.js?v=20260805-faceid3"></script>
     <script>
         function escHtml(s) {
             if (!s) return '';
@@ -916,6 +935,23 @@
                     closeFaceModal();
                     openClient(faceMatchHitId);
                 }
+            });
+            document.getElementById('face-match-save-hit-btn')?.addEventListener('click', () => {
+                if (faceMatchHitId) saveCapturedFaceToClient(faceMatchHitId);
+            });
+            document.getElementById('face-scan-register-btn')?.addEventListener('click', registerNewClientFromScan);
+            document.getElementById('face-scan-attach-btn')?.addEventListener('click', () => {
+                const panel = document.getElementById('face-scan-attach-panel');
+                panel?.classList.toggle('hidden');
+                if (panel && !panel.classList.contains('hidden')) {
+                    document.getElementById('face-scan-attach-search')?.focus();
+                }
+            });
+            let faceAttachSearchTimer = null;
+            document.getElementById('face-scan-attach-search')?.addEventListener('input', (e) => {
+                clearTimeout(faceAttachSearchTimer);
+                const q = (e.target.value || '').trim();
+                faceAttachSearchTimer = setTimeout(() => searchClientsForFaceAttach(q), 250);
             });
 
             document.getElementById('client-form').addEventListener('submit', async (e) => {
@@ -2231,11 +2267,20 @@
             faceCaptureDescriptor = null;
             faceMatchHitId = null;
             document.getElementById('face-match-result')?.classList.add('hidden');
+            document.getElementById('face-scan-actions')?.classList.add('hidden');
+            document.getElementById('face-scan-attach-panel')?.classList.add('hidden');
+            document.getElementById('face-match-save-hit-btn')?.classList.add('hidden');
             document.getElementById('face-snapshot')?.classList.add('hidden');
             document.getElementById('face-video')?.classList.remove('hidden');
             document.getElementById('face-modal-capture')?.classList.remove('hidden');
             document.getElementById('face-modal-save')?.classList.add('hidden');
             document.getElementById('face-modal-recapture')?.classList.add('hidden');
+            const attachSearch = document.getElementById('face-scan-attach-search');
+            if (attachSearch) attachSearch.value = '';
+            const attachResults = document.getElementById('face-scan-attach-results');
+            if (attachResults) attachResults.innerHTML = '';
+            const scanConsent = document.getElementById('face-scan-consent');
+            if (scanConsent) scanConsent.checked = false;
             const consentRow = document.getElementById('face-consent-row');
             const title = document.getElementById('face-modal-title');
             const hint = document.getElementById('face-modal-hint');
@@ -2246,7 +2291,7 @@
                 hint.textContent = App.t('clients.face.hint_match');
                 consentRow?.classList.add('hidden');
             } else {
-                title.textContent = App.t('clients.face.cta_camera');
+                title.textContent = App.t('clients.face.cta_add');
                 hint.textContent = App.t('clients.face.hint_enroll');
                 consentRow?.classList.toggle('hidden', mode === 'pending');
                 const consent = document.getElementById('face-consent');
@@ -2317,6 +2362,7 @@
                     document.getElementById('face-modal-save').classList.add('hidden');
                     stopFaceMatchLoop();
                     await runMatchAgainstRoster(faceCaptureDescriptor);
+                    showFaceScanActions(true);
                 } else {
                     document.getElementById('face-modal-save').classList.remove('hidden');
                     if (status) status.textContent = App.t('clients.face.captured');
@@ -2332,6 +2378,9 @@
             faceCaptureDescriptor = null;
             faceMatchHitId = null;
             document.getElementById('face-match-result')?.classList.add('hidden');
+            document.getElementById('face-scan-actions')?.classList.add('hidden');
+            document.getElementById('face-scan-attach-panel')?.classList.add('hidden');
+            document.getElementById('face-match-save-hit-btn')?.classList.add('hidden');
             document.getElementById('face-snapshot')?.classList.add('hidden');
             document.getElementById('face-video')?.classList.remove('hidden');
             document.getElementById('face-modal-capture')?.classList.remove('hidden');
@@ -2339,6 +2388,104 @@
             document.getElementById('face-modal-recapture')?.classList.add('hidden');
             document.getElementById('face-status').textContent = App.t('clients.face.ready');
             if (faceMode === 'match') startLiveMatchLoop();
+        }
+
+        function showFaceScanActions(captured) {
+            const actions = document.getElementById('face-scan-actions');
+            if (!actions) return;
+            if (faceMode === 'match' && captured) {
+                actions.classList.remove('hidden');
+            } else {
+                actions.classList.add('hidden');
+            }
+            const saveHit = document.getElementById('face-match-save-hit-btn');
+            if (saveHit) {
+                saveHit.classList.toggle('hidden', !(captured && faceMatchHitId));
+            }
+        }
+
+        async function ensureScanCapture() {
+            if (faceCaptureBlob && faceCaptureDescriptor?.length) return true;
+            await onFaceCapture();
+            return !!(faceCaptureBlob && faceCaptureDescriptor?.length);
+        }
+
+        function registerNewClientFromScan() {
+            if (faceMode !== 'match') return;
+            (async () => {
+                if (!(await ensureScanCapture())) return;
+                if (!document.getElementById('face-scan-consent')?.checked) {
+                    App.toast(App.t('clients.face.consent_required'), 'warning');
+                    return;
+                }
+                pendingFaceBlob = faceCaptureBlob;
+                pendingFaceDescriptor = faceCaptureDescriptor;
+                const wrap = document.getElementById('client-modal-face-preview-wrap');
+                const img = document.getElementById('client-modal-face-preview');
+                if (img) img.src = URL.createObjectURL(pendingFaceBlob);
+                wrap?.classList.remove('hidden');
+                document.getElementById('client-modal-face-consent').checked = true;
+                closeFaceModal();
+                document.getElementById('client-modal-title').textContent = App.t('clients.add_client');
+                document.getElementById('client-form').reset();
+                document.querySelector('#client-form [name=id]').value = '';
+                document.getElementById('client-modal-face')?.classList.remove('hidden');
+                // restore pending preview after form reset
+                if (img) img.src = URL.createObjectURL(pendingFaceBlob);
+                wrap?.classList.remove('hidden');
+                document.getElementById('client-modal-face-consent').checked = true;
+                App.openModal('client-modal');
+                App.toastKey('clients.toast.face_pending', 'success');
+            })();
+        }
+
+        async function saveCapturedFaceToClient(clientId) {
+            if (!(await ensureScanCapture())) return;
+            if (!document.getElementById('face-scan-consent')?.checked) {
+                App.toast(App.t('clients.face.consent_required'), 'warning');
+                return;
+            }
+            try {
+                await uploadFaceForClient(clientId, faceCaptureBlob, faceCaptureDescriptor, true);
+                faceRoster = null;
+                App.toastKey('clients.toast.face_saved', 'success');
+                closeFaceModal();
+                await openClient(clientId);
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function searchClientsForFaceAttach(query) {
+            const box = document.getElementById('face-scan-attach-results');
+            if (!box) return;
+            if (!query || query.length < 2) {
+                box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.attach_search_hint')}</p>`;
+                return;
+            }
+            box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.detecting')}</p>`;
+            try {
+                const res = await App.api('GET', App.withStoreQuery(`/api/clients?search=${encodeURIComponent(query)}&page=1`));
+                const rows = res.clients || res.data || [];
+                if (!rows.length) {
+                    box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.attach_none')}</p>`;
+                    return;
+                }
+                box.innerHTML = rows.slice(0, 8).map((c) => `
+                    <button type="button" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-bg-elevated border border-transparent hover:border-border text-sm face-attach-pick" data-id="${c.id}">
+                        <span class="font-medium">${escHtml(c.name || '')}</span>
+                        <span class="text-xs text-text-muted ml-2">${escHtml(c.client_code || '')}</span>
+                    </button>
+                `).join('');
+                box.querySelectorAll('.face-attach-pick').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.getAttribute('data-id'), 10);
+                        if (id) saveCapturedFaceToClient(id);
+                    });
+                });
+            } catch (err) {
+                box.innerHTML = `<p class="text-xs text-danger">${escHtml(err.message)}</p>`;
+            }
         }
 
         async function onFaceSave() {
@@ -2419,6 +2566,7 @@
                 score: Math.round(result.best.score * 100),
             });
             if (status) status.textContent = App.t('clients.face.match_found');
+            showFaceScanActions(!!faceCaptureBlob);
         }
 
         function startLiveMatchLoop() {
