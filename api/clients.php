@@ -813,96 +813,25 @@ if ($method === 'POST') {
         $act = $_POST['action'];
 
         if ($act === 'upload_face') {
-            if (!client_face_columns_exist($pdo)) {
-                json_error('Face photo columns are not migrated yet. Apply 017_client_face.sql.', 503);
-            }
             $clientId = (int)($_POST['client_id'] ?? 0);
             auth_require_client_store_access($pdo, $clientId);
             $consent = filter_var($_POST['consent'] ?? false, FILTER_VALIDATE_BOOLEAN);
-            if (!$consent) {
-                json_error('Client consent is required before saving a face photo.', 400);
-            }
-            if (empty($_FILES['face_file'])) {
-                json_error('No photo provided');
-            }
-            $file = $_FILES['face_file'];
-            $mime = (string)($file['type'] ?? '');
-            $ext = strtolower(pathinfo((string)($file['name'] ?? ''), PATHINFO_EXTENSION));
-            if (!str_starts_with($mime, 'image/') && !in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                json_error('Face photo must be an image (jpg, png, webp)', 400);
-            }
             $descriptor = client_face_parse_descriptor($_POST['descriptor'] ?? null);
-            if ($descriptor === null) {
-                error_log('[face] upload_face rejected: invalid/missing descriptor client_id=' . $clientId);
-                json_error('No face data in upload. Capture again with a clear front-facing Face ID photo.', 400);
-            }
-            $tmpPath = (string)($file['tmp_name'] ?? '');
-            if ($tmpPath === '' || !is_file($tmpPath)) {
-                error_log('[face] upload_face rejected: missing tmp file client_id=' . $clientId);
-                json_error('No photo provided', 400);
-            }
-            // Relax empty browser MIME when extension is an image.
-            if ($mime === '' || $mime === 'application/octet-stream') {
-                $mime = match ($ext) {
-                    'png' => 'image/png',
-                    'webp' => 'image/webp',
-                    default => 'image/jpeg',
-                };
-                $file['type'] = $mime;
-            }
-            $thumb = client_face_make_thumb_data_url($tmpPath);
-            // ponytail: thumb is the durable profile image; storage is best-effort for full file
-            $path = upload_file($file, 'client-faces', false);
-            if ($path === false) {
-                $path = null;
-            }
-            if ($thumb === null && ($path === null || $path === '')) {
-                error_log('[face] upload_face rejected: no thumb and no storage path client_id=' . $clientId);
-                json_error('Could not save Face ID photo. Try a clear JPEG/PNG.', 400);
-            }
-            $descJson = client_face_encode_descriptor($descriptor);
-            if (client_face_thumb_column_exists($pdo)) {
-                $pdo->prepare(
-                    'UPDATE clients
-                     SET face_photo_path = ?,
-                         face_photo_thumb = COALESCE(?, face_photo_thumb),
-                         face_descriptor = ?,
-                         face_consent_at = ' . sql_now() . ',
-                         face_enrolled_at = ' . sql_now() . '
-                     WHERE id = ?'
-                )->execute([$path, $thumb, $descJson, $clientId]);
-            } else {
-                if ($path === null || $path === '') {
-                    json_error('Face ID storage unavailable and thumb column missing. Apply 019_client_face_thumb.sql.', 503);
-                }
-                $pdo->prepare(
-                    'UPDATE clients
-                     SET face_photo_path = ?,
-                         face_descriptor = ?,
-                         face_consent_at = ' . sql_now() . ',
-                         face_enrolled_at = ' . sql_now() . '
-                     WHERE id = ?'
-                )->execute([$path, $descJson, $clientId]);
-            }
+            $clientThumb = isset($_POST['thumb']) ? (string)$_POST['thumb'] : null;
+            $file = $_FILES['face_file'] ?? ['error' => UPLOAD_ERR_NO_FILE];
+            $result = client_face_enroll($pdo, $clientId, $file, $descriptor, $consent, $clientThumb);
             client_activity_log(
                 $pdo,
                 $clientId,
                 'face_enrolled',
-                $path
-                    ? 'Face ID image + descriptor enrolled'
-                    : 'Face ID thumb + descriptor enrolled (storage path unavailable)',
+                !empty($result['stored_remote'])
+                    ? 'Face ID enrolled (remote storage + descriptor)'
+                    : (!empty($result['path'])
+                        ? 'Face ID enrolled (local path + descriptor)'
+                        : 'Face ID enrolled (thumb + descriptor; storage unavailable)'),
                 (int)$user['id']
             );
-            $display = $thumb ?: ($path ? stored_file_url($path) : '');
-            json_response([
-                'success'                => true,
-                'path'                   => $path,
-                'path_url'               => $path ? stored_file_url($path) : '',
-                'face_photo_display_url' => $display,
-                'face_enrolled'          => true,
-                'has_descriptor'         => true,
-                'stored_remote'          => is_string($path) && str_starts_with($path, 'storage://'),
-            ]);
+            json_response($result);
         }
 
         if ($act === 'upload_income') {

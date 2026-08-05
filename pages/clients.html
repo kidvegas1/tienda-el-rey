@@ -525,7 +525,7 @@
                                     <button type="button" class="btn-secondary text-xs py-1.5 px-3" id="face-upload-missing-btn" data-i18n="clients.face.cta_upload">Upload Face ID Photo</button>
                                 </div>
                             </div>
-                            <input type="file" id="face-file-input" accept="image/jpeg,image/png,image/webp" class="hidden">
+                            <input type="file" id="face-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.tif,.tiff,.heic,.heif,.avif,.jfif" class="hidden">
                         </div>
 
                         <!-- Sender ID (IRS/FinCEN) -->
@@ -909,9 +909,9 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260805-faceid6"></script>
-    <script src="assets/js/app.js?v=20260801-gaps"></script>
-    <script src="assets/js/face-id.js?v=20260805-faceid4"></script>
+    <script src="assets/js/i18n.js?v=20260805-faceid7"></script>
+    <script src="assets/js/app.js?v=20260805-faceid7"></script>
+    <script src="assets/js/face-id.js?v=20260805-faceid7"></script>
     <script>
         function escHtml(s) {
             if (!s) return '';
@@ -1264,7 +1264,7 @@
                     // New client OR retry after face failed (form has id + pending face)
                     if (pendingFaceBlob && newId) {
                         try {
-                            await uploadFaceForClient(newId, pendingFaceBlob, pendingFaceDescriptor, true);
+                            await uploadFaceForClient(newId, pendingFaceBlob, pendingFaceDescriptor, true, pendingFaceThumb);
                             clearPendingFace();
                             App.closeModal('client-modal');
                             App.toast(id ? App.t('clients.toast.client_updated') : App.t('clients.toast.client_added'), 'success');
@@ -1274,7 +1274,7 @@
                         } catch (faceErr) {
                             // Keep modal + pending face so staff can retry — do not lose the capture
                             App.toast(
-                                (faceErr.message || App.t('clients.face.no_face')) + ' — ' + App.t('clients.face.retry_after_create'),
+                                faceErrorMessage(faceErr) + ' — ' + App.t('clients.face.retry_after_create'),
                                 'danger'
                             );
                             document.querySelector('#client-form [name=id]').value = String(newId);
@@ -2405,17 +2405,28 @@
         let faceRoster = null;
         let pendingFaceBlob = null;
         let pendingFaceDescriptor = null;
+        let pendingFaceThumb = null;
         let faceEnrollClientId = null;
 
         function clearPendingFace() {
             pendingFaceBlob = null;
             pendingFaceDescriptor = null;
+            pendingFaceThumb = null;
             const wrap = document.getElementById('client-modal-face-preview-wrap');
             const img = document.getElementById('client-modal-face-preview');
             const consent = document.getElementById('client-modal-face-consent');
             if (wrap) wrap.classList.add('hidden');
             if (img) img.removeAttribute('src');
             if (consent) consent.checked = false;
+        }
+
+        function faceErrorMessage(err) {
+            const code = err?.code || '';
+            const key = code ? `clients.face.err.${code}` : '';
+            const mapped = key && App.t(key) !== key ? App.t(key) : '';
+            const base = mapped || err?.message || App.t('clients.face.no_face');
+            const hint = err?.hint ? ` ${err.hint}` : '';
+            return (base + hint).trim();
         }
 
         function renderFaceSection(c) {
@@ -2425,9 +2436,8 @@
             const meta = document.getElementById('face-enrolled-meta');
             const thumb = document.getElementById('face-photo-thumb');
             if (!exists || !missing) return;
-            const displayUrl = c.face_photo_display_url
-                || c.face_photo_path_url
-                || (c.face_photo_path ? ('/api/files?ref=' + encodeURIComponent(c.face_photo_path) + '&inline=1') : '');
+            // Prefer server display URL (DB thumb or durable storage). Never invent /api/files for local paths.
+            const displayUrl = c.face_photo_display_url || '';
             if (displayUrl || c.face_photo_path || c.face_enrolled) {
                 exists.classList.remove('hidden');
                 missing.classList.add('hidden');
@@ -2486,36 +2496,44 @@
             }
         }
 
-        async function uploadFaceForClient(clientId, blob, descriptor, consent) {
-            let desc = Array.isArray(descriptor) ? descriptor : null;
-            // Re-detect from image if descriptor missing/corrupt before giving up
-            if ((!desc?.length || desc.some((n) => !Number.isFinite(n))) && blob && globalThis.FaceId?.detectFromFile) {
-                await FaceId.ensureHuman();
-                const det = await FaceId.detectFromFile(blob);
-                if (det.ok) desc = det.descriptor;
+        async function uploadFaceForClient(clientId, blob, descriptor, consent, thumbDataUrl = null) {
+            if (!blob) {
+                throw Object.assign(new Error(App.t('clients.face.err.no_file')), { code: 'no_file' });
             }
-            if (!desc?.length) {
-                throw new Error(App.t('clients.face.no_face'));
+            if (!globalThis.FaceId?.prepareEnrollment) {
+                throw Object.assign(new Error(App.t('clients.face.unavailable')), { code: 'unavailable' });
             }
-            const fileBlob = blob instanceof Blob
-                ? blob
-                : new Blob([blob], { type: 'image/jpeg' });
+            let fileBlob = blob instanceof Blob ? blob : new Blob([blob], { type: 'image/jpeg' });
+            let thumb = typeof thumbDataUrl === 'string' ? thumbDataUrl : null;
+            // Always normalize any image type → JPEG + fresh descriptor before upload
+            await FaceId.ensureHuman();
+            const prepared = await FaceId.prepareEnrollment(fileBlob);
+            fileBlob = prepared.jpegBlob;
+            const desc = prepared.descriptor;
+            thumb = prepared.thumbDataUrl || thumb;
+            if (!desc?.length || desc.some((n) => !Number.isFinite(n))) {
+                throw Object.assign(new Error(App.t('clients.face.no_face')), { code: 'no_descriptor' });
+            }
             const fd = new FormData();
             fd.append('action', 'upload_face');
             fd.append('client_id', String(clientId));
             fd.append('consent', consent ? '1' : '0');
             fd.append('face_file', fileBlob, 'face.jpg');
             fd.append('descriptor', JSON.stringify(desc));
+            if (thumb) fd.append('thumb', thumb);
             let lastErr = null;
             for (let attempt = 0; attempt < 2; attempt++) {
                 try {
                     return await App.apiForm('/api/clients', fd);
                 } catch (err) {
                     lastErr = err;
-                    await new Promise((r) => setTimeout(r, 400));
+                    if (err?.code === 'consent_required' || err?.code === 'heic_unsupported' || err?.code === 'no_client') {
+                        break; // not retryable
+                    }
+                    await new Promise((r) => setTimeout(r, 450));
                 }
             }
-            throw lastErr || new Error(App.t('clients.face.no_face'));
+            throw lastErr || Object.assign(new Error(App.t('clients.face.err.persist_failed')), { code: 'persist_failed' });
         }
 
         function triggerFaceFileUpload(mode) {
@@ -2544,16 +2562,18 @@
                 await FaceId.ensureHuman();
                 const det = await FaceId.detectFromFile(file);
                 if (!det.ok) {
-                    App.toast(App.t(det.error === 'low_quality' ? 'clients.face.low_quality' : 'clients.face.no_face'), 'warning');
+                    App.toast(faceErrorMessage({
+                        code: det.code || det.error,
+                        message: det.message || App.t(det.error === 'low_quality' ? 'clients.face.low_quality' : 'clients.face.no_face'),
+                    }), 'warning');
                     return;
                 }
-                const blob = file.type?.startsWith('image/')
-                    ? file
-                    : new Blob([await file.arrayBuffer()], { type: 'image/jpeg' });
+                const blob = det.jpegBlob || file;
 
                 if (faceMode === 'pending') {
                     pendingFaceBlob = blob;
                     pendingFaceDescriptor = det.descriptor;
+                    pendingFaceThumb = det.thumbDataUrl || null;
                     const wrap = document.getElementById('client-modal-face-preview-wrap');
                     const img = document.getElementById('client-modal-face-preview');
                     if (img) img.src = URL.createObjectURL(blob);
@@ -2569,12 +2589,12 @@
                 }
                 const consent = confirm(App.t('clients.face.consent_confirm'));
                 if (!consent) return;
-                await uploadFaceForClient(faceEnrollClientId, blob, det.descriptor, true);
+                await uploadFaceForClient(faceEnrollClientId, blob, det.descriptor, true, det.thumbDataUrl);
                 faceRoster = null;
                 App.toastKey('clients.toast.face_saved', 'success');
                 if (currentClientId === faceEnrollClientId) loadClientDetail(currentClientId);
             } catch (err) {
-                App.toast(err.message || App.t('clients.face.no_face'), 'danger');
+                App.toast(faceErrorMessage(err), 'danger');
             } finally {
                 e.target.value = '';
             }
@@ -2945,7 +2965,7 @@
                 closeFaceModal();
                 await openClient(clientId);
             } catch (err) {
-                App.toast(err.message, 'danger');
+                App.toast(faceErrorMessage(err), 'danger');
             }
         }
 
@@ -3056,8 +3076,9 @@
                 closeFaceModal();
                 if (currentClientId === faceEnrollClientId) loadClientDetail(currentClientId);
             } catch (err) {
-                if (status) status.textContent = err.message;
-                App.toast(err.message, 'danger');
+                const msg = faceErrorMessage(err);
+                if (status) status.textContent = msg;
+                App.toast(msg, 'danger');
             }
         }
 

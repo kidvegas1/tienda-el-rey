@@ -344,7 +344,10 @@ const App = {
             if (res.status === 401) {
                 throw new Error(this.t('toast.session_expired'));
             }
-            throw new Error(data.error || `HTTP ${res.status}`);
+            const err = new Error(data.error || `HTTP ${res.status}`);
+            if (data.code) err.code = data.code;
+            if (data.hint) err.hint = data.hint;
+            throw err;
         }
         return data;
     },
@@ -375,7 +378,10 @@ const App = {
             if (res.status === 401) {
                 throw new Error(this.t('toast.session_expired'));
             }
-            throw new Error(data.error || raw.slice(0, 200) || `HTTP ${res.status}`);
+            const err = new Error(data.error || raw.slice(0, 200) || `HTTP ${res.status}`);
+            if (data.code) err.code = data.code;
+            if (data.hint) err.hint = data.hint;
+            throw err;
         }
         return data;
     },
