@@ -85,7 +85,7 @@
             right: 1rem;
             bottom: 1rem;
             z-index: 50;
-            width: 17.5rem;
+            width: 22.5rem;
             border-radius: 1.1rem;
             overflow: hidden;
             color: var(--hud-ink);
@@ -100,7 +100,8 @@
             transform-origin: bottom right;
             animation: faceHudIn .45s cubic-bezier(.2,.8,.2,1);
         }
-        .face-hud.is-large { width: 24rem; }
+        .face-hud.is-large { width: 30rem; }
+        .face-hud.is-large .face-hud__stage { aspect-ratio: 16/11; }
         .face-hud.hidden { display: none !important; }
         @keyframes faceHudIn {
             from { opacity: 0; transform: translateY(12px) scale(.96); }
@@ -266,8 +267,53 @@
             font-size: .65rem !important;
             padding: .35rem .55rem !important;
         }
+        .face-hud__attach {
+            margin-top: .5rem;
+            padding-top: .45rem;
+            border-top: 1px solid rgba(201,162,39,.18);
+        }
+        .face-hud__attach .input {
+            width: 100%;
+            font-size: .72rem !important;
+            padding: .4rem .55rem !important;
+            background: rgba(0,0,0,.35);
+            border-color: rgba(201,162,39,.28);
+            color: #fff;
+        }
+        .face-hud__attach-results {
+            max-height: 8.5rem;
+            overflow-y: auto;
+            margin-top: .35rem;
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+        .face-hud__attach-results .face-attach-pick {
+            width: 100%;
+            text-align: left;
+            padding: .4rem .5rem;
+            border-radius: .45rem;
+            border: 1px solid transparent;
+            background: rgba(255,255,255,.04);
+            color: #fff;
+            font-size: .7rem;
+            cursor: pointer;
+        }
+        .face-hud__attach-results .face-attach-pick:hover {
+            border-color: rgba(201,162,39,.45);
+            background: rgba(201,162,39,.12);
+        }
+        .face-hud__consent {
+            display: flex;
+            align-items: flex-start;
+            gap: .4rem;
+            margin-top: .4rem;
+            font-size: .62rem;
+            color: rgba(232,240,244,.72);
+            line-height: 1.35;
+        }
         @media (max-width: 640px) {
-            .face-hud { right: .75rem; left: .75rem; width: auto; bottom: .75rem; }
+            .face-hud { right: .5rem; left: .5rem; width: auto; bottom: .5rem; }
             .face-hud.is-large { width: auto; }
         }
     </style>
@@ -874,6 +920,15 @@
             <div id="face-dock-unknown" class="hidden">
                 <div class="face-hud__actions">
                     <button type="button" class="btn-secondary" id="face-dock-add-unknown" data-i18n="clients.face.register_new">Register as New Client</button>
+                    <button type="button" class="btn-primary" id="face-dock-attach-btn" data-i18n="clients.face.attach_existing">Add Photo to Existing Client</button>
+                </div>
+                <div id="face-dock-attach-panel" class="face-hud__attach hidden">
+                    <input type="search" id="face-dock-attach-search" class="input" data-i18n-placeholder="clients.face.attach_search_placeholder" placeholder="Search client by name or code…">
+                    <div id="face-dock-attach-results" class="face-hud__attach-results"></div>
+                    <label class="face-hud__consent">
+                        <input type="checkbox" id="face-dock-attach-consent" class="mt-0.5">
+                        <span data-i18n="clients.face.consent">Client consents to store a Face ID photo for identification at the counter</span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -1199,6 +1254,26 @@
             });
             document.getElementById('face-dock-new')?.addEventListener('click', () => faceDockRegisterNew());
             document.getElementById('face-dock-add-unknown')?.addEventListener('click', () => faceDockRegisterNew());
+            document.getElementById('face-dock-attach-btn')?.addEventListener('click', () => {
+                const panel = document.getElementById('face-dock-attach-panel');
+                panel?.classList.toggle('hidden');
+                if (panel && !panel.classList.contains('hidden')) {
+                    document.getElementById('face-dock-attach-search')?.focus();
+                    App.applyI18n?.();
+                }
+            });
+            let faceDockAttachSearchTimer = null;
+            document.getElementById('face-dock-attach-search')?.addEventListener('input', (e) => {
+                clearTimeout(faceDockAttachSearchTimer);
+                const q = (e.target.value || '').trim();
+                faceDockAttachSearchTimer = setTimeout(
+                    () => searchClientsForFaceAttach(q, {
+                        resultsId: 'face-dock-attach-results',
+                        onPick: (id, name) => faceDockAttachToClient(id, name),
+                    }),
+                    250
+                );
+            });
             document.getElementById('face-capture-btn')?.addEventListener('click', () => openFaceModal('enroll', currentClientId));
             document.getElementById('face-retake-btn')?.addEventListener('click', () => openFaceModal('enroll', currentClientId));
             document.getElementById('face-clear-btn')?.addEventListener('click', clearClientFace);
@@ -1251,7 +1326,13 @@
             document.getElementById('face-scan-attach-search')?.addEventListener('input', (e) => {
                 clearTimeout(faceAttachSearchTimer);
                 const q = (e.target.value || '').trim();
-                faceAttachSearchTimer = setTimeout(() => searchClientsForFaceAttach(q), 250);
+                faceAttachSearchTimer = setTimeout(
+                    () => searchClientsForFaceAttach(q, {
+                        resultsId: 'face-scan-attach-results',
+                        onPick: (id, name) => saveCapturedFaceToClientOrCreate(id, name),
+                    }),
+                    250
+                );
             });
 
             document.getElementById('client-form').addEventListener('submit', async (e) => {
@@ -2816,8 +2897,10 @@
                 App.toast(App.t('clients.face.unavailable'), 'danger');
                 return;
             }
-            dock.classList.remove('hidden', 'is-match', 'is-large');
+            dock.classList.remove('hidden', 'is-match');
+            dock.classList.add('is-large'); // roomier default for CTAs + attach search
             setAlwaysScanToggle(true);
+            resetFaceDockAttachPanel();
             const status = document.getElementById('face-dock-status');
             if (status) status.textContent = App.t('clients.face.loading_models');
             try {
@@ -2837,6 +2920,16 @@
             }
         }
 
+        function resetFaceDockAttachPanel() {
+            document.getElementById('face-dock-attach-panel')?.classList.add('hidden');
+            const search = document.getElementById('face-dock-attach-search');
+            if (search) search.value = '';
+            const results = document.getElementById('face-dock-attach-results');
+            if (results) results.innerHTML = '';
+            const consent = document.getElementById('face-dock-attach-consent');
+            if (consent) consent.checked = false;
+        }
+
         function stopFaceDock() {
             if (faceDockTimer) { clearTimeout(faceDockTimer); faceDockTimer = null; }
             FaceId?.stopCamera(faceDockStream);
@@ -2847,6 +2940,7 @@
             dock?.classList.remove('is-match', 'is-large');
             document.getElementById('face-dock-hit')?.classList.add('hidden');
             document.getElementById('face-dock-unknown')?.classList.add('hidden');
+            resetFaceDockAttachPanel();
             setAlwaysScanToggle(false);
         }
 
@@ -2871,6 +2965,7 @@
                             dock?.classList.add('is-match');
                             document.getElementById('face-dock-hit')?.classList.remove('hidden');
                             document.getElementById('face-dock-unknown')?.classList.add('hidden');
+                            resetFaceDockAttachPanel();
                             document.getElementById('face-dock-name').textContent = result.best.name;
                             const openBtn = document.getElementById('face-dock-open');
                             if (openBtn) openBtn.dataset.clientId = String(faceDockHitId);
@@ -2901,29 +2996,40 @@
             faceDockTimer = setTimeout(tick, 400);
         }
 
+        function faceDockCanvas() {
+            return document.getElementById('face-canvas') || (() => {
+                const c = document.createElement('canvas');
+                c.id = 'face-canvas';
+                c.className = 'hidden';
+                document.body.appendChild(c);
+                return c;
+            })();
+        }
+
+        async function faceDockCaptureFace() {
+            if (!faceDockStream || !globalThis.FaceId) {
+                throw Object.assign(new Error(App.t('clients.face.camera_error')), { code: 'camera_error' });
+            }
+            const video = document.getElementById('face-dock-video');
+            const det = await FaceId.detectDescriptor(video);
+            if (!det.ok) {
+                throw Object.assign(
+                    new Error(App.t(det.code === 'low_quality' ? 'clients.face.low_quality' : 'clients.face.no_face')),
+                    { code: det.code || 'no_face' }
+                );
+            }
+            const blob = await FaceId.captureBlob(video, faceDockCanvas());
+            return { blob, descriptor: det.descriptor };
+        }
+
         async function faceDockRegisterNew() {
-            if (!faceDockStream || !globalThis.FaceId) return;
             try {
-                const video = document.getElementById('face-dock-video');
-                const canvas = document.getElementById('face-canvas') || (() => {
-                    const c = document.createElement('canvas');
-                    c.id = 'face-canvas';
-                    c.className = 'hidden';
-                    document.body.appendChild(c);
-                    return c;
-                })();
-                const det = await FaceId.detectDescriptor(video);
-                if (!det.ok) {
-                    App.toast(App.t('clients.face.no_face'), 'warning');
-                    return;
-                }
-                pendingFaceBlob = await FaceId.captureBlob(video, canvas);
-                pendingFaceDescriptor = det.descriptor;
+                const capture = await faceDockCaptureFace();
+                pendingFaceBlob = capture.blob;
+                pendingFaceDescriptor = capture.descriptor;
+                pendingFaceThumb = null;
                 const wrap = document.getElementById('client-modal-face-preview-wrap');
                 const img = document.getElementById('client-modal-face-preview');
-                if (img) img.src = URL.createObjectURL(pendingFaceBlob);
-                wrap?.classList.remove('hidden');
-                document.getElementById('client-modal-face-consent').checked = true;
                 stopFaceDock();
                 document.getElementById('client-modal-title').textContent = App.t('clients.add_client');
                 document.getElementById('client-form').reset();
@@ -2933,8 +3039,40 @@
                 document.getElementById('client-modal-face-consent').checked = true;
                 document.getElementById('client-modal-face')?.classList.remove('hidden');
                 App.openModal('client-modal');
+                App.toastKey('clients.toast.face_pending', 'success');
             } catch (err) {
-                App.toast(err.message, 'danger');
+                App.toast(faceErrorMessage(err), 'danger');
+            }
+        }
+
+        async function faceDockAttachToClient(clientId, name) {
+            let id = parseInt(clientId, 10) || 0;
+            if (!document.getElementById('face-dock-attach-consent')?.checked) {
+                App.toast(App.t('clients.face.consent_required'), 'warning');
+                return;
+            }
+            try {
+                if (!id) {
+                    if (!String(name || '').trim()) {
+                        App.toast(App.t('clients.face.attach_none'), 'warning');
+                        return;
+                    }
+                    const created = await App.api('POST', '/api/clients', {
+                        action: 'create',
+                        name: String(name).trim(),
+                        monthly_limit: 5000,
+                    });
+                    id = parseInt(created.client_id, 10) || 0;
+                    if (!id) throw Object.assign(new Error(App.t('clients.face.no_client')), { code: 'no_client' });
+                }
+                const capture = await faceDockCaptureFace();
+                await uploadFaceForClient(id, capture.blob, capture.descriptor, true);
+                faceRoster = null;
+                App.toastKey('clients.toast.face_saved', 'success');
+                stopFaceDock();
+                await openClient(id);
+            } catch (err) {
+                App.toast(faceErrorMessage(err), 'danger');
             }
         }
 
@@ -2990,8 +3128,11 @@
             }
         }
 
-        async function searchClientsForFaceAttach(query) {
-            const box = document.getElementById('face-scan-attach-results');
+        async function searchClientsForFaceAttach(query, options = {}) {
+            const box = document.getElementById(options.resultsId || 'face-scan-attach-results');
+            const onPick = typeof options.onPick === 'function'
+                ? options.onPick
+                : (id, name) => saveCapturedFaceToClientOrCreate(id, name);
             if (!box) return;
             if (!query || query.length < 2) {
                 box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.attach_search_hint')}</p>`;
@@ -3015,7 +3156,7 @@
                         ? App.t('clients.activity.checks_short')
                         : (c.client_code || '');
                     return `
-                    <button type="button" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-bg-elevated border border-transparent hover:border-border text-sm face-attach-pick"
+                    <button type="button" class="face-attach-pick"
                         data-id="${id}" data-name="${escHtml(c.name || '')}">
                         <span class="font-medium">${escHtml(c.name || '')}</span>
                         <span class="text-xs text-text-muted ml-2">${escHtml(kind)}</span>
@@ -3025,7 +3166,7 @@
                     btn.addEventListener('click', () => {
                         const id = parseInt(btn.getAttribute('data-id'), 10) || 0;
                         const name = btn.getAttribute('data-name') || '';
-                        saveCapturedFaceToClientOrCreate(id, name);
+                        onPick(id, name);
                     });
                 });
             } catch (err) {
