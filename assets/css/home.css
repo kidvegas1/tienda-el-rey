@@ -353,6 +353,47 @@ h2 {
     border-block: 1px solid rgb(42 127 160 / 16%);
 }
 .process-intro > p:nth-of-type(2) { max-width: 30rem; margin-top: 1.35rem; }
+.process-phones {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+    margin-top: 1.25rem;
+    max-width: 28rem;
+}
+.process-phones a {
+    display: grid;
+    gap: .15rem;
+    padding: .85rem 1rem;
+    border: 1px solid rgb(42 127 160 / 28%);
+    border-radius: .7rem;
+    background: rgb(248 243 235 / 82%);
+    color: var(--brown-900);
+    text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+}
+.process-phones a:hover {
+    border-color: var(--sky-600);
+    background: #fff;
+}
+.process-phones span {
+    color: var(--sky-700);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.process-phones strong {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.2;
+}
+.steps a {
+    color: var(--sky-700);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: .15em;
+}
 .process-photo {
     margin: 1.75rem 0 0;
     overflow: hidden;
@@ -534,6 +575,46 @@ h2 {
 .closing .eyebrow { color: var(--gold-soft); }
 .closing h2 { font-size: clamp(2.2rem, 4vw, 3.6rem); color: var(--cream); max-width: 16ch; }
 .closing p { margin: .85rem 0 0; color: rgb(247 241 231 / 85%); max-width: 32rem; }
+.phone-contacts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .85rem;
+    margin-top: 1.35rem;
+    max-width: 28rem;
+}
+.phone-contact {
+    display: grid;
+    gap: .2rem;
+    padding: .95rem 1rem;
+    border: 1px solid rgb(247 241 231 / 28%);
+    border-radius: .7rem;
+    background: rgb(247 241 231 / 10%);
+    color: var(--cream);
+    text-decoration: none;
+    transition: background .2s ease, border-color .2s ease;
+}
+.phone-contact:hover {
+    border-color: rgb(228 199 122 / 65%);
+    background: rgb(247 241 231 / 16%);
+}
+.phone-label {
+    color: var(--gold-soft);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.phone-number {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    line-height: 1.2;
+}
+.faq-list a {
+    color: var(--sky-700);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: .15em;
+}
 
 footer {
     display: grid;
@@ -542,8 +623,8 @@ footer {
     margin: auto;
     border-top: 1px solid var(--border);
     align-items: center;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 2rem;
+    grid-template-columns: 1.2fr 1.4fr auto auto;
+    gap: 1.5rem 2rem;
     color: var(--text-muted);
     font-size: .78rem;
 }
@@ -551,7 +632,18 @@ footer {
 .footer-brand strong, .footer-brand small { display: block; }
 .footer-brand strong { color: var(--brown-900); font-size: .88rem; }
 .footer-brand small { color: var(--text-muted); }
-footer > a { justify-self: end; color: var(--sky-700); font-weight: 700; }
+.footer-phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1.25rem;
+}
+.footer-phones a {
+    color: var(--brown-700);
+    font-weight: 600;
+    text-decoration: none;
+}
+.footer-phones a:hover { color: var(--sky-700); }
+footer > a:last-child { justify-self: end; color: var(--sky-700); font-weight: 700; }
 
 @keyframes hero-drift {
     from { transform: scale(1.02) translate3d(0, 0, 0); }
@@ -673,9 +765,12 @@ footer > a { justify-self: end; color: var(--sky-700); font-weight: 700; }
     .care-visual img { min-height: 18rem; }
     .care-points div { grid-template-columns: 1fr; }
     .closing-content { flex-direction: column; align-items: flex-start; }
+    .process-phones,
+    .phone-contacts { grid-template-columns: 1fr; max-width: none; width: 100%; }
     footer { padding: 2rem 0; text-align: center; grid-template-columns: 1fr; }
     .footer-brand { justify-content: center; }
-    footer > a { justify-self: center; }
+    .footer-phones { justify-content: center; }
+    footer > a:last-child { justify-self: center; }
 }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
