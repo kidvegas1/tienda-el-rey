@@ -155,6 +155,9 @@
                     <button type="button" id="stock-in-cta" class="btn-secondary w-full text-base sm:text-lg justify-center" data-mode="stock_in" aria-pressed="false">
                         <span data-i18n="inventory.stock_in">Agregar inventario</span>
                     </button>
+                    <button type="button" id="price-compare-cta" class="btn-secondary w-full text-base sm:text-lg justify-center hidden">
+                        <span data-i18n="inventory.price_compare">Price comparison</span>
+                    </button>
                 </div>
                 <button type="button" id="vender-cta" class="hidden" tabindex="-1" aria-hidden="true"></button>
                 <button type="button" id="camera-scan-cta" class="hidden" tabindex="-1" aria-hidden="true"></button>
@@ -176,6 +179,17 @@
                 <div class="card p-4"><p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="inventory.col.product">Productos</p><p id="stat-products" class="mt-1 text-2xl font-bold font-mono">—</p></div>
                 <div class="card p-4"><p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="inventory.col.quantity">Unidades</p><p id="stat-units" class="mt-1 text-2xl font-bold font-mono">—</p></div>
                 <div class="card p-4"><p class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="inventory.low_stock">Stock bajo</p><p id="stat-low-stock" class="mt-1 text-2xl font-bold font-mono text-danger">—</p></div>
+            </section>
+
+            <section id="price-recs-section" class="card p-0 overflow-hidden hidden">
+                <div class="p-4 sm:p-5 border-b border-border flex items-start justify-between gap-3">
+                    <div>
+                        <h3 class="font-bold" data-i18n="inventory.price_recs_title">Order from cheapest supplier</h3>
+                        <p class="text-xs text-text-muted mt-1" data-i18n="inventory.price_recs_hint">Based on saved invoice unit costs. Order each product from the cheapest registered provider.</p>
+                    </div>
+                    <button type="button" id="price-recs-refresh" class="btn-secondary !text-xs shrink-0" data-i18n="action.refresh">Refresh</button>
+                </div>
+                <div id="price-recs-list" class="divide-y divide-border"></div>
             </section>
 
             <section class="card p-0 overflow-hidden">
@@ -303,7 +317,54 @@
         <button type="button" id="scanner-stop-btn" class="btn-secondary w-full justify-center mt-4" data-close-modal="scanner-modal">Cerrar cámara</button>
     </section>
 
-    <script src="assets/js/i18n.js?v=20260801-gaps"></script><script src="assets/js/app.js?v=20260801-gaps"></script>
+    <div class="modal-backdrop" id="price-compare-modal-backdrop"></div>
+    <section class="modal-content max-w-3xl max-h-[90dvh] overflow-y-auto" id="price-compare-modal" role="dialog" aria-modal="true">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-xl font-bold" data-i18n="inventory.price_compare">Price comparison</h3>
+                <p class="text-sm text-text-muted mt-1" data-i18n="inventory.price_compare_hint">Upload or capture a supplier invoice. We detect products and save unit costs so you can order from the cheapest provider.</p>
+            </div>
+            <button type="button" class="text-text-muted hover:text-text-primary text-xl" data-close-modal="price-compare-modal" aria-label="Close">×</button>
+        </div>
+        <div class="space-y-4">
+            <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="inventory.supplier">Supplier</label>
+                    <select id="pc-supplier-select" class="input text-sm mb-2"></select>
+                    <div class="flex gap-2">
+                        <input id="pc-supplier-new" class="input text-sm flex-1" data-i18n-placeholder="inventory.supplier_new" placeholder="New supplier name">
+                        <button type="button" id="pc-supplier-add" class="btn-secondary !text-xs whitespace-nowrap" data-i18n="action.add">Add</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-secondary mb-2" data-i18n="inventory.invoice_file">Invoice (image or PDF)</label>
+                    <input type="file" id="pc-file" class="input text-sm" accept="image/*,.pdf,application/pdf">
+                    <div class="flex gap-2 mt-2">
+                        <label class="btn-secondary !text-xs flex-1 justify-center cursor-pointer">
+                            <span data-i18n="inventory.scan_camera">Camera</span>
+                            <input type="file" id="pc-camera" class="hidden" accept="image/*" capture="environment">
+                        </label>
+                        <button type="button" id="pc-analyze" class="btn-primary !text-xs flex-1 justify-center" data-i18n="inventory.analyze_invoice">Analyze invoice</button>
+                    </div>
+                </div>
+            </div>
+            <p id="pc-status" class="text-sm text-text-muted min-h-[1.25rem]"></p>
+            <div id="pc-preview-wrap" class="hidden">
+                <img id="pc-preview" alt="" class="max-h-40 rounded-lg border border-border object-contain bg-bg-base">
+            </div>
+            <div id="pc-lines-wrap" class="hidden">
+                <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="inventory.invoice_lines">Invoice lines</p>
+                <div id="pc-lines" class="space-y-2 max-h-72 overflow-y-auto"></div>
+                <label class="flex items-center gap-2 text-xs text-text-secondary mt-3">
+                    <input type="checkbox" id="pc-skip-unmatched" checked>
+                    <span data-i18n="inventory.skip_unmatched">Skip lines without a product match</span>
+                </label>
+                <button type="button" id="pc-save" class="btn-primary w-full justify-center mt-4" data-i18n="inventory.save_prices">Save prices</button>
+            </div>
+        </div>
+    </section>
+
+    <script src="assets/js/i18n.js?v=20260805-pc1"></script><script src="assets/js/app.js?v=20260801-gaps"></script>
     <script>
     (() => {
         const state = {
@@ -363,6 +424,7 @@
             syncStoreContext(state.viewAllStores ? t('inventory.all_stores') : App.currentStore?.name);
             syncProductsTableHeader();
             syncAddProductButton();
+            syncPriceCompareAdminUi();
         }
         function syncStoreContext(storeName) {
             const name = storeName || App.currentStore?.name || '—';
@@ -1196,6 +1258,239 @@
             focusBarcode();
         }
 
+        // ── Price comparison (admin) ──
+        const pcState = {
+            suppliers: [],
+            products: [],
+            lines: [],
+            sourcePath: '',
+            invoiceDate: '',
+            file: null,
+        };
+
+        function syncPriceCompareAdminUi() {
+            const show = isAdmin() && !state.viewAllStores;
+            $('price-compare-cta')?.classList.toggle('hidden', !show);
+            $('price-recs-section')?.classList.toggle('hidden', !show);
+            if (show) loadPriceRecommendations();
+        }
+
+        async function openPriceCompareModal() {
+            if (!isAdmin()) return App.toast(t('inventory.price_compare_admin_only'), 'warning');
+            if (state.viewAllStores) return App.toast(t('inventory.pick_store_to_create'), 'warning');
+            pcState.lines = [];
+            pcState.sourcePath = '';
+            pcState.invoiceDate = '';
+            pcState.file = null;
+            $('pc-status').textContent = '';
+            $('pc-lines-wrap')?.classList.add('hidden');
+            $('pc-preview-wrap')?.classList.add('hidden');
+            $('pc-file').value = '';
+            $('pc-camera').value = '';
+            await Promise.all([loadPcSuppliers(), loadPcProducts()]);
+            App.applyI18n?.();
+            App.openModal('price-compare-modal');
+        }
+
+        function closePriceCompareModal() {
+            App.closeModal('price-compare-modal');
+        }
+
+        async function loadPcSuppliers() {
+            const res = await App.api('GET', `/api/price-comparison?action=list_suppliers${storeQuery()}`);
+            pcState.suppliers = res.suppliers || [];
+            const sel = $('pc-supplier-select');
+            if (!sel) return;
+            sel.innerHTML = `<option value="">${esc(t('inventory.supplier_select'))}</option>`
+                + pcState.suppliers.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+        }
+
+        async function loadPcProducts() {
+            const res = await App.api('GET', `/api/price-comparison?action=inventory_options${storeQuery()}`);
+            pcState.products = res.products || [];
+        }
+
+        async function addPcSupplier() {
+            const name = ($('pc-supplier-new')?.value || '').trim();
+            if (!name) return App.toast(t('inventory.supplier_required'), 'warning');
+            try {
+                const res = await App.api('POST', '/api/price-comparison', withStorePayload({
+                    action: 'upsert_supplier',
+                    name,
+                }));
+                $('pc-supplier-new').value = '';
+                await loadPcSuppliers();
+                if ($('pc-supplier-select') && res.id) $('pc-supplier-select').value = String(res.id);
+                App.toast(t('inventory.supplier_saved'), 'success');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function setPcFile(file) {
+            pcState.file = file || null;
+            const wrap = $('pc-preview-wrap');
+            const img = $('pc-preview');
+            if (!file || !file.type?.startsWith('image/')) {
+                wrap?.classList.add('hidden');
+                if (img) img.removeAttribute('src');
+                return;
+            }
+            if (img) img.src = URL.createObjectURL(file);
+            wrap?.classList.remove('hidden');
+        }
+
+        function renderPcLines() {
+            const box = $('pc-lines');
+            if (!box) return;
+            const opts = pcState.products.map(p =>
+                `<option value="${p.id}">${esc(p.product_name)}${p.barcode ? ' · ' + esc(p.barcode) : ''}</option>`
+            ).join('');
+            box.innerHTML = pcState.lines.map((line, i) => `
+                <div class="rounded-xl border border-border p-3 bg-bg-base" data-pc-line="${i}">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold truncate">${esc(line.description || '—')}</p>
+                            <p class="text-xs text-text-muted mt-0.5">
+                                ${esc(t('inventory.col.quantity'))}: ${esc(String(line.qty))}
+                                · ${esc(t('inventory.col.cost'))}: ${App.money(line.unit_cost)}
+                                ${line.barcode ? ' · ' + esc(line.barcode) : ''}
+                            </p>
+                        </div>
+                        <label class="text-xs text-text-muted flex items-center gap-1 shrink-0">
+                            <input type="checkbox" data-pc-skip ${line.skip ? 'checked' : ''}>
+                            <span data-i18n="inventory.skip_line">Skip</span>
+                        </label>
+                    </div>
+                    <label class="block text-xs font-semibold text-text-secondary mt-2 mb-1" data-i18n="inventory.match_product">Match product</label>
+                    <select class="input text-sm" data-pc-inv>
+                        <option value="">${esc(t('inventory.no_match'))}</option>
+                        ${opts}
+                    </select>
+                </div>
+            `).join('');
+            box.querySelectorAll('[data-pc-line]').forEach((row) => {
+                const i = Number(row.getAttribute('data-pc-line'));
+                const sel = row.querySelector('[data-pc-inv]');
+                const skip = row.querySelector('[data-pc-skip]');
+                if (sel && pcState.lines[i]?.inventory_id) sel.value = String(pcState.lines[i].inventory_id);
+                sel?.addEventListener('change', () => {
+                    pcState.lines[i].inventory_id = parseInt(sel.value, 10) || null;
+                    pcState.lines[i].skip = !pcState.lines[i].inventory_id;
+                    if (skip) skip.checked = pcState.lines[i].skip;
+                });
+                skip?.addEventListener('change', () => {
+                    pcState.lines[i].skip = !!skip.checked;
+                });
+            });
+            App.applyI18n?.();
+            $('pc-lines-wrap')?.classList.remove('hidden');
+        }
+
+        async function analyzePcInvoice() {
+            if (!pcState.file) return App.toast(t('inventory.invoice_required'), 'warning');
+            $('pc-status').textContent = t('inventory.analyzing_invoice');
+            try {
+                const fd = new FormData();
+                fd.append('action', 'parse_invoice');
+                fd.append('file', pcState.file, pcState.file.name || 'invoice.jpg');
+                const sid = currentStoreId();
+                if (sid) fd.append('store_id', String(sid));
+                const res = await App.apiForm('/api/price-comparison', fd);
+                pcState.sourcePath = res.source_path || '';
+                pcState.invoiceDate = res.date || '';
+                pcState.lines = (res.line_items || []).map((l) => ({
+                    ...l,
+                    skip: !l.inventory_id,
+                }));
+                if (res.suggested_supplier && !$('pc-supplier-select')?.value) {
+                    const hit = pcState.suppliers.find(s =>
+                        String(s.name).toLowerCase() === String(res.suggested_supplier).toLowerCase()
+                    );
+                    if (hit) $('pc-supplier-select').value = String(hit.id);
+                    else if ($('pc-supplier-new') && !$('pc-supplier-new').value) {
+                        $('pc-supplier-new').value = res.suggested_supplier;
+                    }
+                }
+                $('pc-status').textContent = t('inventory.invoice_parsed', {
+                    count: String(pcState.lines.length),
+                    vendor: res.vendor || '—',
+                });
+                renderPcLines();
+            } catch (err) {
+                $('pc-status').textContent = err.message || t('inventory.analyze_failed');
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function savePcPrices() {
+            const supplierId = parseInt($('pc-supplier-select')?.value || '0', 10) || 0;
+            const supplierName = ($('pc-supplier-new')?.value || '').trim()
+                || (pcState.suppliers.find(s => Number(s.id) === supplierId)?.name || '');
+            if (!supplierId && !supplierName) {
+                return App.toast(t('inventory.supplier_required'), 'warning');
+            }
+            const skipUnmatched = !!$('pc-skip-unmatched')?.checked;
+            const lines = pcState.lines.map((l) => ({
+                description: l.description,
+                qty: l.qty,
+                unit_cost: l.unit_cost,
+                barcode: l.barcode || '',
+                inventory_id: l.inventory_id || null,
+                skip: l.skip || (skipUnmatched && !l.inventory_id),
+            }));
+            try {
+                const res = await App.api('POST', '/api/price-comparison', withStorePayload({
+                    action: 'save_prices',
+                    supplier_id: supplierId,
+                    supplier_name: supplierName,
+                    source_path: pcState.sourcePath,
+                    invoice_date: pcState.invoiceDate,
+                    lines,
+                }));
+                App.toast(t('inventory.prices_saved', { count: String(res.saved || 0) }), 'success');
+                closePriceCompareModal();
+                renderPriceRecommendations(res.recommendations || []);
+                $('price-recs-section')?.classList.remove('hidden');
+            } catch (err) {
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function renderPriceRecommendations(rows) {
+            const box = $('price-recs-list');
+            if (!box) return;
+            if (!rows.length) {
+                box.innerHTML = `<p class="text-sm text-text-muted p-4">${esc(t('inventory.price_recs_empty'))}</p>`;
+                return;
+            }
+            box.innerHTML = rows.map((r) => `
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 justify-between">
+                    <div class="min-w-0">
+                        <p class="font-semibold truncate">${esc(r.product_name || '')}</p>
+                        <p class="text-xs text-text-muted">${r.barcode ? esc(r.barcode) : ''}</p>
+                    </div>
+                    <div class="text-sm sm:text-right">
+                        <p class="font-semibold text-accent">${esc(t('inventory.order_from'))}: ${esc(r.order_from || r.supplier_name || '')}</p>
+                        <p class="font-mono">${App.money(r.unit_cost)}
+                            ${r.savings != null ? `<span class="text-xs text-text-muted ml-1">(${esc(t('inventory.saves'))} ${App.money(r.savings)})</span>` : ''}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadPriceRecommendations() {
+            if (!isAdmin() || state.viewAllStores) return;
+            try {
+                const res = await App.api('GET', `/api/price-comparison?action=recommendations${storeQuery()}`);
+                renderPriceRecommendations(res.recommendations || []);
+            } catch (_) {
+                /* migration missing — hide quietly */
+                $('price-recs-section')?.classList.add('hidden');
+            }
+        }
+
         async function init() {
             const ok = await App.init();
             if (!ok) return;
@@ -1207,6 +1502,7 @@
                 $('user-avatar').textContent = App.user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             }
             syncTaxBadge();
+            syncPriceCompareAdminUi();
             function startVenderFlow() {
                 setMode('sale');
                 startCameraScan('sale');
@@ -1217,6 +1513,14 @@
             }
             $('venta-cta')?.addEventListener('click', startVenderFlow);
             $('stock-in-cta')?.addEventListener('click', startStockInFlow);
+            $('price-compare-cta')?.addEventListener('click', openPriceCompareModal);
+            $('price-recs-refresh')?.addEventListener('click', loadPriceRecommendations);
+            $('pc-supplier-add')?.addEventListener('click', addPcSupplier);
+            $('pc-file')?.addEventListener('change', (e) => setPcFile(e.target.files?.[0]));
+            $('pc-camera')?.addEventListener('change', (e) => setPcFile(e.target.files?.[0]));
+            $('pc-analyze')?.addEventListener('click', analyzePcInvoice);
+            $('pc-save')?.addEventListener('click', savePcPrices);
+            $('price-compare-modal-backdrop')?.addEventListener('click', closePriceCompareModal);
             $('barcode-form').addEventListener('submit', e => { e.preventDefault(); lookupBarcode(); });
             $('vender-cta')?.addEventListener('click', startVenderFlow);
             $('vender-cta-header')?.addEventListener('click', startVenderFlow);
@@ -1265,6 +1569,7 @@
                     if (id === 'scanner-modal') closeScannerModal();
                     else if (id === 'tax-modal') closeTaxModal();
                     else if (id === 'product-modal') closeProductModal();
+                    else if (id === 'price-compare-modal') closePriceCompareModal();
                     return;
                 }
                 const edit = e.target.closest('[data-edit-product]');
@@ -1281,12 +1586,14 @@
                 if ($('scanner-modal').classList.contains('open')) closeScannerModal();
                 else if ($('tax-modal').classList.contains('open')) closeTaxModal();
                 else if ($('product-modal').classList.contains('open')) closeProductModal();
+                else if ($('price-compare-modal')?.classList.contains('open')) closePriceCompareModal();
             });
             window.addEventListener('store-changed', () => {
                 $('barcode-input').value = '';
                 $('scan-result').classList.add('hidden');
                 state.product = null;
                 syncInventoryScopeFromApp();
+                syncPriceCompareAdminUi();
                 loadData();
             });
             document.addEventListener('language-changed', loadData);
