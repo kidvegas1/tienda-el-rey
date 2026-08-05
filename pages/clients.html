@@ -909,7 +909,7 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260805-faceid7"></script>
+    <script src="assets/js/i18n.js?v=20260805-faceid8"></script>
     <script src="assets/js/app.js?v=20260805-faceid7"></script>
     <script src="assets/js/face-id.js?v=20260805-faceid7"></script>
     <script>
@@ -1187,7 +1187,15 @@
                 document.getElementById('face-dock')?.classList.toggle('is-large');
             });
             document.getElementById('face-dock-open')?.addEventListener('click', () => {
-                if (faceDockHitId) { stopFaceDock(); openClient(faceDockHitId); }
+                // Capture id BEFORE stopFaceDock() — that helper clears faceDockHitId
+                const btn = document.getElementById('face-dock-open');
+                const matchId = parseInt(faceDockHitId || btn?.dataset?.clientId, 10) || 0;
+                if (!matchId) {
+                    App.toast(App.t('clients.face.no_client'), 'warning');
+                    return;
+                }
+                stopFaceDock();
+                openClient(matchId);
             });
             document.getElementById('face-dock-new')?.addEventListener('click', () => faceDockRegisterNew());
             document.getElementById('face-dock-add-unknown')?.addEventListener('click', () => faceDockRegisterNew());
@@ -1219,13 +1227,17 @@
                 if (document.getElementById('recv-id-file')?.files?.length) clearReceiverIdCamera();
             });
             document.getElementById('face-match-open-btn')?.addEventListener('click', () => {
-                if (faceMatchHitId) {
-                    closeFaceModal();
-                    openClient(faceMatchHitId);
+                const matchId = parseInt(faceMatchHitId, 10) || 0;
+                if (!matchId) {
+                    App.toast(App.t('clients.face.no_client'), 'warning');
+                    return;
                 }
+                closeFaceModal();
+                openClient(matchId);
             });
             document.getElementById('face-match-save-hit-btn')?.addEventListener('click', () => {
-                if (faceMatchHitId) saveCapturedFaceToClient(faceMatchHitId);
+                const matchId = parseInt(faceMatchHitId, 10) || 0;
+                if (matchId) saveCapturedFaceToClient(matchId);
             });
             document.getElementById('face-scan-register-btn')?.addEventListener('click', registerNewClientFromScan);
             document.getElementById('face-scan-attach-btn')?.addEventListener('click', () => {
@@ -1779,20 +1791,25 @@
         }
 
         async function openClient(id, options = {}) {
-            currentClientId = id;
+            const clientId = parseInt(id, 10);
+            if (!Number.isFinite(clientId) || clientId <= 0) {
+                App.toast(App.t('clients.face.no_client'), 'danger');
+                return;
+            }
+            currentClientId = clientId;
             currentCheckCasherName = null;
             document.getElementById('client-list-view').classList.add('hidden');
             document.getElementById('client-detail').classList.remove('hidden');
             if (!options.skipHistory) {
                 const url = new URL(window.location.href);
-                url.searchParams.set('client_id', String(id));
+                url.searchParams.set('client_id', String(clientId));
                 url.searchParams.delete('id');
                 url.searchParams.delete('check_name');
                 const next = url.pathname + '?' + url.searchParams.toString() + url.hash;
-                if (options.fromDeepLink) history.replaceState({ clientId: id }, '', next);
-                else history.pushState({ clientId: id }, '', next);
+                if (options.fromDeepLink) history.replaceState({ clientId }, '', next);
+                else history.pushState({ clientId }, '', next);
             }
-            await loadClientDetail(id);
+            await loadClientDetail(clientId);
         }
 
         async function openCheckCasher(name, options = {}) {
@@ -2850,11 +2867,13 @@
                     } else {
                         const result = FaceId.matchDescriptor(det.descriptor, faceRoster || []);
                         if (result.matched) {
-                            faceDockHitId = result.best.id;
+                            faceDockHitId = parseInt(result.best.id, 10) || 0;
                             dock?.classList.add('is-match');
                             document.getElementById('face-dock-hit')?.classList.remove('hidden');
                             document.getElementById('face-dock-unknown')?.classList.add('hidden');
                             document.getElementById('face-dock-name').textContent = result.best.name;
+                            const openBtn = document.getElementById('face-dock-open');
+                            if (openBtn) openBtn.dataset.clientId = String(faceDockHitId);
                             if (status) status.textContent = App.t('clients.face.match_found');
                             const now = Date.now();
                             if (faceDockLastBeepId !== faceDockHitId || now - faceDockLastBeepAt > 8000) {
@@ -2867,6 +2886,8 @@
                             dock?.classList.remove('is-match');
                             document.getElementById('face-dock-hit')?.classList.add('hidden');
                             document.getElementById('face-dock-unknown')?.classList.remove('hidden');
+                            const openBtn = document.getElementById('face-dock-open');
+                            if (openBtn) delete openBtn.dataset.clientId;
                             if (status) {
                                 status.textContent = result.best
                                     ? App.t('clients.face.no_match_low', { score: Math.round(result.best.score * 100), name: result.best.name })
@@ -3107,12 +3128,14 @@
                 }
                 return;
             }
-            faceMatchHitId = result.best.id;
+            faceMatchHitId = parseInt(result.best.id, 10) || 0;
             box?.classList.remove('hidden');
             document.getElementById('face-match-name').textContent = result.best.name;
             document.getElementById('face-match-score').textContent = App.t('clients.face.match_score', {
                 score: Math.round(result.best.score * 100),
             });
+            const openBtn = document.getElementById('face-match-open-btn');
+            if (openBtn) openBtn.dataset.clientId = String(faceMatchHitId);
             if (status) status.textContent = App.t('clients.face.match_found');
             showFaceScanActions(!!faceCaptureBlob);
         }
