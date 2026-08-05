@@ -229,7 +229,9 @@ if ($method === 'GET') {
             $storeTSql = '';
         }
 
-        $envioSql = "SELECT t.id, t.date_sent, t.amount_usd, t.fee, t.tax, t.beneficiary, t.company,
+        // ponytail: cast date_sent to text so UNION ALL with check dates doesn't type-mismatch on PG
+        $envioDateExpr = db_is_pgsql() ? 't.date_sent::text' : 't.date_sent';
+        $envioSql = "SELECT t.id, {$envioDateExpr} AS date_sent, t.amount_usd, t.fee, t.tax, t.beneficiary, t.company,
                             t.transaction_type, t.transaction_code, t.source, t.paying_bank,
                             t.destination_country, t.destination_city, t.store_id,
                             s.name AS store_name,
