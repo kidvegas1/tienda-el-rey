@@ -313,10 +313,17 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" data-i18n="clients.sender_id.id_file">ID File</label>
-                                            <input type="file" id="sender-id-file" accept="image/*,.pdf" class="input text-sm py-1.5" required>
+                                            <input type="file" id="sender-id-file" accept="image/*,.pdf" class="input text-sm py-1.5">
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn-primary text-xs py-1.5 px-3" data-i18n="clients.sender_id.upload">Upload ID</button>
+                                    <div id="sender-id-camera-preview-wrap" class="hidden flex items-center gap-3">
+                                        <img id="sender-id-camera-preview" class="w-28 h-20 object-cover rounded-lg border border-border" alt="">
+                                        <button type="button" class="text-xs text-danger" id="sender-id-camera-clear" data-i18n="clients.sender_id.clear_camera">Clear camera photo</button>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button type="button" class="btn-secondary text-xs py-1.5 px-3" id="sender-id-camera-btn" data-i18n="clients.sender_id.use_camera">Use camera</button>
+                                        <button type="submit" class="btn-primary text-xs py-1.5 px-3" data-i18n="clients.sender_id.upload">Upload ID</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -514,12 +521,36 @@
                     <option value="other" data-i18n="clients.id_type.other">Other</option>
                 </select>
             </div>
-            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.sender_id.id_file">ID File</label><input type="file" id="recv-id-file" accept="image/*,.pdf" class="input text-sm py-1.5" required></div>
+            <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.sender_id.id_file">ID File</label><input type="file" id="recv-id-file" accept="image/*,.pdf" class="input text-sm py-1.5"></div>
+            <div id="recv-id-camera-preview-wrap" class="hidden flex items-center gap-3">
+                <img id="recv-id-camera-preview" class="w-28 h-20 object-cover rounded-lg border border-border" alt="">
+                <button type="button" class="text-xs text-danger" id="recv-id-camera-clear" data-i18n="clients.sender_id.clear_camera">Clear camera photo</button>
+            </div>
+            <button type="button" class="btn-secondary text-sm w-full justify-center" id="recv-id-camera-btn" data-i18n="clients.sender_id.use_camera">Use camera</button>
             <div class="flex gap-3 pt-2">
                 <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('receiver-id-modal')" data-i18n="action.cancel">Cancel</button>
                 <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="clients.modal.upload">Upload</button>
             </div>
         </form>
+    </div>
+
+    <!-- Photo ID camera modal -->
+    <div class="modal-backdrop" id="id-camera-modal-backdrop"></div>
+    <div class="modal-content max-w-md" id="id-camera-modal">
+        <h3 class="text-lg font-bold mb-2" data-i18n="clients.sender_id.camera_title">Take photo of ID</h3>
+        <p class="text-sm text-text-muted mb-3" data-i18n="clients.sender_id.camera_hint">Hold the ID steady in front of the camera, then capture.</p>
+        <div class="relative rounded-xl overflow-hidden bg-black aspect-[4/3] mb-3">
+            <video id="id-camera-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+            <canvas id="id-camera-canvas" class="hidden"></canvas>
+            <img id="id-camera-snapshot" class="hidden absolute inset-0 w-full h-full object-cover" alt="">
+        </div>
+        <p class="text-sm mb-3 min-h-[1.25rem]" id="id-camera-status"></p>
+        <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn-secondary flex-1" id="id-camera-cancel" data-i18n="action.cancel">Cancel</button>
+            <button type="button" class="btn-secondary flex-1 hidden" id="id-camera-retake" data-i18n="clients.face.retake">Retake Photo</button>
+            <button type="button" class="btn-primary flex-1 justify-center" id="id-camera-capture" data-i18n="clients.face.capture">Capture</button>
+            <button type="button" class="btn-primary flex-1 justify-center hidden" id="id-camera-use" data-i18n="clients.sender_id.use_photo">Use this photo</button>
+        </div>
     </div>
 
     <!-- Records by Name Modal -->
@@ -573,9 +604,9 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260805-face"></script>
+    <script src="assets/js/i18n.js?v=20260805-idcam"></script>
     <script src="assets/js/app.js?v=20260801-gaps"></script>
-    <script src="assets/js/face-id.js?v=20260805-face"></script>
+    <script src="assets/js/face-id.js?v=20260805-idcam"></script>
     <script>
         function escHtml(s) {
             if (!s) return '';
@@ -854,6 +885,20 @@
             document.getElementById('face-modal-capture')?.addEventListener('click', onFaceCapture);
             document.getElementById('face-modal-recapture')?.addEventListener('click', onFaceRecapture);
             document.getElementById('face-modal-save')?.addEventListener('click', onFaceSave);
+            document.getElementById('sender-id-camera-btn')?.addEventListener('click', () => openIdCamera('sender'));
+            document.getElementById('sender-id-camera-clear')?.addEventListener('click', clearSenderIdCamera);
+            document.getElementById('recv-id-camera-btn')?.addEventListener('click', () => openIdCamera('receiver'));
+            document.getElementById('recv-id-camera-clear')?.addEventListener('click', clearReceiverIdCamera);
+            document.getElementById('id-camera-cancel')?.addEventListener('click', closeIdCamera);
+            document.getElementById('id-camera-capture')?.addEventListener('click', onIdCameraCapture);
+            document.getElementById('id-camera-retake')?.addEventListener('click', onIdCameraRetake);
+            document.getElementById('id-camera-use')?.addEventListener('click', onIdCameraUse);
+            document.getElementById('sender-id-file')?.addEventListener('change', () => {
+                if (document.getElementById('sender-id-file')?.files?.length) clearSenderIdCamera();
+            });
+            document.getElementById('recv-id-file')?.addEventListener('change', () => {
+                if (document.getElementById('recv-id-file')?.files?.length) clearReceiverIdCamera();
+            });
             document.getElementById('face-match-open-btn')?.addEventListener('click', () => {
                 if (faceMatchHitId) {
                     closeFaceModal();
@@ -1690,15 +1735,147 @@
             return false;
         }
 
+        // ── Photo ID camera ──
+        let idCameraTarget = 'sender'; // sender | receiver
+        let idCameraStream = null;
+        let idCameraBlob = null;
+        let senderIdCameraBlob = null;
+        let receiverIdCameraBlob = null;
+
+        function clearSenderIdCamera() {
+            senderIdCameraBlob = null;
+            document.getElementById('sender-id-camera-preview-wrap')?.classList.add('hidden');
+            const img = document.getElementById('sender-id-camera-preview');
+            if (img) img.removeAttribute('src');
+        }
+
+        function clearReceiverIdCamera() {
+            receiverIdCameraBlob = null;
+            document.getElementById('recv-id-camera-preview-wrap')?.classList.add('hidden');
+            const img = document.getElementById('recv-id-camera-preview');
+            if (img) img.removeAttribute('src');
+        }
+
+        async function openIdCamera(target) {
+            idCameraTarget = target === 'receiver' ? 'receiver' : 'sender';
+            idCameraBlob = null;
+            document.getElementById('id-camera-snapshot')?.classList.add('hidden');
+            document.getElementById('id-camera-video')?.classList.remove('hidden');
+            document.getElementById('id-camera-capture')?.classList.remove('hidden');
+            document.getElementById('id-camera-retake')?.classList.add('hidden');
+            document.getElementById('id-camera-use')?.classList.add('hidden');
+            const status = document.getElementById('id-camera-status');
+            if (status) status.textContent = App.t('clients.sender_id.camera_opening');
+            App.openModal('id-camera-modal');
+            try {
+                const video = document.getElementById('id-camera-video');
+                if (globalThis.FaceId?.startCamera) {
+                    idCameraStream = await FaceId.startCamera(video, 'environment');
+                } else {
+                    idCameraStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+                        audio: false,
+                    });
+                    video.srcObject = idCameraStream;
+                    await video.play();
+                }
+                if (status) status.textContent = App.t('clients.sender_id.camera_ready');
+            } catch (err) {
+                if (status) status.textContent = err.message || App.t('clients.face.camera_error');
+                App.toast(err.message || App.t('clients.face.camera_error'), 'danger');
+            }
+        }
+
+        function closeIdCamera() {
+            if (globalThis.FaceId?.stopCamera) FaceId.stopCamera(idCameraStream);
+            else idCameraStream?.getTracks?.().forEach((t) => t.stop());
+            idCameraStream = null;
+            idCameraBlob = null;
+            App.closeModal('id-camera-modal');
+        }
+
+        async function onIdCameraCapture() {
+            const status = document.getElementById('id-camera-status');
+            try {
+                const video = document.getElementById('id-camera-video');
+                const canvas = document.getElementById('id-camera-canvas');
+                if (globalThis.FaceId?.captureBlob) {
+                    idCameraBlob = await FaceId.captureBlob(video, canvas);
+                } else {
+                    canvas.width = video.videoWidth || 1280;
+                    canvas.height = video.videoHeight || 720;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    idCameraBlob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+                }
+                if (!idCameraBlob) {
+                    if (status) status.textContent = App.t('clients.sender_id.camera_failed');
+                    return;
+                }
+                const snap = document.getElementById('id-camera-snapshot');
+                snap.src = URL.createObjectURL(idCameraBlob);
+                snap.classList.remove('hidden');
+                video.classList.add('hidden');
+                document.getElementById('id-camera-capture').classList.add('hidden');
+                document.getElementById('id-camera-retake').classList.remove('hidden');
+                document.getElementById('id-camera-use').classList.remove('hidden');
+                if (status) status.textContent = App.t('clients.sender_id.camera_captured');
+            } catch (err) {
+                if (status) status.textContent = err.message;
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function onIdCameraRetake() {
+            idCameraBlob = null;
+            document.getElementById('id-camera-snapshot')?.classList.add('hidden');
+            document.getElementById('id-camera-video')?.classList.remove('hidden');
+            document.getElementById('id-camera-capture')?.classList.remove('hidden');
+            document.getElementById('id-camera-retake')?.classList.add('hidden');
+            document.getElementById('id-camera-use')?.classList.add('hidden');
+            document.getElementById('id-camera-status').textContent = App.t('clients.sender_id.camera_ready');
+        }
+
+        function onIdCameraUse() {
+            if (!idCameraBlob) return;
+            if (idCameraTarget === 'receiver') {
+                receiverIdCameraBlob = idCameraBlob;
+                const wrap = document.getElementById('recv-id-camera-preview-wrap');
+                const img = document.getElementById('recv-id-camera-preview');
+                if (img) img.src = URL.createObjectURL(receiverIdCameraBlob);
+                wrap?.classList.remove('hidden');
+                const file = document.getElementById('recv-id-file');
+                if (file) file.value = '';
+            } else {
+                senderIdCameraBlob = idCameraBlob;
+                const wrap = document.getElementById('sender-id-camera-preview-wrap');
+                const img = document.getElementById('sender-id-camera-preview');
+                if (img) img.src = URL.createObjectURL(senderIdCameraBlob);
+                wrap?.classList.remove('hidden');
+                const file = document.getElementById('sender-id-file');
+                if (file) file.value = '';
+            }
+            closeIdCamera();
+            App.toast(App.t('clients.sender_id.camera_ready_to_upload'), 'success');
+        }
+
         async function uploadSenderId(e) {
             e.preventDefault();
+            const fileInput = document.getElementById('sender-id-file');
+            const file = fileInput?.files?.[0] || null;
+            if (!file && !senderIdCameraBlob) {
+                App.toast(App.t('clients.sender_id.need_photo'), 'warning');
+                return false;
+            }
             const fd = new FormData();
             fd.append('action', 'upload_id');
             fd.append('client_id', currentClientId);
             fd.append('id_type', document.getElementById('sender-id-type').value);
-            fd.append('id_file', document.getElementById('sender-id-file').files[0]);
+            if (senderIdCameraBlob) fd.append('id_file', senderIdCameraBlob, 'sender-id.jpg');
+            else fd.append('id_file', file);
             try {
                 await App.apiForm('/api/clients', fd);
+                clearSenderIdCamera();
+                if (fileInput) fileInput.value = '';
                 App.toastKey('clients.toast.sender_id_uploaded', 'success');
                 loadClientDetail(currentClientId);
             } catch (err) { App.toast(err.message, 'danger'); }
@@ -1709,18 +1886,27 @@
             document.getElementById('recv-id-target').value = receiverId;
             document.getElementById('receiver-id-form').reset();
             document.getElementById('recv-id-target').value = receiverId;
+            clearReceiverIdCamera();
             App.openModal('receiver-id-modal');
         }
 
         async function uploadReceiverId(e) {
             e.preventDefault();
+            const fileInput = document.getElementById('recv-id-file');
+            const file = fileInput?.files?.[0] || null;
+            if (!file && !receiverIdCameraBlob) {
+                App.toast(App.t('clients.sender_id.need_photo'), 'warning');
+                return false;
+            }
             const fd = new FormData();
             fd.append('action', 'upload_receiver_id');
             fd.append('receiver_id', document.getElementById('recv-id-target').value);
             fd.append('id_type', document.getElementById('recv-id-type').value);
-            fd.append('id_file', document.getElementById('recv-id-file').files[0]);
+            if (receiverIdCameraBlob) fd.append('id_file', receiverIdCameraBlob, 'receiver-id.jpg');
+            else fd.append('id_file', file);
             try {
                 await App.apiForm('/api/clients', fd);
+                clearReceiverIdCamera();
                 App.toastKey('clients.toast.receiver_id_uploaded', 'success');
                 App.closeModal('receiver-id-modal');
                 loadClientDetail(currentClientId);
