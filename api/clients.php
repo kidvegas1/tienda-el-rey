@@ -6,6 +6,7 @@ require_once __DIR__ . '/../includes/settings.php';
 require_once __DIR__ . '/../includes/client-activity.php';
 require_once __DIR__ . '/../includes/transfer-security.php';
 require_once __DIR__ . '/../includes/commission.php';
+require_once __DIR__ . '/../includes/client-face.php';
 
 function clients_activity_mode(?string $raw): string {
     $mode = strtolower(trim((string)$raw));
@@ -348,6 +349,10 @@ if ($method === 'GET') {
         $receivers = $pdo->prepare('SELECT * FROM receivers WHERE client_id = ? ORDER BY name');
         $receivers->execute([$clientId]);
 
+        $faceEnrolled = !empty($client['face_descriptor']);
+        unset($client['face_descriptor']);
+        $client['face_enrolled'] = $faceEnrolled;
+
         json_response([
             'client'            => with_stored_file_urls($client),
             'is_service_bucket' => $isServiceBucket,
@@ -368,6 +373,32 @@ if ($method === 'GET') {
             'activity'          => client_activity_list($pdo, $clientId, 30),
             'security_alerts'   => transfer_security_open_for_client($pdo, $clientId),
         ]);
+    }
+
+    if ($action === 'face_roster') {
+        if (!client_face_columns_exist($pdo)) {
+            json_response(['faces' => [], 'count' => 0, 'available' => false]);
+        }
+        $stmt = $pdo->query(
+            "SELECT id, name, face_descriptor
+             FROM clients
+             WHERE face_descriptor IS NOT NULL AND TRIM(face_descriptor) <> ''
+             ORDER BY name
+             LIMIT 5000"
+        );
+        $faces = [];
+        while ($row = $stmt->fetch()) {
+            $desc = client_face_parse_descriptor($row['face_descriptor']);
+            if ($desc === null) {
+                continue;
+            }
+            $faces[] = [
+                'id'         => (int)$row['id'],
+                'name'       => (string)$row['name'],
+                'descriptor' => $desc,
+            ];
+        }
+        json_response(['faces' => $faces, 'count' => count($faces), 'available' => true]);
     }
 
     if ($action === 'checks_by_name') {
@@ -776,8 +807,57 @@ if ($method === 'POST') {
     $requestedStore = !empty($_POST['store_id']) ? (int)$_POST['store_id'] : null;
 
     // Handle multipart form uploads
-    if (!empty($_POST['action']) && in_array($_POST['action'], ['upload_id', 'upload_receiver_id', 'upload_income'])) {
+    if (!empty($_POST['action']) && in_array($_POST['action'], ['upload_id', 'upload_receiver_id', 'upload_income', 'upload_face'], true)) {
         $act = $_POST['action'];
+
+        if ($act === 'upload_face') {
+            if (!client_face_columns_exist($pdo)) {
+                json_error('Face photo columns are not migrated yet. Apply 017_client_face.sql.', 503);
+            }
+            $clientId = (int)($_POST['client_id'] ?? 0);
+            auth_require_client_store_access($pdo, $clientId);
+            $consent = filter_var($_POST['consent'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            if (!$consent) {
+                json_error('Client consent is required before saving a face photo.', 400);
+            }
+            if (empty($_FILES['face_file'])) {
+                json_error('No photo provided');
+            }
+            $file = $_FILES['face_file'];
+            $mime = (string)($file['type'] ?? '');
+            $ext = strtolower(pathinfo((string)($file['name'] ?? ''), PATHINFO_EXTENSION));
+            if (!str_starts_with($mime, 'image/') && !in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+                json_error('Face photo must be an image (jpg, png, webp)', 400);
+            }
+            $descriptor = client_face_parse_descriptor($_POST['descriptor'] ?? null);
+            $path = upload_file($file, 'client-faces');
+            if (!$path) {
+                json_error('Upload failed');
+            }
+            $descJson = $descriptor !== null ? client_face_encode_descriptor($descriptor) : null;
+            $pdo->prepare(
+                'UPDATE clients
+                 SET face_photo_path = ?,
+                     face_descriptor = ?,
+                     face_consent_at = ' . sql_now() . ',
+                     face_enrolled_at = ' . sql_now() . '
+                 WHERE id = ?'
+            )->execute([$path, $descJson, $clientId]);
+            client_activity_log(
+                $pdo,
+                $clientId,
+                'face_enrolled',
+                $descriptor !== null ? 'Face photo + descriptor enrolled' : 'Face photo saved (no descriptor)',
+                (int)$user['id']
+            );
+            json_response([
+                'success'        => true,
+                'path'           => $path,
+                'path_url'       => stored_file_url($path),
+                'face_enrolled'  => $descriptor !== null,
+                'has_descriptor' => $descriptor !== null,
+            ]);
+        }
 
         if ($act === 'upload_income') {
             $clientId = (int)($_POST['client_id'] ?? 0);
@@ -1006,6 +1086,23 @@ if ($method === 'POST') {
         $stmt = $pdo->prepare('SELECT * FROM receivers WHERE client_id = ? ORDER BY name');
         $stmt->execute([(int)$data['client_id']]);
         json_response(['receivers' => $stmt->fetchAll()]);
+    }
+
+    if ($act === 'clear_face') {
+        if (!client_face_columns_exist($pdo)) {
+            json_error('Face photo columns are not migrated yet.', 503);
+        }
+        validate_required($data, ['client_id']);
+        $clientId = (int)$data['client_id'];
+        auth_require_client_store_access($pdo, $clientId);
+        $pdo->prepare(
+            'UPDATE clients
+             SET face_photo_path = NULL, face_descriptor = NULL,
+                 face_consent_at = NULL, face_enrolled_at = NULL
+             WHERE id = ?'
+        )->execute([$clientId]);
+        client_activity_log($pdo, $clientId, 'face_cleared', 'Face photo removed', (int)$user['id']);
+        json_response(['success' => true]);
     }
 
     json_error('Unknown action');

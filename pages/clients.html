@@ -110,6 +110,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><circle cx="10" cy="13" r="2"/><path d="M14 17c0-1.1-.9-2-2-2h-4a2 2 0 0 0-2 2"/></svg>
                     <span data-i18n="clients.records_by_name">Records by Name</span>
                 </button>
+                <button id="face-match-btn" class="btn-secondary" type="button" data-i18n-title="clients.face.match_title" title="Identify client by face">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 3H5a2 2 0 0 0-2 2v4"/><path d="M15 3h4a2 2 0 0 1 2 2v4"/><path d="M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M15 21h4a2 2 0 0 0 2-2v-4"/><circle cx="12" cy="11" r="3"/><path d="M7 20c1.5-2 3.2-3 5-3s3.5 1 5 3"/></svg>
+                    <span data-i18n="clients.face.match">Live Match</span>
+                </button>
                 <button id="add-client-btn" class="btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     <span data-i18n="clients.add_client">Add Client</span>
@@ -246,6 +250,33 @@
                             <div class="space-y-2" id="monthly-summary"></div>
                         </div>
 
+                        <!-- Face photo (live match) -->
+                        <div class="card">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider" data-i18n="clients.face.title">Client Photo / Face</h4>
+                                <span id="face-enrolled-badge" class="badge badge-warning text-[10px] hidden" data-i18n="clients.face.not_enrolled">Not enrolled</span>
+                            </div>
+                            <div id="face-photo-exists" class="hidden">
+                                <div class="flex items-center gap-4">
+                                    <img id="face-photo-thumb" class="w-28 h-28 object-cover rounded-xl border border-border cursor-pointer hover:opacity-80 transition-opacity" alt="Client face" onclick="this.src && window.open(this.src, '_blank')">
+                                    <div class="space-y-2">
+                                        <p id="face-enrolled-meta" class="text-xs text-text-muted"></p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <button type="button" class="btn-secondary text-xs py-1 px-2.5" id="face-retake-btn" data-i18n="clients.face.retake">Retake Photo</button>
+                                            <button type="button" class="btn-secondary text-xs py-1 px-2.5 text-danger" id="face-clear-btn" data-i18n="clients.face.clear">Remove Photo</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="face-photo-missing" class="hidden">
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-bg-elevated border border-border mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-text-muted shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    <span class="text-sm text-text-secondary" data-i18n="clients.face.missing">No face photo on file — take one for live match</span>
+                                </div>
+                                <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-capture-btn" data-i18n="clients.face.take_photo">Take Photo</button>
+                            </div>
+                        </div>
+
                         <!-- Sender ID (IRS/FinCEN) -->
                         <div class="card">
                             <div class="flex items-center justify-between mb-3">
@@ -340,11 +371,53 @@
             <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.full_name">Full Name</label><input type="text" name="name" class="input" required></div>
             <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.modal.monthly_limit">Monthly Limit ($)</label><input type="number" name="monthly_limit" class="input font-mono" step="0.01" value="5000"></div>
             <div><label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="common.notes">Notes</label><textarea name="notes" class="input" rows="2"></textarea></div>
+            <div id="client-modal-face" class="rounded-xl border border-border p-3 space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                    <label class="text-xs font-semibold text-text-secondary uppercase tracking-wider" data-i18n="clients.face.optional_photo">Face photo (optional)</label>
+                    <button type="button" class="btn-secondary text-xs py-1 px-2" id="client-modal-face-btn" data-i18n="clients.face.take_photo">Take Photo</button>
+                </div>
+                <label class="flex items-start gap-2 text-xs text-text-secondary">
+                    <input type="checkbox" id="client-modal-face-consent" class="mt-0.5">
+                    <span data-i18n="clients.face.consent">Client consents to store a face photo for identification at the counter</span>
+                </label>
+                <div id="client-modal-face-preview-wrap" class="hidden">
+                    <img id="client-modal-face-preview" class="w-24 h-24 object-cover rounded-lg border border-border" alt="">
+                    <button type="button" class="text-xs text-danger mt-1" id="client-modal-face-clear" data-i18n="clients.face.clear_pending">Clear pending photo</button>
+                </div>
+            </div>
             <div class="flex gap-3 pt-2">
                 <button type="button" class="btn-secondary flex-1" onclick="App.closeModal('client-modal')" data-i18n="action.cancel">Cancel</button>
                 <button type="submit" class="btn-primary flex-1 justify-center" data-i18n="action.save">Save</button>
             </div>
         </form>
+    </div>
+
+    <!-- Face camera modal (enroll + live match) -->
+    <div class="modal-backdrop" id="face-modal-backdrop"></div>
+    <div class="modal-content max-w-md" id="face-modal">
+        <h3 class="text-lg font-bold mb-2" id="face-modal-title" data-i18n="clients.face.take_photo">Take Photo</h3>
+        <p class="text-sm text-text-muted mb-3" id="face-modal-hint" data-i18n="clients.face.hint_enroll">Center the client's face, then capture.</p>
+        <div class="relative rounded-xl overflow-hidden bg-black aspect-[4/3] mb-3">
+            <video id="face-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+            <canvas id="face-canvas" class="hidden"></canvas>
+            <img id="face-snapshot" class="hidden absolute inset-0 w-full h-full object-cover" alt="">
+        </div>
+        <p class="text-sm mb-3 min-h-[1.25rem]" id="face-status"></p>
+        <div id="face-match-result" class="hidden mb-3 p-3 rounded-xl bg-bg-elevated border border-border">
+            <p class="text-sm font-semibold" id="face-match-name"></p>
+            <p class="text-xs text-text-muted" id="face-match-score"></p>
+            <button type="button" class="btn-primary text-xs py-1.5 px-3 mt-2" id="face-match-open-btn" data-i18n="clients.face.open_client">Open Client</button>
+        </div>
+        <label id="face-consent-row" class="flex items-start gap-2 text-xs text-text-secondary mb-3">
+            <input type="checkbox" id="face-consent" class="mt-0.5">
+            <span data-i18n="clients.face.consent">Client consents to store a face photo for identification at the counter</span>
+        </label>
+        <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn-secondary flex-1" id="face-modal-cancel" data-i18n="action.cancel">Cancel</button>
+            <button type="button" class="btn-secondary flex-1 hidden" id="face-modal-recapture" data-i18n="clients.face.retake">Retake Photo</button>
+            <button type="button" class="btn-primary flex-1 justify-center" id="face-modal-capture" data-i18n="clients.face.capture">Capture</button>
+            <button type="button" class="btn-primary flex-1 justify-center hidden" id="face-modal-save" data-i18n="clients.face.save">Save Photo</button>
+        </div>
     </div>
 
     <!-- Add Transfer Modal -->
@@ -500,8 +573,9 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260801-gaps"></script>
+    <script src="assets/js/i18n.js?v=20260805-face"></script>
     <script src="assets/js/app.js?v=20260801-gaps"></script>
+    <script src="assets/js/face-id.js?v=20260805-face"></script>
     <script>
         function escHtml(s) {
             if (!s) return '';
@@ -765,7 +839,26 @@
                 document.getElementById('client-modal-title').textContent = App.t('clients.add_client');
                 document.getElementById('client-form').reset();
                 document.querySelector('#client-form [name=id]').value = '';
+                clearPendingFace();
+                document.getElementById('client-modal-face')?.classList.remove('hidden');
                 App.openModal('client-modal');
+            });
+
+            document.getElementById('face-match-btn')?.addEventListener('click', () => openFaceModal('match'));
+            document.getElementById('face-capture-btn')?.addEventListener('click', () => openFaceModal('enroll', currentClientId));
+            document.getElementById('face-retake-btn')?.addEventListener('click', () => openFaceModal('enroll', currentClientId));
+            document.getElementById('face-clear-btn')?.addEventListener('click', clearClientFace);
+            document.getElementById('client-modal-face-btn')?.addEventListener('click', () => openFaceModal('pending'));
+            document.getElementById('client-modal-face-clear')?.addEventListener('click', clearPendingFace);
+            document.getElementById('face-modal-cancel')?.addEventListener('click', closeFaceModal);
+            document.getElementById('face-modal-capture')?.addEventListener('click', onFaceCapture);
+            document.getElementById('face-modal-recapture')?.addEventListener('click', onFaceRecapture);
+            document.getElementById('face-modal-save')?.addEventListener('click', onFaceSave);
+            document.getElementById('face-match-open-btn')?.addEventListener('click', () => {
+                if (faceMatchHitId) {
+                    closeFaceModal();
+                    openClient(faceMatchHitId);
+                }
             });
 
             document.getElementById('client-form').addEventListener('submit', async (e) => {
@@ -773,7 +866,11 @@
                 const fd = new FormData(e.target);
                 const id = fd.get('id');
                 try {
-                    await App.api('POST', '/api/clients', {
+                    if (!id && pendingFaceBlob && !document.getElementById('client-modal-face-consent')?.checked) {
+                        App.toast(App.t('clients.face.consent_required'), 'warning');
+                        return;
+                    }
+                    const res = await App.api('POST', '/api/clients', {
                         action: id ? 'update' : 'create',
                         id: id ? parseInt(id) : undefined,
                         client_code: fd.get('client_code'),
@@ -784,6 +881,18 @@
                     });
                     App.closeModal('client-modal');
                     App.toast(id ? App.t('clients.toast.client_updated') : App.t('clients.toast.client_added'), 'success');
+                    const newId = id ? parseInt(id, 10) : (res.client_id ? parseInt(res.client_id, 10) : 0);
+                    if (!id && pendingFaceBlob && newId) {
+                        try {
+                            await uploadFaceForClient(newId, pendingFaceBlob, pendingFaceDescriptor, true);
+                            clearPendingFace();
+                        } catch (faceErr) {
+                            App.toast(faceErr.message, 'warning');
+                        }
+                        await openClient(newId);
+                        return;
+                    }
+                    clearPendingFace();
                     if (currentClientId) loadClientDetail(currentClientId);
                     else loadClients();
                 } catch (err) { App.toast(err.message, 'danger'); }
@@ -839,6 +948,8 @@
 
             document.getElementById('edit-client-btn').addEventListener('click', () => {
                 document.getElementById('client-modal-title').textContent = App.t('clients.edit_client');
+                document.getElementById('client-modal-face')?.classList.add('hidden');
+                clearPendingFace();
                 App.openModal('client-modal');
             });
 
@@ -1447,6 +1558,9 @@
                     </div>`;
                 }).join('');
 
+                // Face photo
+                renderFaceSection(c);
+
                 // Sender ID
                 const idExists = document.getElementById('sender-id-exists');
                 const idMissing = document.getElementById('sender-id-missing');
@@ -1746,6 +1860,283 @@
                 App.toast(App.t('clients.toast.request_logged'), 'success');
                 document.getElementById('records-requester-name').value = '';
             } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        // ── Face photo / live match ──
+        let faceMode = 'enroll'; // enroll | match | pending
+        let faceStream = null;
+        let faceCaptureBlob = null;
+        let faceCaptureDescriptor = null;
+        let faceMatchHitId = null;
+        let faceMatchTimer = null;
+        let faceRoster = null;
+        let pendingFaceBlob = null;
+        let pendingFaceDescriptor = null;
+        let faceEnrollClientId = null;
+
+        function clearPendingFace() {
+            pendingFaceBlob = null;
+            pendingFaceDescriptor = null;
+            const wrap = document.getElementById('client-modal-face-preview-wrap');
+            const img = document.getElementById('client-modal-face-preview');
+            const consent = document.getElementById('client-modal-face-consent');
+            if (wrap) wrap.classList.add('hidden');
+            if (img) img.removeAttribute('src');
+            if (consent) consent.checked = false;
+        }
+
+        function renderFaceSection(c) {
+            const exists = document.getElementById('face-photo-exists');
+            const missing = document.getElementById('face-photo-missing');
+            const badge = document.getElementById('face-enrolled-badge');
+            const meta = document.getElementById('face-enrolled-meta');
+            const thumb = document.getElementById('face-photo-thumb');
+            if (!exists || !missing) return;
+            if (c.face_photo_path) {
+                exists.classList.remove('hidden');
+                missing.classList.add('hidden');
+                thumb.src = c.face_photo_path_url || ('/' + c.face_photo_path);
+                thumb.alt = App.t('clients.face.alt');
+                if (badge) {
+                    badge.classList.remove('hidden');
+                    badge.className = c.face_enrolled ? 'badge badge-success text-[10px]' : 'badge badge-warning text-[10px]';
+                    badge.textContent = c.face_enrolled
+                        ? App.t('clients.face.enrolled')
+                        : App.t('clients.face.photo_only');
+                }
+                if (meta) {
+                    meta.textContent = c.face_enrolled_at
+                        ? App.t('clients.face.enrolled_at', { date: App.formatDate?.(c.face_enrolled_at) || c.face_enrolled_at })
+                        : '';
+                }
+            } else {
+                exists.classList.add('hidden');
+                missing.classList.remove('hidden');
+                if (badge) {
+                    badge.classList.remove('hidden');
+                    badge.className = 'badge badge-warning text-[10px]';
+                    badge.textContent = App.t('clients.face.not_enrolled');
+                }
+                if (meta) meta.textContent = '';
+            }
+        }
+
+        async function uploadFaceForClient(clientId, blob, descriptor, consent) {
+            const fd = new FormData();
+            fd.append('action', 'upload_face');
+            fd.append('client_id', String(clientId));
+            fd.append('consent', consent ? '1' : '0');
+            fd.append('face_file', blob, 'face.jpg');
+            if (descriptor?.length) {
+                fd.append('descriptor', JSON.stringify(descriptor));
+            }
+            return App.apiForm('/api/clients', fd);
+        }
+
+        async function clearClientFace() {
+            if (!currentClientId) return;
+            if (!App.confirmKey?.('clients.face.confirm_clear') && !confirm(App.t('clients.face.confirm_clear'))) return;
+            try {
+                await App.api('POST', '/api/clients', { action: 'clear_face', client_id: currentClientId });
+                App.toastKey('clients.toast.face_cleared', 'success');
+                faceRoster = null;
+                loadClientDetail(currentClientId);
+            } catch (err) { App.toast(err.message, 'danger'); }
+        }
+
+        async function openFaceModal(mode, clientId = null) {
+            if (!globalThis.FaceId) {
+                App.toast(App.t('clients.face.unavailable'), 'danger');
+                return;
+            }
+            faceMode = mode;
+            faceEnrollClientId = clientId || currentClientId;
+            faceCaptureBlob = null;
+            faceCaptureDescriptor = null;
+            faceMatchHitId = null;
+            document.getElementById('face-match-result')?.classList.add('hidden');
+            document.getElementById('face-snapshot')?.classList.add('hidden');
+            document.getElementById('face-video')?.classList.remove('hidden');
+            document.getElementById('face-modal-capture')?.classList.remove('hidden');
+            document.getElementById('face-modal-save')?.classList.add('hidden');
+            document.getElementById('face-modal-recapture')?.classList.add('hidden');
+            const consentRow = document.getElementById('face-consent-row');
+            const title = document.getElementById('face-modal-title');
+            const hint = document.getElementById('face-modal-hint');
+            const status = document.getElementById('face-status');
+            if (status) status.textContent = App.t('clients.face.loading_models');
+            if (mode === 'match') {
+                title.textContent = App.t('clients.face.match');
+                hint.textContent = App.t('clients.face.hint_match');
+                consentRow?.classList.add('hidden');
+            } else {
+                title.textContent = App.t('clients.face.take_photo');
+                hint.textContent = App.t('clients.face.hint_enroll');
+                consentRow?.classList.toggle('hidden', mode === 'pending');
+                const consent = document.getElementById('face-consent');
+                if (consent) consent.checked = false;
+            }
+            App.openModal('face-modal');
+            try {
+                await FaceId.ensureHuman();
+                faceStream = await FaceId.startCamera(document.getElementById('face-video'));
+                if (status) status.textContent = mode === 'match'
+                    ? App.t('clients.face.scanning')
+                    : App.t('clients.face.ready');
+                if (mode === 'match') {
+                    faceRoster = (await App.api('GET', '/api/clients?action=face_roster')).faces || [];
+                    if (!faceRoster.length) {
+                        if (status) status.textContent = App.t('clients.face.roster_empty');
+                    } else {
+                        startLiveMatchLoop();
+                    }
+                }
+            } catch (err) {
+                if (status) status.textContent = err.message || App.t('clients.face.camera_error');
+                App.toast(err.message || App.t('clients.face.camera_error'), 'danger');
+            }
+        }
+
+        function stopFaceMatchLoop() {
+            if (faceMatchTimer) {
+                clearTimeout(faceMatchTimer);
+                faceMatchTimer = null;
+            }
+        }
+
+        function closeFaceModal() {
+            stopFaceMatchLoop();
+            FaceId?.stopCamera(faceStream);
+            faceStream = null;
+            faceCaptureBlob = null;
+            faceCaptureDescriptor = null;
+            App.closeModal('face-modal');
+        }
+
+        async function onFaceCapture() {
+            const status = document.getElementById('face-status');
+            try {
+                if (status) status.textContent = App.t('clients.face.detecting');
+                const video = document.getElementById('face-video');
+                const canvas = document.getElementById('face-canvas');
+                const det = await FaceId.detectDescriptor(video);
+                if (!det.ok) {
+                    if (status) status.textContent = App.t('clients.face.no_face');
+                    return;
+                }
+                faceCaptureDescriptor = det.descriptor;
+                faceCaptureBlob = await FaceId.captureBlob(video, canvas);
+                const snap = document.getElementById('face-snapshot');
+                snap.src = URL.createObjectURL(faceCaptureBlob);
+                snap.classList.remove('hidden');
+                video.classList.add('hidden');
+                document.getElementById('face-modal-capture').classList.add('hidden');
+                document.getElementById('face-modal-recapture').classList.remove('hidden');
+                if (faceMode === 'match') {
+                    document.getElementById('face-modal-save').classList.add('hidden');
+                    stopFaceMatchLoop();
+                    await runMatchAgainstRoster(faceCaptureDescriptor);
+                } else {
+                    document.getElementById('face-modal-save').classList.remove('hidden');
+                    if (status) status.textContent = App.t('clients.face.captured');
+                }
+            } catch (err) {
+                if (status) status.textContent = err.message;
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        function onFaceRecapture() {
+            faceCaptureBlob = null;
+            faceCaptureDescriptor = null;
+            faceMatchHitId = null;
+            document.getElementById('face-match-result')?.classList.add('hidden');
+            document.getElementById('face-snapshot')?.classList.add('hidden');
+            document.getElementById('face-video')?.classList.remove('hidden');
+            document.getElementById('face-modal-capture')?.classList.remove('hidden');
+            document.getElementById('face-modal-save')?.classList.add('hidden');
+            document.getElementById('face-modal-recapture')?.classList.add('hidden');
+            document.getElementById('face-status').textContent = App.t('clients.face.ready');
+            if (faceMode === 'match') startLiveMatchLoop();
+        }
+
+        async function onFaceSave() {
+            if (!faceCaptureBlob) return;
+            const status = document.getElementById('face-status');
+            if (faceMode === 'pending') {
+                pendingFaceBlob = faceCaptureBlob;
+                pendingFaceDescriptor = faceCaptureDescriptor;
+                const wrap = document.getElementById('client-modal-face-preview-wrap');
+                const img = document.getElementById('client-modal-face-preview');
+                if (img) img.src = URL.createObjectURL(pendingFaceBlob);
+                wrap?.classList.remove('hidden');
+                document.getElementById('client-modal-face-consent').checked = true;
+                closeFaceModal();
+                App.toastKey('clients.toast.face_pending', 'success');
+                return;
+            }
+            if (faceMode === 'match') return;
+            const consent = document.getElementById('face-consent')?.checked;
+            if (!consent) {
+                App.toast(App.t('clients.face.consent_required'), 'warning');
+                return;
+            }
+            if (!faceEnrollClientId) {
+                App.toast(App.t('clients.face.no_client'), 'danger');
+                return;
+            }
+            try {
+                if (status) status.textContent = App.t('clients.face.saving');
+                await uploadFaceForClient(faceEnrollClientId, faceCaptureBlob, faceCaptureDescriptor, true);
+                faceRoster = null;
+                App.toastKey('clients.toast.face_saved', 'success');
+                closeFaceModal();
+                if (currentClientId === faceEnrollClientId) loadClientDetail(currentClientId);
+            } catch (err) {
+                if (status) status.textContent = err.message;
+                App.toast(err.message, 'danger');
+            }
+        }
+
+        async function runMatchAgainstRoster(descriptor) {
+            const status = document.getElementById('face-status');
+            const result = FaceId.matchDescriptor(descriptor, faceRoster || []);
+            const box = document.getElementById('face-match-result');
+            if (!result.matched) {
+                faceMatchHitId = null;
+                box?.classList.add('hidden');
+                if (status) {
+                    status.textContent = result.best
+                        ? App.t('clients.face.no_match_low', { score: Math.round(result.best.score * 100) })
+                        : App.t('clients.face.no_match');
+                }
+                return;
+            }
+            faceMatchHitId = result.best.id;
+            box?.classList.remove('hidden');
+            document.getElementById('face-match-name').textContent = result.best.name;
+            document.getElementById('face-match-score').textContent = App.t('clients.face.match_score', {
+                score: Math.round(result.best.score * 100),
+            });
+            if (status) status.textContent = App.t('clients.face.match_found');
+        }
+
+        function startLiveMatchLoop() {
+            stopFaceMatchLoop();
+            const tick = async () => {
+                if (faceMode !== 'match' || !faceStream || faceCaptureBlob) return;
+                try {
+                    const det = await FaceId.detectDescriptor(document.getElementById('face-video'));
+                    if (det.ok) {
+                        await runMatchAgainstRoster(det.descriptor);
+                        if (faceMatchHitId) {
+                            // keep scanning lightly after a hit so score can update
+                        }
+                    }
+                } catch (_) { /* ignore frame errors */ }
+                faceMatchTimer = setTimeout(tick, 700);
+            };
+            faceMatchTimer = setTimeout(tick, 400);
         }
 
         // Receiver form submit

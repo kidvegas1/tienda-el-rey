@@ -250,7 +250,7 @@ function storage_serve(string $storedPath, array $options = []): void {
 /**
  * Add web URLs for known file path columns on client/receiver records.
  */
-function with_stored_file_urls(array $row, array $keys = ['sender_id_path', 'income_doc_path', 'id_path']): array {
+function with_stored_file_urls(array $row, array $keys = ['sender_id_path', 'income_doc_path', 'id_path', 'face_photo_path']): array {
     foreach ($keys as $key) {
         if (!empty($row[$key])) {
             $row[$key . '_url'] = stored_file_url((string)$row[$key]);
