@@ -118,12 +118,23 @@ function client_face_fail(string $code, string $message, string $hint = '', int 
     ], $extra), $http);
 }
 
+function client_face_gd_available(): bool {
+    return function_exists('imagecreatefromstring') && function_exists('imagejpeg');
+}
+
+function client_face_is_jpeg_bytes(string $raw): bool {
+    return strlen($raw) >= 3
+        && ord($raw[0]) === 0xFF
+        && ord($raw[1]) === 0xD8
+        && ord($raw[2]) === 0xFF;
+}
+
 /**
  * Decode any supported raster into a GD image.
  * @return resource|\GdImage|null
  */
 function client_face_gd_from_bytes(string $raw, string $ext = '') {
-    if ($raw === '' || !function_exists('imagecreatefromstring')) {
+    if ($raw === '' || !client_face_gd_available()) {
         return null;
     }
     $img = @imagecreatefromstring($raw);
@@ -214,11 +225,35 @@ function client_face_normalize_upload(string $tmpPath, string $originalName = ''
 
     $gd = client_face_gd_from_bytes($raw, $ext);
     if ($gd === null) {
+        // Browser already normalizes to JPEG before upload — accept without GD.
+        $looksJpeg = client_face_is_jpeg_bytes($raw)
+            || in_array($ext, ['jpg', 'jpeg', 'jfif'], true)
+            || str_contains(strtolower($mime), 'jpeg');
+        if ($looksJpeg) {
+            $out = tempnam(sys_get_temp_dir(), 'facejpg');
+            if ($out === false || @file_put_contents($out, $raw) === false) {
+                return [
+                    'ok' => false,
+                    'code' => 'encode_failed',
+                    'error' => 'Could not stage JPEG for Face ID.',
+                    'hint' => 'Try again or use the camera.',
+                ];
+            }
+            return [
+                'ok' => true,
+                'path' => $out,
+                'mime' => 'image/jpeg',
+                'bytes' => (int)@filesize($out),
+                'passthrough' => true,
+            ];
+        }
         return [
             'ok' => false,
             'code' => 'decode_failed',
-            'error' => 'Could not decode this image format.',
-            'hint' => 'Convert to JPG/PNG, or capture with the Face ID camera.',
+            'error' => client_face_gd_available()
+                ? 'Could not decode this image format.'
+                : 'Server image processing is unavailable and the upload was not JPEG.',
+            'hint' => 'Use the Face ID camera (saves as JPEG), or try again after deploy with GD enabled.',
         ];
     }
 
@@ -369,9 +404,10 @@ function client_face_enroll(PDO $pdo, int $clientId, array $file, ?array $descri
     }
 
     $jpegPath = $norm['path'];
-    $thumb = client_face_make_thumb_data_url($jpegPath);
+    // Prefer client thumb when GD is missing (passthrough JPEG path)
+    $thumb = client_face_parse_thumb_data_url($clientThumb);
     if ($thumb === null) {
-        $thumb = client_face_parse_thumb_data_url($clientThumb);
+        $thumb = client_face_make_thumb_data_url($jpegPath);
     }
 
     $upload = [

@@ -6,7 +6,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         libpq-dev \
         postgresql-client \
-    && docker-php-ext-install pdo pdo_pgsql \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libwebp-dev \
+        libfreetype6-dev \
+        zlib1g-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install pdo pdo_pgsql gd \
     && a2enmod rewrite headers \
     && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf \
     && rm -rf /var/lib/apt/lists/*

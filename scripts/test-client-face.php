@@ -49,6 +49,8 @@ assert_true(is_string($encoded) && str_starts_with($encoded, '['), 'encode descr
 assert_true(client_face_is_heic('heic', '', '') === true, 'heic by extension');
 assert_true(client_face_is_heic('jpg', 'image/heic', '') === true, 'heic by mime');
 assert_true(client_face_is_heic('jpg', 'image/jpeg', '') === false, 'jpeg not heic');
+assert_true(client_face_is_jpeg_bytes("\xFF\xD8\xFF\xE0test") === true, 'jpeg magic bytes');
+assert_true(client_face_is_jpeg_bytes('PNG') === false, 'reject non-jpeg magic');
 
 if (function_exists('imagecreatetruecolor')) {
     $tmpJpg = tempnam(sys_get_temp_dir(), 'facejpg');
