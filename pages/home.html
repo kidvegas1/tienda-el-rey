@@ -27,6 +27,7 @@
             </button>
             <nav id="main-nav" class="main-nav" aria-label="Navegación principal">
                 <a href="#destinos">Destinos</a>
+                <a href="#tipos-de-cambio">Tipo de cambio</a>
                 <a href="#como-funciona">Cómo funciona</a>
                 <a href="#preparacion">Qué traer</a>
                 <a href="#preguntas">Preguntas</a>
@@ -126,6 +127,17 @@
                     </div>
                 </article>
             </div>
+        </section>
+
+        <section id="tipos-de-cambio" class="section exchange-rates" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Tipo de cambio</p>
+                    <h2>Cuánto rinde tu dólar</h2>
+                </div>
+                <p id="exchange-rates-disclaimer">Tipos de cambio de referencia para envíos. Consulta en tienda antes de enviar; pueden variar según compañía (Barri, Viamericas, Ria) y destino.</p>
+            </div>
+            <div class="exchange-rates-grid" id="exchange-rates-grid" aria-live="polite"></div>
         </section>
 
         <section id="como-funciona" class="section process">
@@ -272,6 +284,39 @@
             toggle.setAttribute('aria-expanded', 'false');
             nav.classList.remove('open');
         });
+
+        // ponytail: public FX cards; hide section when nothing published
+        (async function loadExchangeRates() {
+            const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+            ));
+            const section = document.getElementById('tipos-de-cambio');
+            const grid = document.getElementById('exchange-rates-grid');
+            const disclaimer = document.getElementById('exchange-rates-disclaimer');
+            if (!section || !grid) return;
+            try {
+                const res = await fetch('/api/exchange-rates', { headers: { Accept: 'application/json' } });
+                if (!res.ok) return;
+                const data = await res.json();
+                const rates = data.rates || [];
+                if (!rates.length) return;
+                if (data.disclaimer && disclaimer) disclaimer.textContent = data.disclaimer;
+                grid.innerHTML = rates.map((r) => {
+                    const rate = Number(r.rate_per_usd) || 0;
+                    const formatted = rate.toLocaleString('es-US', { maximumFractionDigits: 4 });
+                    const flag = r.flag_url
+                        ? `<img src="${esc(r.flag_url)}" alt="" width="28" height="18">`
+                        : `<span class="fx-code">${esc(r.country_code)}</span>`;
+                    const note = r.note ? `<p class="fx-note">${esc(r.note)}</p>` : '';
+                    return `<article class="fx-card">
+                        <div class="fx-label">${flag}<span>${esc(r.country_name)}</span></div>
+                        <p class="fx-rate"><span>1 USD</span> = <strong>${esc(formatted)} ${esc(r.currency_code)}</strong></p>
+                        ${note}
+                    </article>`;
+                }).join('');
+                section.hidden = false;
+            } catch (_) { /* keep section hidden */ }
+        })();
     </script>
 </body>
 </html>

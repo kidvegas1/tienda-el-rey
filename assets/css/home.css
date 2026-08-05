@@ -558,7 +558,67 @@ footer > a { justify-self: end; color: var(--sky-700); font-weight: 700; }
     to { transform: scale(1.06) translate3d(-1.2%, -1%, 0); }
 }
 
+.exchange-rates-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+.fx-card {
+    padding: 1.2rem 1.25rem 1.35rem;
+    border: 1px solid var(--border);
+    border-radius: .85rem;
+    background: linear-gradient(180deg, var(--surface), var(--sky-100));
+    box-shadow: 0 10px 30px rgb(47 34 28 / 5%);
+}
+.fx-label {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .65rem;
+    color: var(--sky-700);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.fx-label img {
+    width: 1.55rem;
+    height: 1.05rem;
+    border-radius: .15rem;
+    box-shadow: 0 0 0 1px rgb(47 34 28 / 12%);
+}
+.fx-code {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.7rem;
+    height: 1.05rem;
+    padding: 0 .25rem;
+    border-radius: .15rem;
+    background: var(--brown-900);
+    color: #fff;
+    font-size: .62rem;
+    letter-spacing: .04em;
+}
+.fx-rate {
+    margin: 0;
+    color: var(--brown-900);
+    font-size: 1.05rem;
+    line-height: 1.35;
+}
+.fx-rate span { color: var(--text-muted); font-size: .9rem; }
+.fx-rate strong {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    font-weight: 400;
+}
+.fx-note {
+    margin: .55rem 0 0;
+    color: var(--text-muted);
+    font-size: .78rem;
+}
+
 @media (max-width: 960px) {
+    .exchange-rates-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .destination-grid { grid-template-columns: 1fr 1fr; }
     .destination-featured { grid-row: auto; }
     .destination-featured img { aspect-ratio: 4 / 3; }
@@ -606,6 +666,7 @@ footer > a { justify-self: end; color: var(--sky-700); font-weight: 700; }
     .flag-strip { margin-top: -1.1rem; justify-content: flex-start; }
     .section { padding: 4.75rem 0; }
     .destination-grid { grid-template-columns: 1fr; }
+    .exchange-rates-grid { grid-template-columns: 1fr; }
     .destination-card:nth-child(4) { display: block; grid-column: auto; }
     .destination-card:nth-child(4) img { aspect-ratio: 4 / 3; }
     .process { padding-top: 4.75rem; padding-bottom: 4.75rem; }
