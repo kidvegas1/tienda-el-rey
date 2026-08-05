@@ -114,7 +114,7 @@ function paginate(int $total, int $perPage = 50): array {
     ];
 }
 
-function upload_file(array $file, string $subdir = ''): string|false {
+function upload_file(array $file, string $subdir = '', bool $requireRemote = false): string|false {
     if ($file['error'] !== UPLOAD_ERR_OK) return false;
     if ($file['size'] > MAX_UPLOAD_SIZE) return false;
 
@@ -128,8 +128,13 @@ function upload_file(array $file, string $subdir = ''): string|false {
         try {
             return storage_upload($file['tmp_name'], $bucket, $objectPath, (string)($file['name'] ?? ''));
         } catch (Throwable $e) {
-            error_log('[storage] upload failed, using local disk fallback: ' . $e->getMessage());
+            error_log('[storage] upload failed' . ($requireRemote ? '' : ', using local disk fallback') . ': ' . $e->getMessage());
+            if ($requireRemote) {
+                return false;
+            }
         }
+    } elseif ($requireRemote) {
+        return false;
     }
 
     $dir = UPLOAD_DIR . ($subdir !== '' ? $subdir . '/' : '');

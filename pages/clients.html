@@ -2126,37 +2126,54 @@
             const meta = document.getElementById('face-enrolled-meta');
             const thumb = document.getElementById('face-photo-thumb');
             if (!exists || !missing) return;
-            if (c.face_photo_path) {
+            const displayUrl = c.face_photo_display_url
+                || c.face_photo_path_url
+                || (c.face_photo_path ? ('/api/files?ref=' + encodeURIComponent(c.face_photo_path) + '&inline=1') : '');
+            if (displayUrl || c.face_photo_path || c.face_enrolled) {
                 exists.classList.remove('hidden');
                 missing.classList.add('hidden');
                 if (thumb) {
-                    thumb.onerror = () => {
-                        // Stored path exists in DB but file is missing (ephemeral upload) — prompt re-add
-                        exists.classList.add('hidden');
-                        missing.classList.remove('hidden');
-                        if (badge) {
-                            badge.classList.remove('hidden');
-                            badge.className = 'badge badge-warning text-[10px]';
-                            badge.textContent = c.face_enrolled
-                                ? App.t('clients.face.enrolled_no_image')
-                                : App.t('clients.face.not_enrolled');
-                        }
-                        if (meta) meta.textContent = App.t('clients.face.image_missing_hint');
-                    };
-                    thumb.src = c.face_photo_path_url || ('/api/files?ref=' + encodeURIComponent(c.face_photo_path) + '&inline=1');
-                    thumb.alt = App.t('clients.face.alt');
+                    if (displayUrl) {
+                        thumb.onerror = () => {
+                            // Full file missing — keep enrolled state and prompt re-add
+                            if (!String(displayUrl).startsWith('data:')) {
+                                exists.classList.add('hidden');
+                                missing.classList.remove('hidden');
+                                if (badge) {
+                                    badge.classList.remove('hidden');
+                                    badge.className = 'badge badge-warning text-[10px]';
+                                    badge.textContent = c.face_enrolled
+                                        ? App.t('clients.face.enrolled_no_image')
+                                        : App.t('clients.face.not_enrolled');
+                                }
+                                if (meta) meta.textContent = App.t('clients.face.image_missing_hint');
+                            }
+                        };
+                        thumb.src = displayUrl;
+                        thumb.alt = App.t('clients.face.alt');
+                        thumb.classList.remove('hidden');
+                    } else {
+                        thumb.removeAttribute('src');
+                        thumb.classList.add('hidden');
+                    }
                 }
                 if (badge) {
                     badge.classList.remove('hidden');
-                    badge.className = c.face_enrolled ? 'badge badge-success text-[10px]' : 'badge badge-warning text-[10px]';
-                    badge.textContent = c.face_enrolled
-                        ? App.t('clients.face.enrolled')
-                        : App.t('clients.face.photo_only');
+                    badge.className = (c.face_enrolled && displayUrl)
+                        ? 'badge badge-success text-[10px]'
+                        : 'badge badge-warning text-[10px]';
+                    badge.textContent = displayUrl
+                        ? (c.face_enrolled ? App.t('clients.face.enrolled') : App.t('clients.face.photo_only'))
+                        : (c.face_enrolled ? App.t('clients.face.enrolled_no_image') : App.t('clients.face.not_enrolled'));
                 }
                 if (meta) {
-                    meta.textContent = c.face_enrolled_at
-                        ? App.t('clients.face.enrolled_at', { date: App.formatDate?.(c.face_enrolled_at) || c.face_enrolled_at })
-                        : '';
+                    if (!displayUrl) {
+                        meta.textContent = App.t('clients.face.image_missing_hint');
+                    } else {
+                        meta.textContent = c.face_enrolled_at
+                            ? App.t('clients.face.enrolled_at', { date: App.formatDate?.(c.face_enrolled_at) || c.face_enrolled_at })
+                            : '';
+                    }
                 }
             } else {
                 exists.classList.add('hidden');

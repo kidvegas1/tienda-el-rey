@@ -354,7 +354,7 @@ if ($method === 'GET') {
         $client['face_enrolled'] = $faceEnrolled;
 
         json_response([
-            'client'            => with_stored_file_urls($client),
+            'client'            => client_face_with_display_urls($client),
             'is_service_bucket' => $isServiceBucket,
             'month_usage'       => $monthUsage,
             'month_limit'       => (float)$client['monthly_limit'],
@@ -833,19 +833,42 @@ if ($method === 'POST') {
             if ($descriptor === null) {
                 json_error('No face detected in the image. Use a clear front-facing Face ID photo.', 400);
             }
-            $path = upload_file($file, 'client-faces');
+            $tmpPath = (string)($file['tmp_name'] ?? '');
+            $thumb = client_face_make_thumb_data_url($tmpPath);
+            if ($thumb === null) {
+                json_error('Could not read Face ID photo. Try another clear JPEG/PNG.', 400);
+            }
+            // Face ID must land in durable storage when configured (no ephemeral disk).
+            $path = upload_file($file, 'client-faces', storage_enabled());
             if (!$path) {
-                json_error('Upload failed');
+                json_error(
+                    storage_enabled()
+                        ? 'Face ID upload to storage failed. Try again in a moment.'
+                        : 'Upload failed',
+                    502
+                );
             }
             $descJson = client_face_encode_descriptor($descriptor);
-            $pdo->prepare(
-                'UPDATE clients
-                 SET face_photo_path = ?,
-                     face_descriptor = ?,
-                     face_consent_at = ' . sql_now() . ',
-                     face_enrolled_at = ' . sql_now() . '
-                 WHERE id = ?'
-            )->execute([$path, $descJson, $clientId]);
+            if (client_face_thumb_column_exists($pdo)) {
+                $pdo->prepare(
+                    'UPDATE clients
+                     SET face_photo_path = ?,
+                         face_photo_thumb = ?,
+                         face_descriptor = ?,
+                         face_consent_at = ' . sql_now() . ',
+                         face_enrolled_at = ' . sql_now() . '
+                     WHERE id = ?'
+                )->execute([$path, $thumb, $descJson, $clientId]);
+            } else {
+                $pdo->prepare(
+                    'UPDATE clients
+                     SET face_photo_path = ?,
+                         face_descriptor = ?,
+                         face_consent_at = ' . sql_now() . ',
+                         face_enrolled_at = ' . sql_now() . '
+                     WHERE id = ?'
+                )->execute([$path, $descJson, $clientId]);
+            }
             client_activity_log(
                 $pdo,
                 $clientId,
@@ -854,11 +877,12 @@ if ($method === 'POST') {
                 (int)$user['id']
             );
             json_response([
-                'success'        => true,
-                'path'           => $path,
-                'path_url'       => stored_file_url($path),
-                'face_enrolled'  => $descriptor !== null,
-                'has_descriptor' => $descriptor !== null,
+                'success'               => true,
+                'path'                  => $path,
+                'path_url'              => stored_file_url($path),
+                'face_photo_display_url'=> $thumb,
+                'face_enrolled'         => true,
+                'has_descriptor'        => true,
             ]);
         }
 
@@ -1101,7 +1125,8 @@ if ($method === 'POST') {
         $pdo->prepare(
             'UPDATE clients
              SET face_photo_path = NULL, face_descriptor = NULL,
-                 face_consent_at = NULL, face_enrolled_at = NULL
+                 face_consent_at = NULL, face_enrolled_at = NULL'
+                . (client_face_thumb_column_exists($pdo) ? ', face_photo_thumb = NULL' : '') . '
              WHERE id = ?'
         )->execute([$clientId]);
         client_activity_log($pdo, $clientId, 'face_cleared', 'Face photo removed', (int)$user['id']);

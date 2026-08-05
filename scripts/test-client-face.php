@@ -29,6 +29,15 @@ assert_true(client_face_parse_descriptor($good) !== null, 'accept array input');
 $encoded = client_face_encode_descriptor($parsed);
 assert_true(is_string($encoded) && str_starts_with($encoded, '['), 'encode descriptor json');
 
+if (function_exists('imagecreatetruecolor')) {
+    $tmp = tempnam(sys_get_temp_dir(), 'face');
+    $im = imagecreatetruecolor(64, 64);
+    imagejpeg($im, $tmp, 85);
+    $thumb = client_face_make_thumb_data_url($tmp);
+    assert_true(is_string($thumb) && str_starts_with($thumb, 'data:image/jpeg;base64,'), 'make face thumb data url');
+    @unlink($tmp);
+}
+
 if ($failures > 0) {
     fwrite(STDERR, "{$failures} test(s) failed\n");
     exit(1);
