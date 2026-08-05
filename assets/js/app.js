@@ -9,7 +9,7 @@ const App = {
 
     // Canonical left-nav order (keep every page identical).
     NAV_ORDER: [
-        'dashboard', 'caja', 'clients', 'company-verification', 'libro-interno', 'schedule',
+        'dashboard', 'caja', 'clients', 'precios-cambio', 'company-verification', 'libro-interno', 'schedule',
         'employees', 'statistics', 'reports', 'analytics', 'metas', 'security', 'reports-center',
         'accounting', 'finances', 'receipts', 'inventory', 'sales-log', 'import', 'stores',
     ],
@@ -485,7 +485,7 @@ const App = {
         const page = location.pathname.split('/').pop() || 'dashboard';
         if (role === 'admin') return;
         // Keep in sync with includes/auth.php auth_admin_only_paths() + reports-center.
-        const adminOnly = ['stores', 'employees', 'analytics', 'metas', 'security', 'reports-center'];
+        const adminOnly = ['stores', 'employees', 'analytics', 'metas', 'security', 'reports-center', 'precios-cambio', 'exchange-prices'];
         const managerPlus = ['import', 'sales-log'];
         document.querySelectorAll('.sidebar-link').forEach(link => {
             const href = link.getAttribute('href');

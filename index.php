@@ -98,6 +98,8 @@ $pageMap = [
     '/metas'          => 'pages/metas.html',
     '/security'       => 'pages/security.html',
     '/stores'         => 'pages/stores.html',
+    '/precios-cambio' => 'pages/precios-cambio.html',
+    '/exchange-prices'=> 'pages/precios-cambio.html',
     '/tienda'         => 'pages/catalog.html',
     '/productos'      => 'pages/catalog.html',
 ];

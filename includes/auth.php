@@ -172,7 +172,7 @@ function auth_can_import_excel(): bool {
 
 /** Paths that only admins may open (HTML routes without leading slash). */
 function auth_admin_only_paths(): array {
-    return ['stores', 'employees', 'analytics', 'metas', 'security', 'reports-center'];
+    return ['stores', 'employees', 'analytics', 'metas', 'security', 'reports-center', 'precios-cambio', 'exchange-prices'];
 }
 
 /** Paths open to store managers and admins. */
