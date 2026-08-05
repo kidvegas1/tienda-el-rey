@@ -267,50 +267,18 @@
             font-size: .65rem !important;
             padding: .35rem .55rem !important;
         }
-        .face-hud__attach {
-            margin-top: .5rem;
-            padding-top: .45rem;
-            border-top: 1px solid rgba(201,162,39,.18);
-        }
-        .face-hud__attach .input {
-            width: 100%;
-            font-size: .72rem !important;
-            padding: .4rem .55rem !important;
-            background: rgba(0,0,0,.35);
-            border-color: rgba(201,162,39,.28);
-            color: #fff;
-        }
-        .face-hud__attach-results {
-            max-height: 8.5rem;
-            overflow-y: auto;
-            margin-top: .35rem;
-            display: flex;
-            flex-direction: column;
-            gap: .25rem;
-        }
-        .face-hud__attach-results .face-attach-pick {
+        #face-attach-results .face-attach-pick {
             width: 100%;
             text-align: left;
-            padding: .4rem .5rem;
-            border-radius: .45rem;
+            padding: .65rem .75rem;
+            border-radius: .65rem;
             border: 1px solid transparent;
-            background: rgba(255,255,255,.04);
-            color: #fff;
-            font-size: .7rem;
+            background: transparent;
             cursor: pointer;
         }
-        .face-hud__attach-results .face-attach-pick:hover {
-            border-color: rgba(201,162,39,.45);
-            background: rgba(201,162,39,.12);
-        }
-        .face-hud__consent {
-            display: flex;
-            align-items: flex-start;
-            gap: .4rem;
-            margin-top: .4rem;
-            font-size: .62rem;
-            color: rgba(232,240,244,.72);
-            line-height: 1.35;
+        #face-attach-results .face-attach-pick:hover {
+            border-color: var(--border, #2a3340);
+            background: var(--bg-elevated, rgba(255,255,255,.04));
         }
         @media (max-width: 640px) {
             .face-hud { right: .5rem; left: .5rem; width: auto; bottom: .5rem; }
@@ -725,10 +693,6 @@
                 <button type="button" class="btn-primary text-xs py-1.5 px-3" id="face-scan-register-btn" data-i18n="clients.face.register_new">Register as New Client</button>
                 <button type="button" class="btn-secondary text-xs py-1.5 px-3" id="face-scan-attach-btn" data-i18n="clients.face.attach_existing">Add Photo to Existing Client</button>
             </div>
-            <div id="face-scan-attach-panel" class="hidden space-y-2 pt-1">
-                <input type="search" id="face-scan-attach-search" class="input text-sm" data-i18n-placeholder="clients.face.attach_search_placeholder" placeholder="Search client by name or code…">
-                <div id="face-scan-attach-results" class="max-h-40 overflow-y-auto space-y-1"></div>
-            </div>
             <label class="flex items-start gap-2 text-xs text-text-secondary">
                 <input type="checkbox" id="face-scan-consent" class="mt-0.5">
                 <span data-i18n="clients.face.consent">Client consents to store a Face ID image for identification at the counter</span>
@@ -922,15 +886,31 @@
                     <button type="button" class="btn-secondary" id="face-dock-add-unknown" data-i18n="clients.face.register_new">Register as New Client</button>
                     <button type="button" class="btn-primary" id="face-dock-attach-btn" data-i18n="clients.face.attach_existing">Add Photo to Existing Client</button>
                 </div>
-                <div id="face-dock-attach-panel" class="face-hud__attach hidden">
-                    <input type="search" id="face-dock-attach-search" class="input" data-i18n-placeholder="clients.face.attach_search_placeholder" placeholder="Search client by name or code…">
-                    <div id="face-dock-attach-results" class="face-hud__attach-results"></div>
-                    <label class="face-hud__consent">
-                        <input type="checkbox" id="face-dock-attach-consent" class="mt-0.5">
-                        <span data-i18n="clients.face.consent">Client consents to store a Face ID photo for identification at the counter</span>
-                    </label>
-                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Attach Face ID to existing client -->
+    <div class="modal-backdrop" id="face-attach-modal-backdrop"></div>
+    <div class="modal-content max-w-lg" id="face-attach-modal">
+        <h3 class="text-lg font-bold mb-1" data-i18n="clients.face.attach_modal_title">Add Face ID to Existing Client</h3>
+        <p class="text-sm text-text-muted mb-4" data-i18n="clients.face.attach_modal_hint">Photo captured. Search and select the client profile to save this Face ID.</p>
+        <div class="flex items-start gap-3 mb-4 p-3 rounded-xl bg-bg-elevated border border-border">
+            <img id="face-attach-preview" alt="" class="w-20 h-20 rounded-lg object-cover bg-black shrink-0">
+            <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1" data-i18n="clients.face.captured">Face ID captured — save to enroll</p>
+                <p class="text-xs text-text-muted" data-i18n="clients.face.attach_search_hint">Type at least 2 characters to search</p>
+            </div>
+        </div>
+        <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2" data-i18n="clients.face.attach_existing">Add Photo to Existing Client</label>
+        <input type="search" id="face-attach-search" class="input text-sm mb-2" data-i18n-placeholder="clients.face.attach_search_placeholder" placeholder="Search client by name or code…" autocomplete="off">
+        <div id="face-attach-results" class="max-h-56 overflow-y-auto space-y-1 mb-3 min-h-[6rem] border border-border rounded-xl p-2 bg-bg-base"></div>
+        <label class="flex items-start gap-2 text-xs text-text-secondary mb-4">
+            <input type="checkbox" id="face-attach-consent" class="mt-0.5">
+            <span data-i18n="clients.face.consent">Client consents to store a Face ID photo for identification at the counter</span>
+        </label>
+        <div class="flex justify-end gap-2">
+            <button type="button" class="btn-secondary" id="face-attach-cancel" data-i18n="action.cancel">Cancel</button>
         </div>
     </div>
 
@@ -964,7 +944,7 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260805-faceid8"></script>
+    <script src="assets/js/i18n.js?v=20260805-faceid9"></script>
     <script src="assets/js/app.js?v=20260805-faceid7"></script>
     <script src="assets/js/face-id.js?v=20260805-faceid7"></script>
     <script>
@@ -1254,22 +1234,17 @@
             });
             document.getElementById('face-dock-new')?.addEventListener('click', () => faceDockRegisterNew());
             document.getElementById('face-dock-add-unknown')?.addEventListener('click', () => faceDockRegisterNew());
-            document.getElementById('face-dock-attach-btn')?.addEventListener('click', () => {
-                const panel = document.getElementById('face-dock-attach-panel');
-                panel?.classList.toggle('hidden');
-                if (panel && !panel.classList.contains('hidden')) {
-                    document.getElementById('face-dock-attach-search')?.focus();
-                    App.applyI18n?.();
-                }
-            });
-            let faceDockAttachSearchTimer = null;
-            document.getElementById('face-dock-attach-search')?.addEventListener('input', (e) => {
-                clearTimeout(faceDockAttachSearchTimer);
+            document.getElementById('face-dock-attach-btn')?.addEventListener('click', () => faceDockStartAttach());
+            document.getElementById('face-attach-cancel')?.addEventListener('click', closeFaceAttachModal);
+            document.getElementById('face-attach-modal-backdrop')?.addEventListener('click', closeFaceAttachModal);
+            let faceAttachModalSearchTimer = null;
+            document.getElementById('face-attach-search')?.addEventListener('input', (e) => {
+                clearTimeout(faceAttachModalSearchTimer);
                 const q = (e.target.value || '').trim();
-                faceDockAttachSearchTimer = setTimeout(
+                faceAttachModalSearchTimer = setTimeout(
                     () => searchClientsForFaceAttach(q, {
-                        resultsId: 'face-dock-attach-results',
-                        onPick: (id, name) => faceDockAttachToClient(id, name),
+                        resultsId: 'face-attach-results',
+                        onPick: (id, name) => saveFaceAttachToClient(id, name),
                     }),
                     250
                 );
@@ -1315,25 +1290,7 @@
                 if (matchId) saveCapturedFaceToClient(matchId);
             });
             document.getElementById('face-scan-register-btn')?.addEventListener('click', registerNewClientFromScan);
-            document.getElementById('face-scan-attach-btn')?.addEventListener('click', () => {
-                const panel = document.getElementById('face-scan-attach-panel');
-                panel?.classList.toggle('hidden');
-                if (panel && !panel.classList.contains('hidden')) {
-                    document.getElementById('face-scan-attach-search')?.focus();
-                }
-            });
-            let faceAttachSearchTimer = null;
-            document.getElementById('face-scan-attach-search')?.addEventListener('input', (e) => {
-                clearTimeout(faceAttachSearchTimer);
-                const q = (e.target.value || '').trim();
-                faceAttachSearchTimer = setTimeout(
-                    () => searchClientsForFaceAttach(q, {
-                        resultsId: 'face-scan-attach-results',
-                        onPick: (id, name) => saveCapturedFaceToClientOrCreate(id, name),
-                    }),
-                    250
-                );
-            });
+            document.getElementById('face-scan-attach-btn')?.addEventListener('click', () => faceScanStartAttach());
 
             document.getElementById('client-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -2721,17 +2678,12 @@
             faceMatchHitId = null;
             document.getElementById('face-match-result')?.classList.add('hidden');
             document.getElementById('face-scan-actions')?.classList.add('hidden');
-            document.getElementById('face-scan-attach-panel')?.classList.add('hidden');
             document.getElementById('face-match-save-hit-btn')?.classList.add('hidden');
             document.getElementById('face-snapshot')?.classList.add('hidden');
             document.getElementById('face-video')?.classList.remove('hidden');
             document.getElementById('face-modal-capture')?.classList.remove('hidden');
             document.getElementById('face-modal-save')?.classList.add('hidden');
             document.getElementById('face-modal-recapture')?.classList.add('hidden');
-            const attachSearch = document.getElementById('face-scan-attach-search');
-            if (attachSearch) attachSearch.value = '';
-            const attachResults = document.getElementById('face-scan-attach-results');
-            if (attachResults) attachResults.innerHTML = '';
             const scanConsent = document.getElementById('face-scan-consent');
             if (scanConsent) scanConsent.checked = false;
             const consentRow = document.getElementById('face-consent-row');
@@ -2833,7 +2785,6 @@
             faceMatchHitId = null;
             document.getElementById('face-match-result')?.classList.add('hidden');
             document.getElementById('face-scan-actions')?.classList.add('hidden');
-            document.getElementById('face-scan-attach-panel')?.classList.add('hidden');
             document.getElementById('face-match-save-hit-btn')?.classList.add('hidden');
             document.getElementById('face-snapshot')?.classList.add('hidden');
             document.getElementById('face-video')?.classList.remove('hidden');
@@ -2898,9 +2849,8 @@
                 return;
             }
             dock.classList.remove('hidden', 'is-match');
-            dock.classList.add('is-large'); // roomier default for CTAs + attach search
+            dock.classList.add('is-large'); // roomier default for CTAs
             setAlwaysScanToggle(true);
-            resetFaceDockAttachPanel();
             const status = document.getElementById('face-dock-status');
             if (status) status.textContent = App.t('clients.face.loading_models');
             try {
@@ -2920,16 +2870,6 @@
             }
         }
 
-        function resetFaceDockAttachPanel() {
-            document.getElementById('face-dock-attach-panel')?.classList.add('hidden');
-            const search = document.getElementById('face-dock-attach-search');
-            if (search) search.value = '';
-            const results = document.getElementById('face-dock-attach-results');
-            if (results) results.innerHTML = '';
-            const consent = document.getElementById('face-dock-attach-consent');
-            if (consent) consent.checked = false;
-        }
-
         function stopFaceDock() {
             if (faceDockTimer) { clearTimeout(faceDockTimer); faceDockTimer = null; }
             FaceId?.stopCamera(faceDockStream);
@@ -2940,7 +2880,6 @@
             dock?.classList.remove('is-match', 'is-large');
             document.getElementById('face-dock-hit')?.classList.add('hidden');
             document.getElementById('face-dock-unknown')?.classList.add('hidden');
-            resetFaceDockAttachPanel();
             setAlwaysScanToggle(false);
         }
 
@@ -2965,7 +2904,6 @@
                             dock?.classList.add('is-match');
                             document.getElementById('face-dock-hit')?.classList.remove('hidden');
                             document.getElementById('face-dock-unknown')?.classList.add('hidden');
-                            resetFaceDockAttachPanel();
                             document.getElementById('face-dock-name').textContent = result.best.name;
                             const openBtn = document.getElementById('face-dock-open');
                             if (openBtn) openBtn.dataset.clientId = String(faceDockHitId);
@@ -3045,12 +2983,89 @@
             }
         }
 
-        async function faceDockAttachToClient(clientId, name) {
-            let id = parseInt(clientId, 10) || 0;
-            if (!document.getElementById('face-dock-attach-consent')?.checked) {
+        let faceAttachBlob = null;
+        let faceAttachDescriptor = null;
+        let faceAttachPreviewUrl = null;
+
+        function closeFaceAttachModal() {
+            App.closeModal('face-attach-modal');
+            faceAttachBlob = null;
+            faceAttachDescriptor = null;
+            if (faceAttachPreviewUrl) {
+                URL.revokeObjectURL(faceAttachPreviewUrl);
+                faceAttachPreviewUrl = null;
+            }
+            const img = document.getElementById('face-attach-preview');
+            if (img) img.removeAttribute('src');
+            const search = document.getElementById('face-attach-search');
+            if (search) search.value = '';
+            const results = document.getElementById('face-attach-results');
+            if (results) results.innerHTML = '';
+            const consent = document.getElementById('face-attach-consent');
+            if (consent) consent.checked = false;
+        }
+
+        function openFaceAttachModal(blob, descriptor) {
+            if (!blob || !descriptor?.length) {
+                App.toast(App.t('clients.face.no_face'), 'warning');
+                return;
+            }
+            faceAttachBlob = blob;
+            faceAttachDescriptor = descriptor;
+            if (faceAttachPreviewUrl) URL.revokeObjectURL(faceAttachPreviewUrl);
+            faceAttachPreviewUrl = URL.createObjectURL(blob);
+            const img = document.getElementById('face-attach-preview');
+            if (img) {
+                img.src = faceAttachPreviewUrl;
+                img.alt = App.t('clients.face.alt');
+            }
+            const search = document.getElementById('face-attach-search');
+            if (search) search.value = '';
+            const results = document.getElementById('face-attach-results');
+            if (results) {
+                results.innerHTML = `<p class="text-xs text-text-muted p-2">${App.t('clients.face.attach_search_hint')}</p>`;
+            }
+            const consent = document.getElementById('face-attach-consent');
+            if (consent) consent.checked = false;
+            App.applyI18n?.();
+            App.openModal('face-attach-modal');
+            setTimeout(() => document.getElementById('face-attach-search')?.focus(), 80);
+        }
+
+        async function faceDockStartAttach() {
+            try {
+                App.toast(App.t('clients.face.detecting'), 'info');
+                const capture = await faceDockCaptureFace();
+                stopFaceDock();
+                openFaceAttachModal(capture.blob, capture.descriptor);
+            } catch (err) {
+                App.toast(faceErrorMessage(err), 'danger');
+            }
+        }
+
+        async function faceScanStartAttach() {
+            if (faceMode !== 'match') return;
+            try {
+                if (!(await ensureScanCapture())) return;
+                const blob = faceCaptureBlob;
+                const descriptor = faceCaptureDescriptor;
+                closeFaceModal();
+                openFaceAttachModal(blob, descriptor);
+            } catch (err) {
+                App.toast(faceErrorMessage(err), 'danger');
+            }
+        }
+
+        async function saveFaceAttachToClient(clientId, name) {
+            if (!faceAttachBlob || !faceAttachDescriptor?.length) {
+                App.toast(App.t('clients.face.no_face'), 'warning');
+                return;
+            }
+            if (!document.getElementById('face-attach-consent')?.checked) {
                 App.toast(App.t('clients.face.consent_required'), 'warning');
                 return;
             }
+            let id = parseInt(clientId, 10) || 0;
             try {
                 if (!id) {
                     if (!String(name || '').trim()) {
@@ -3065,11 +3080,11 @@
                     id = parseInt(created.client_id, 10) || 0;
                     if (!id) throw Object.assign(new Error(App.t('clients.face.no_client')), { code: 'no_client' });
                 }
-                const capture = await faceDockCaptureFace();
-                await uploadFaceForClient(id, capture.blob, capture.descriptor, true);
+                App.toast(App.t('clients.face.attach_saving'), 'info');
+                await uploadFaceForClient(id, faceAttachBlob, faceAttachDescriptor, true);
                 faceRoster = null;
+                closeFaceAttachModal();
                 App.toastKey('clients.toast.face_saved', 'success');
-                stopFaceDock();
                 await openClient(id);
             } catch (err) {
                 App.toast(faceErrorMessage(err), 'danger');
@@ -3129,16 +3144,16 @@
         }
 
         async function searchClientsForFaceAttach(query, options = {}) {
-            const box = document.getElementById(options.resultsId || 'face-scan-attach-results');
+            const box = document.getElementById(options.resultsId || 'face-attach-results');
             const onPick = typeof options.onPick === 'function'
                 ? options.onPick
-                : (id, name) => saveCapturedFaceToClientOrCreate(id, name);
+                : (id, name) => saveFaceAttachToClient(id, name);
             if (!box) return;
             if (!query || query.length < 2) {
-                box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.attach_search_hint')}</p>`;
+                box.innerHTML = `<p class="text-xs text-text-muted p-2">${App.t('clients.face.attach_search_hint')}</p>`;
                 return;
             }
-            box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.detecting')}</p>`;
+            box.innerHTML = `<p class="text-xs text-text-muted p-2">${App.t('clients.face.detecting')}</p>`;
             try {
                 // activity=both includes envíos, cheques, and orphan check-cashers
                 const res = await App.api(
@@ -3147,19 +3162,20 @@
                 );
                 const rows = res.clients || res.data || [];
                 if (!rows.length) {
-                    box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.attach_none')}</p>`;
+                    box.innerHTML = `<p class="text-xs text-text-muted p-2">${App.t('clients.face.attach_none')}</p>`;
                     return;
                 }
-                box.innerHTML = rows.slice(0, 12).map((c) => {
+                box.innerHTML = rows.slice(0, 16).map((c) => {
                     const id = parseInt(c.id, 10) || 0;
                     const kind = c.row_kind === 'check_casher' || c.is_check_only
                         ? App.t('clients.activity.checks_short')
                         : (c.client_code || '');
+                    const phone = c.phone ? String(c.phone) : '';
                     return `
                     <button type="button" class="face-attach-pick"
                         data-id="${id}" data-name="${escHtml(c.name || '')}">
-                        <span class="font-medium">${escHtml(c.name || '')}</span>
-                        <span class="text-xs text-text-muted ml-2">${escHtml(kind)}</span>
+                        <span class="block text-sm font-semibold text-text-primary">${escHtml(c.name || '')}</span>
+                        <span class="block text-xs text-text-muted mt-0.5">${escHtml([kind, phone].filter(Boolean).join(' · '))}</span>
                     </button>`;
                 }).join('');
                 box.querySelectorAll('.face-attach-pick').forEach((btn) => {
@@ -3170,7 +3186,7 @@
                     });
                 });
             } catch (err) {
-                box.innerHTML = `<p class="text-xs text-danger">${escHtml(err.message)}</p>`;
+                box.innerHTML = `<p class="text-xs text-danger p-2">${escHtml(err.message)}</p>`;
             }
         }
 
