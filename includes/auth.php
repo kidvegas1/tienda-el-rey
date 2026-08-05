@@ -281,8 +281,12 @@ function auth_require_stored_path_access(string $storedPath): void {
         return;
     }
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT id FROM clients WHERE sender_id_path = ? OR income_doc_path = ? LIMIT 1');
-    $stmt->execute([$storedPath, $storedPath]);
+    $stmt = $pdo->prepare(
+        'SELECT id FROM clients
+         WHERE sender_id_path = ? OR income_doc_path = ? OR face_photo_path = ?
+         LIMIT 1'
+    );
+    $stmt->execute([$storedPath, $storedPath, $storedPath]);
     $client = $stmt->fetch();
     if ($client) {
         auth_require_client_store_access($pdo, (int)$client['id']);

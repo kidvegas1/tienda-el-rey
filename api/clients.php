@@ -830,11 +830,14 @@ if ($method === 'POST') {
                 json_error('Face photo must be an image (jpg, png, webp)', 400);
             }
             $descriptor = client_face_parse_descriptor($_POST['descriptor'] ?? null);
+            if ($descriptor === null) {
+                json_error('No face detected in the image. Use a clear front-facing Face ID photo.', 400);
+            }
             $path = upload_file($file, 'client-faces');
             if (!$path) {
                 json_error('Upload failed');
             }
-            $descJson = $descriptor !== null ? client_face_encode_descriptor($descriptor) : null;
+            $descJson = client_face_encode_descriptor($descriptor);
             $pdo->prepare(
                 'UPDATE clients
                  SET face_photo_path = ?,
@@ -847,7 +850,7 @@ if ($method === 'POST') {
                 $pdo,
                 $clientId,
                 'face_enrolled',
-                $descriptor !== null ? 'Face photo + descriptor enrolled' : 'Face photo saved (no descriptor)',
+                'Face ID image + descriptor enrolled',
                 (int)$user['id']
             );
             json_response([

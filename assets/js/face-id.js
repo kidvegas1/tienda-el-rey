@@ -1,12 +1,15 @@
 /**
  * Browser face detect + match via @vladmandic/human (CDN).
- * ponytail: cosine similarity locally; server only stores descriptors.
+ * Cosine similarity locally; server only stores descriptors.
  */
 (function (global) {
     const MODEL_BASE = 'https://cdn.jsdelivr.net/npm/@vladmandic/human@3.3.6/models/';
     const HUMAN_SRC = 'https://cdn.jsdelivr.net/npm/@vladmandic/human@3.3.6/dist/human.js';
-    // Human face description similarity is typically ~0.5+ for same person
-    const MATCH_THRESHOLD = 0.45;
+    // Different people in this store scored ~0.41; same person is typically 0.65+.
+    // Keep threshold high and require a clear gap vs the runner-up.
+    const MATCH_THRESHOLD = 0.58;
+    const MATCH_MARGIN = 0.08;
+    const MIN_FACE_SCORE = 0.45;
 
     let human = null;
     let loadPromise = null;
@@ -90,6 +93,9 @@
         if (!face?.embedding?.length) {
             return { ok: false, error: 'no_face', face: null };
         }
+        if ((face.score || 0) < MIN_FACE_SCORE) {
+            return { ok: false, error: 'low_quality', face, score: face.score || 0 };
+        }
         return {
             ok: true,
             descriptor: Array.from(face.embedding),
@@ -98,20 +104,46 @@
         };
     }
 
-    function matchDescriptor(descriptor, roster, threshold = MATCH_THRESHOLD) {
-        let best = null;
+    /**
+     * Match descriptor against roster.
+     * Requires score >= threshold AND clear margin over second-best.
+     */
+    function matchDescriptor(descriptor, roster, threshold = MATCH_THRESHOLD, margin = MATCH_MARGIN) {
+        const scored = [];
         for (const row of roster || []) {
             const emb = row.descriptor;
             if (!Array.isArray(emb) || !emb.length) continue;
-            const score = cosineSimilarity(descriptor, emb);
-            if (!best || score > best.score) {
-                best = { id: row.id, name: row.name, score };
-            }
+            scored.push({
+                id: row.id,
+                name: row.name,
+                score: cosineSimilarity(descriptor, emb),
+            });
         }
+        scored.sort((a, b) => b.score - a.score);
+        const best = scored[0] || null;
+        const second = scored[1] || null;
         if (!best || best.score < threshold) {
-            return { matched: false, best };
+            return { matched: false, reason: 'below_threshold', best, second };
         }
-        return { matched: true, best };
+        if (second && (best.score - second.score) < margin) {
+            return { matched: false, reason: 'ambiguous', best, second };
+        }
+        return { matched: true, best, second };
+    }
+
+    async function detectFromFile(file) {
+        const url = URL.createObjectURL(file);
+        try {
+            const img = await new Promise((resolve, reject) => {
+                const el = new Image();
+                el.onload = () => resolve(el);
+                el.onerror = () => reject(new Error('Could not read image'));
+                el.src = url;
+            });
+            return detectDescriptor(img);
+        } finally {
+            URL.revokeObjectURL(url);
+        }
     }
 
     async function startCamera(videoEl, facingMode = 'user') {
@@ -142,8 +174,11 @@
 
     global.FaceId = {
         MATCH_THRESHOLD,
+        MATCH_MARGIN,
+        MIN_FACE_SCORE,
         ensureHuman,
         detectDescriptor,
+        detectFromFile,
         matchDescriptor,
         cosineSimilarity,
         startCamera,
