@@ -909,7 +909,7 @@
         <div id="other-services-list" class="space-y-2"></div>
     </div>
 
-    <script src="assets/js/i18n.js?v=20260805-faceid5"></script>
+    <script src="assets/js/i18n.js?v=20260805-faceid6"></script>
     <script src="assets/js/app.js?v=20260801-gaps"></script>
     <script src="assets/js/face-id.js?v=20260805-faceid4"></script>
     <script>
@@ -1260,19 +1260,30 @@
                         monthly_limit: parseFloat(fd.get('monthly_limit')) || 5000,
                         notes: fd.get('notes'),
                     });
-                    App.closeModal('client-modal');
-                    App.toast(id ? App.t('clients.toast.client_updated') : App.t('clients.toast.client_added'), 'success');
                     const newId = id ? parseInt(id, 10) : (res.client_id ? parseInt(res.client_id, 10) : 0);
-                    if (!id && pendingFaceBlob && newId) {
+                    // New client OR retry after face failed (form has id + pending face)
+                    if (pendingFaceBlob && newId) {
                         try {
                             await uploadFaceForClient(newId, pendingFaceBlob, pendingFaceDescriptor, true);
                             clearPendingFace();
+                            App.closeModal('client-modal');
+                            App.toast(id ? App.t('clients.toast.client_updated') : App.t('clients.toast.client_added'), 'success');
+                            App.toastKey('clients.toast.face_saved', 'success');
+                            await openClient(newId);
+                            return;
                         } catch (faceErr) {
-                            App.toast(faceErr.message, 'warning');
+                            // Keep modal + pending face so staff can retry — do not lose the capture
+                            App.toast(
+                                (faceErr.message || App.t('clients.face.no_face')) + ' — ' + App.t('clients.face.retry_after_create'),
+                                'danger'
+                            );
+                            document.querySelector('#client-form [name=id]').value = String(newId);
+                            document.getElementById('client-modal-title').textContent = App.t('clients.face.finish_face_for_client');
+                            return;
                         }
-                        await openClient(newId);
-                        return;
                     }
+                    App.closeModal('client-modal');
+                    App.toast(id ? App.t('clients.toast.client_updated') : App.t('clients.toast.client_added'), 'success');
                     clearPendingFace();
                     if (currentClientId) loadClientDetail(currentClientId);
                     else loadClients();
@@ -2476,16 +2487,35 @@
         }
 
         async function uploadFaceForClient(clientId, blob, descriptor, consent) {
-            if (!descriptor?.length) {
+            let desc = Array.isArray(descriptor) ? descriptor : null;
+            // Re-detect from image if descriptor missing/corrupt before giving up
+            if ((!desc?.length || desc.some((n) => !Number.isFinite(n))) && blob && globalThis.FaceId?.detectFromFile) {
+                await FaceId.ensureHuman();
+                const det = await FaceId.detectFromFile(blob);
+                if (det.ok) desc = det.descriptor;
+            }
+            if (!desc?.length) {
                 throw new Error(App.t('clients.face.no_face'));
             }
+            const fileBlob = blob instanceof Blob
+                ? blob
+                : new Blob([blob], { type: 'image/jpeg' });
             const fd = new FormData();
             fd.append('action', 'upload_face');
             fd.append('client_id', String(clientId));
             fd.append('consent', consent ? '1' : '0');
-            fd.append('face_file', blob, 'face.jpg');
-            fd.append('descriptor', JSON.stringify(descriptor));
-            return App.apiForm('/api/clients', fd);
+            fd.append('face_file', fileBlob, 'face.jpg');
+            fd.append('descriptor', JSON.stringify(desc));
+            let lastErr = null;
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    return await App.apiForm('/api/clients', fd);
+                } catch (err) {
+                    lastErr = err;
+                    await new Promise((r) => setTimeout(r, 400));
+                }
+            }
+            throw lastErr || new Error(App.t('clients.face.no_face'));
         }
 
         function triggerFaceFileUpload(mode) {
@@ -2928,27 +2958,61 @@
             }
             box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.detecting')}</p>`;
             try {
-                const res = await App.api('GET', App.withStoreQuery(`/api/clients?search=${encodeURIComponent(query)}&page=1`));
+                // activity=both includes envíos, cheques, and orphan check-cashers
+                const res = await App.api(
+                    'GET',
+                    App.withStoreQuery(`/api/clients?search=${encodeURIComponent(query)}&page=1&activity=both&sort=name`)
+                );
                 const rows = res.clients || res.data || [];
                 if (!rows.length) {
                     box.innerHTML = `<p class="text-xs text-text-muted">${App.t('clients.face.attach_none')}</p>`;
                     return;
                 }
-                box.innerHTML = rows.slice(0, 8).map((c) => `
-                    <button type="button" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-bg-elevated border border-transparent hover:border-border text-sm face-attach-pick" data-id="${c.id}">
+                box.innerHTML = rows.slice(0, 12).map((c) => {
+                    const id = parseInt(c.id, 10) || 0;
+                    const kind = c.row_kind === 'check_casher' || c.is_check_only
+                        ? App.t('clients.activity.checks_short')
+                        : (c.client_code || '');
+                    return `
+                    <button type="button" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-bg-elevated border border-transparent hover:border-border text-sm face-attach-pick"
+                        data-id="${id}" data-name="${escHtml(c.name || '')}">
                         <span class="font-medium">${escHtml(c.name || '')}</span>
-                        <span class="text-xs text-text-muted ml-2">${escHtml(c.client_code || '')}</span>
-                    </button>
-                `).join('');
+                        <span class="text-xs text-text-muted ml-2">${escHtml(kind)}</span>
+                    </button>`;
+                }).join('');
                 box.querySelectorAll('.face-attach-pick').forEach((btn) => {
                     btn.addEventListener('click', () => {
-                        const id = parseInt(btn.getAttribute('data-id'), 10);
-                        if (id) saveCapturedFaceToClient(id);
+                        const id = parseInt(btn.getAttribute('data-id'), 10) || 0;
+                        const name = btn.getAttribute('data-name') || '';
+                        saveCapturedFaceToClientOrCreate(id, name);
                     });
                 });
             } catch (err) {
                 box.innerHTML = `<p class="text-xs text-danger">${escHtml(err.message)}</p>`;
             }
+        }
+
+        async function saveCapturedFaceToClientOrCreate(clientId, name) {
+            let id = clientId;
+            if (!id) {
+                if (!name.trim()) {
+                    App.toast(App.t('clients.face.attach_none'), 'warning');
+                    return;
+                }
+                try {
+                    const created = await App.api('POST', '/api/clients', {
+                        action: 'create',
+                        name: name.trim(),
+                        monthly_limit: 5000,
+                    });
+                    id = parseInt(created.client_id, 10) || 0;
+                    if (!id) throw new Error(App.t('clients.face.no_client'));
+                } catch (err) {
+                    App.toast(err.message, 'danger');
+                    return;
+                }
+            }
+            await saveCapturedFaceToClient(id);
         }
 
         async function onFaceSave() {

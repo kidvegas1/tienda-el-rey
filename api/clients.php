@@ -833,35 +833,48 @@ if ($method === 'POST') {
             }
             $descriptor = client_face_parse_descriptor($_POST['descriptor'] ?? null);
             if ($descriptor === null) {
-                json_error('No face detected in the image. Use a clear front-facing Face ID photo.', 400);
+                error_log('[face] upload_face rejected: invalid/missing descriptor client_id=' . $clientId);
+                json_error('No face data in upload. Capture again with a clear front-facing Face ID photo.', 400);
             }
             $tmpPath = (string)($file['tmp_name'] ?? '');
-            $thumb = client_face_make_thumb_data_url($tmpPath);
-            if ($thumb === null) {
-                json_error('Could not read Face ID photo. Try another clear JPEG/PNG.', 400);
+            if ($tmpPath === '' || !is_file($tmpPath)) {
+                error_log('[face] upload_face rejected: missing tmp file client_id=' . $clientId);
+                json_error('No photo provided', 400);
             }
-            // Face ID must land in durable storage when configured (no ephemeral disk).
-            $path = upload_file($file, 'client-faces', storage_enabled());
-            if (!$path) {
-                json_error(
-                    storage_enabled()
-                        ? 'Face ID upload to storage failed. Try again in a moment.'
-                        : 'Upload failed',
-                    502
-                );
+            // Relax empty browser MIME when extension is an image.
+            if ($mime === '' || $mime === 'application/octet-stream') {
+                $mime = match ($ext) {
+                    'png' => 'image/png',
+                    'webp' => 'image/webp',
+                    default => 'image/jpeg',
+                };
+                $file['type'] = $mime;
+            }
+            $thumb = client_face_make_thumb_data_url($tmpPath);
+            // ponytail: thumb is the durable profile image; storage is best-effort for full file
+            $path = upload_file($file, 'client-faces', false);
+            if ($path === false) {
+                $path = null;
+            }
+            if ($thumb === null && ($path === null || $path === '')) {
+                error_log('[face] upload_face rejected: no thumb and no storage path client_id=' . $clientId);
+                json_error('Could not save Face ID photo. Try a clear JPEG/PNG.', 400);
             }
             $descJson = client_face_encode_descriptor($descriptor);
             if (client_face_thumb_column_exists($pdo)) {
                 $pdo->prepare(
                     'UPDATE clients
                      SET face_photo_path = ?,
-                         face_photo_thumb = ?,
+                         face_photo_thumb = COALESCE(?, face_photo_thumb),
                          face_descriptor = ?,
                          face_consent_at = ' . sql_now() . ',
                          face_enrolled_at = ' . sql_now() . '
                      WHERE id = ?'
                 )->execute([$path, $thumb, $descJson, $clientId]);
             } else {
+                if ($path === null || $path === '') {
+                    json_error('Face ID storage unavailable and thumb column missing. Apply 019_client_face_thumb.sql.', 503);
+                }
                 $pdo->prepare(
                     'UPDATE clients
                      SET face_photo_path = ?,
@@ -875,16 +888,20 @@ if ($method === 'POST') {
                 $pdo,
                 $clientId,
                 'face_enrolled',
-                'Face ID image + descriptor enrolled',
+                $path
+                    ? 'Face ID image + descriptor enrolled'
+                    : 'Face ID thumb + descriptor enrolled (storage path unavailable)',
                 (int)$user['id']
             );
+            $display = $thumb ?: ($path ? stored_file_url($path) : '');
             json_response([
-                'success'               => true,
-                'path'                  => $path,
-                'path_url'              => stored_file_url($path),
-                'face_photo_display_url'=> $thumb,
-                'face_enrolled'         => true,
-                'has_descriptor'        => true,
+                'success'                => true,
+                'path'                   => $path,
+                'path_url'               => $path ? stored_file_url($path) : '',
+                'face_photo_display_url' => $display,
+                'face_enrolled'          => true,
+                'has_descriptor'         => true,
+                'stored_remote'          => is_string($path) && str_starts_with($path, 'storage://'),
             ]);
         }
 

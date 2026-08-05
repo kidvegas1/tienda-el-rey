@@ -20,7 +20,11 @@ function client_face_parse_descriptor(mixed $raw): ?array {
         if (!is_numeric($v)) {
             return null;
         }
-        $out[] = (float)$v;
+        $f = (float)$v;
+        if (!is_finite($f)) {
+            return null;
+        }
+        $out[] = $f;
     }
     // ponytail: Human/face-api descriptors are typically 128–1024 floats
     $n = count($out);
